@@ -58,9 +58,23 @@ The direction of the previously reported dissociation was therefore
 reproduced, and reproduced with high statistical confidence. Its magnitude
 was not. The mean probe-minus-Mahalanobis AUROC gap was
 $1.6\times10^{-3}$ (range $1.567\times10^{-3}$ to $1.666\times10^{-3}$ across
-configurations), against a gap of approximately $0.3$ in the convolutional
-setting where the dissociation was originally
-reported~\cite{tran2026decodable} --- a ratio of roughly $200$. Distance-based estimators were already operating near
+configurations). The comparison figure in the convolutional setting depends on
+a convention that source makes explicit, so we state both. Under the directed
+higher-distance-is-more-OOD convention its linear probes stand $0.333$ above
+Mahalanobis, a ratio of roughly $200$ against the present gap. Read
+orientation-free, as $\max(\mathrm{AUROC}, 1-\mathrm{AUROC})$, the same
+comparison gives $0.137$ and a ratio of roughly $86$, because a directed AUROC
+of $0.402$ there reflects an inverted ordering rather than an absent
+signal~\cite{tran2026decodable}.
+
+The two settings are therefore not measuring one quantity, and the ratio should
+not be read as though they were. Here both quantities sit near ceiling and the
+gap is compressed against it; there, the gap is dominated by a sign inversion
+in the estimator. What survives the difference in convention is the direction
+and the order of magnitude: the separation between what a probe recovers and
+what a distance-based estimator delivers is roughly two orders of magnitude
+smaller in this regime under either reading ($10^{2.3}$ directed,
+$10^{1.9}$ orientation-free). Distance-based estimators were already operating near
 ceiling on the unmodified representation, with Reference-arm AUROC of
 $0.9984$ (Mahalanobis), $0.9979$ (nearest-neighbour), $0.9805$ (cosine), and
 $0.8942$ (kernel density).
