@@ -16,17 +16,27 @@
 % If option A is taken, replace the Preregistration section below with the
 % DOI citation and delete the "available from the authors" clause.
 %
-% REMAINING PLACEHOLDERS -- must be resolved before submission, none from
-% memory:
-%   - Funding: confirm whether any grant or institutional support requires
-%     acknowledgment. If none, delete the sentence rather than softening it.
-%   - Repository: code and frozen artifacts exist locally under ../../PhaseB/
-%     but have NOT been published. Either publish and insert the real URL/DOI,
-%     or delete the availability sentence. Do not promise availability that
-%     does not exist.
-%   - JBHI placement: confirm whether availability and declarations belong in
-%     the acknowledgment or a separate declarations section under the
-%     journal's current author guidelines.
+% STATUS 2026-08-28.
+%
+% Preregistration wording: option B remains implemented, and the section now
+% also states what option A would and would not buy. Depositing the protocol
+% today makes it readable; it does not establish that it preceded the runs,
+% because a deposit dated after execution cannot. The priority evidence is the
+% 2026-08-04 checksum against the 2026-08-05 run artifacts, both under our own
+% control, and the section says so in those terms. If a deposit is made, add
+% the DOI as access, not as proof of timing.
+%
+% Availability: option (b) is now written as printed text rather than left as
+% a commented choice. PhaseB is under version control as of 2026-08-28 but has
+% no remote, so no public URL exists to insert. Switching to (a) is a one-line
+% edit once a deposit is made.
+%
+% Funding: no funding sentence appears below. Confirm no grant or institutional
+% support requires acknowledgment; if one does, add it rather than omitting it.
+%
+% Venue: the JBHI placement question is withdrawn -- the target venue is no
+% longer JBHI and is not yet fixed. Recheck section placement against whichever
+% author guidelines apply before submission.
 
 \section*{Acknowledgment}
 
@@ -38,14 +48,22 @@ for releasing pretrained weights.
 
 \section*{Preregistration and Reproducibility}
 
-Prior to any execution, a protocol document specifying the claims to be
-tested, the statistical test for each claim, the gate criteria, and the
-multiplicity-correction family was finalized and cryptographically
-checksummed. This document was not deposited with a public preregistration
-registry; the record is internal, timestamped, and available from the authors
-on request. All statistical analyses reported here follow that document, and
-deviations arising during execution were recorded as dated amendments rather
-than applied silently.
+Prior to any execution, a protocol document specifying the claims to be tested,
+the statistical test for each claim, the gate criteria, and the
+multiplicity-correction family was finalized and cryptographically checksummed.
+That document is dated 2026-08-04 and the earliest canonical run artifact is
+dated 2026-08-05, so the plan precedes the results it governs. All statistical
+analyses reported here follow it, and deviations arising during execution were
+recorded as dated amendments rather than applied silently.
+
+We state the limits of that evidence rather than leave them to be inferred. The
+protocol was not lodged with a third-party registry before execution, so its
+priority rests on file timestamps and checksums under our own control rather
+than on an independent record. Depositing it now would make the document
+readable but would not establish its timing, and we do not present a post hoc
+deposit as though it did. Readers who require independent temporal evidence
+should treat the plan as prespecified and internally documented rather than as
+externally registered.
 
 Result artifacts were frozen on completion, with per-file checksums recorded
 in a manifest, so that every number reported in this manuscript is traceable
@@ -53,16 +71,22 @@ to an immutable file.
 
 \section*{Data and Code Availability}
 
-Both datasets used in this study are publicly available from their original
-sources.
-%
-% ACTION BEFORE SUBMISSION -- deliberately a comment, not printed text, so
-% that nothing bracketed can reach a reviewer if this file is compiled as-is.
-% Choose one and uncomment it:
-%
-%   (a) public deposit made:
-% Analysis code and the frozen result artifacts are available at [URL/DOI].
-%
-%   (b) no public deposit:
-% Analysis code and the frozen result artifacts are available from the
-% authors on request.
+Both datasets are publicly available from their original sources: ISIC
+2019~\cite{tschandl2018ham10000,hernandezperez2024bcn20000,codella2018isbi} and
+PAD-UFES-20~\cite{pacheco2020padufes}. Neither is redistributed here. The
+frozen backbone is the released PanDerm ViT-L/16
+checkpoint~\cite{yan2025panderm}, used without modification and pinned by
+SHA-256 in the artifact manifest; it is obtained from its authors rather than
+from us.
+
+The per-checkpoint matrix underlying the comparison in
+Section~\ref{sec:results} is published with the study it comes
+from~\cite{tran2026decodable}, so the figure this paper cites can be recomputed
+independently rather than read off a plot.
+
+Analysis code, the trained adapters for all three arms and five seeds, the
+extracted representations, and the per-file checksum manifest are held under
+version control with the frozen artifacts they describe, and are available from
+the authors on request pending deposit at submission. We state availability
+this way because the deposit has not yet been made; nothing here is promised
+that does not exist.
