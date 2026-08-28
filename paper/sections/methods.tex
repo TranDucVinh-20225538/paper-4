@@ -206,10 +206,13 @@ and spectral-decay slope is reported in Section~\ref{sec:results}.
 
 A geometry metric is interpretable as a predictor of a scorer's ranking only if
 the operator that moves the metric also moves the structure the scorer reads.
-The two are routinely conflated: a metric is computed on a representation, an
-AUROC is computed from a scorer applied to the same representation, and their
-covariation across conditions is read as evidence that the geometry explains the
-ranking. That inference requires a step that is rarely checked. This subsection
+The inference at issue runs as follows: a metric is computed on a
+representation, an AUROC is computed from a scorer applied to the same
+representation, and their covariation across conditions is read as support for
+the geometry explaining the ranking. The cross-backbone association this study
+examines~\cite{yu2510dissecting} has that form. Whether the metric and the
+scorer are sensitive to the same structure is a separate question, and it is
+prior to the reading. This subsection
 supplies it for the operator of \eqref{eq:tempering}, and the answer separates
 the estimators of Section~\ref{sec:estimators} into two classes.
 
