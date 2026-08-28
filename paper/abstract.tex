@@ -1,56 +1,52 @@
 % abstract.tex -- standalone abstract, \input into paper.tex and also kept
 % separate for submission portals that require the abstract as its own file.
 %
-% v2 (2026-08-06). REBUILT, not patched, after primary-source verification
-% overturned the v1 framing. v1 said the account "transfers" to foundation
-% models; arXiv:2510.15202v3 is itself a study across foundation-model
-% backbones, so that premise was false. See ../27_One_Sentence_Paper.md for
-% the withdrawn v1 and the three-position structure this version follows.
+% v3 (2026-08-28). Reframed from "causal evaluation with limited support" to a
+% boundary study, per PI direction. The evidence is unchanged; what changes is
+% the claim it is asked to carry. v2 let the framing imply a hypothesis test
+% that five seeds and uniformly non-significant p-values cannot support. The
+% boundary claim is one the same evidence does support.
 %
-% Claim-level constraints enforced here:
-%   - the two prior observations are kept SEPARATE: the dissociation (CNNs)
-%     and the geometry-performance association (FM backbones, correlational).
-%   - the link between them is stated as OUR hypothesis, not prior work.
+% Claim-level constraints carried over from v2 and still enforced:
+%   - the two prior observations stay SEPARATE: the dissociation (CNNs) and
+%     the geometry-performance association (FM backbones, correlational).
 %   - "account" / "explanation", never "mechanism".
 %   - the dissociation is REPRODUCED IN DIRECTION but ~2 orders of magnitude
 %     smaller -- never "absent", "not reproduced", "fails".
-%   - condition number: empirical association only, no interpretation.
 %   - no priority claim, no "transfer".
+% New in v3:
+%   - the invariance result is stated as a result, not a caveat.
+%   - the near-ceiling regime is named as the boundary, not apologised for.
 
-Distance-based estimators are widely used to flag domain-shifted inputs
-before a clinical model acts on them. Two observations motivate this study.
-On convolutional representations, a linear probe recovered acquisition-domain
-identity while distance-based estimators on the same representations
-performed near chance---a dissociation between decodable and accessible
-information. Separately, across frozen vision foundation-model backbones,
-local intrinsic dimensionality (LID) and within-class spectral decay were
-found to track how well such estimators perform. Whether the second explains
-the first has not been tested: the reported association is correlational
-across backbones, and does not establish that intervening on geometry within
-a backbone changes what these estimators recover. We evaluated that
-hypothesis on a frozen dermatology foundation model (PanDerm ViT-L/16), with
-ISIC 2019 as the in-distribution population and PAD-UFES-20 as the
-domain-shifted population; neither dataset formed part of the backbone's
-pretraining corpus. Rather than proposing a new detector, we assessed an
-explanatory hypothesis under a preregistered protocol in which claims,
-statistical tests, and multiplicity correction were fixed before execution.
-Representations were reshaped post hoc along an intervention-strength ladder
-against a matched-budget fine-tuning control. An implementation-integrity
-gate confirmed that domain information and in-distribution task performance
-persisted after intervention, and a manipulation check confirmed that the
-targeted geometry was measurably altered before any causal comparison was
-interpreted. Four estimators---Mahalanobis, cosine-to-centroid,
-$k$-nearest-neighbour, and kernel density---were evaluated across five seeds
-with Holm--Bonferroni correction. The probe--reliability dissociation
-remained statistically detectable but was approximately two orders of
-magnitude smaller than originally reported (mean AUROC gap $\approx$0.002
-versus $\approx$0.3), with estimators already near ceiling on the unmodified
-representation. LID and spectral-decay slope showed no Holm-significant
-association with estimator performance; condition number was consistently
-associated with all four. A comparison matching geometry across differing
-nominal intervention strengths yielded no Holm-significant difference in
-degradation. These results provide limited empirical support for a causal
-explanatory reading of the geometry--performance association under the
-evaluated backbone, layer, and task, and indicate that associations observed
-across representations warrant direct intervention-based evaluation before
-being interpreted as explanatory.
+Distance-based estimators are widely used to flag domain-shifted inputs before
+a clinical model acts on them, and representation geometry has been reported to
+track how well they perform across frozen foundation-model backbones. Reading
+that association as an explanation requires a step correlational comparison
+cannot supply: the geometry a metric measures must be geometry the scorer
+actually reads. We make that requirement precise and then evaluate it. We show
+that the spectral-tempering operator used to match geometry sets the condition
+number in closed form, $\kappa(\Sigma')=\kappa(\Sigma)^{1-\gamma}$, while
+leaving Mahalanobis scoring exactly invariant once its parameters are refit; for
+that estimator the geometry-matched comparison therefore has no difference
+available to detect, and its null is entailed by the algebra rather than
+measured. Cosine, $k$-nearest-neighbour, and kernel-density scoring are not
+invariant and remain admissible. Empirically, we report a preregistered
+within-backbone intervention study on a frozen dermatology foundation model
+(PanDerm ViT-L/16), with ISIC 2019 in-distribution and PAD-UFES-20
+domain-shifted, neither in the pretraining corpus. Backbone, feature layer,
+splits, and scorer definitions are held fixed while the representation is
+reshaped along a dose ladder against a matched-budget control, with
+implementation-integrity gating, an explicit manipulation check, and
+multiplicity correction fixed before execution. Domain information and
+in-distribution task performance persisted after intervention, and the targeted
+geometry moved measurably, so the absence of a relationship is not an artefact
+of a destroyed representation. The probe--reliability dissociation reproduced in
+direction but roughly two orders of magnitude smaller than originally reported
+(mean AUROC gap $\approx$0.002 versus $\approx$0.3), with all estimators above
+0.99 on the unmodified representation. We therefore do not report a test of the
+explanatory account. We report the boundary of where it can be tested: a regime
+in which every estimator already exceeds 0.99 leaves this design little room to
+observe an account operating, and in which one of the four estimators cannot
+respond to the manipulation at all. This locates what such an evaluation
+requires, and it is a claim about what the present study can support, not about
+what holds in regimes it did not evaluate.

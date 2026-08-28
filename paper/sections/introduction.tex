@@ -75,16 +75,17 @@ in the sense the dissociation would require, such an intervention should
 change what distance-based estimators recover from a representation whose
 domain content is otherwise preserved.
 
-We evaluated that hypothesis on a frozen dermatology foundation model, within
-a single fixed backbone rather than across backbones. Rather than proposing a
-new out-of-distribution detector, we assessed an explanatory hypothesis,
+We examined where that hypothesis can be evaluated, on a frozen dermatology
+foundation model, within a single fixed backbone rather than across backbones.
+Rather than proposing a new out-of-distribution detector, we characterised the
+conditions an explanatory reading requires,
 under a preregistered protocol incorporating implementation-integrity
 verification, manipulation checking, and prespecified statistical analysis
 with multiplicity correction fixed in advance of execution. Only checkpoints
 clearing both verification stages enter the causal comparison.
 
-Our findings provide limited empirical support for a causal explanatory
-reading of the association, under the evaluated backbone, layer, and task.
+Our findings delimit where such a reading can be evaluated at all, under the
+evaluated backbone, layer, and task, rather than adjudicating it.
 The probe--reliability dissociation remained statistically detectable, but at
 approximately two orders of magnitude smaller a margin than originally
 reported, with distance-based estimators already operating near ceiling on
@@ -93,21 +94,46 @@ no Holm-significant association with estimator performance. These results
 indicate that associations observed across representations warrant direct
 intervention-based evaluation before being interpreted as explanatory.
 
-The contributions of this work are as follows.
+This study is organised around three questions, fixed before execution.
 
 \begin{itemize}
-  \item We present a preregistered evaluation protocol for testing whether an
-        observed representation-level association supports a causal
-        explanatory reading, incorporating implementation-integrity gating,
-        explicit manipulation checking, and multiplicity correction fixed
-        before execution.
-  \item We formulate and test the hypothesis that links two previously
-        separate observations---the probe--reliability dissociation and the
-        geometry--performance association---by intervening on representation
-        geometry within a single fixed frozen backbone, rather than comparing
-        geometry across backbones that differ in many respects at once.
-  \item We characterize the extent to which the previously reported
-        probe--reliability dissociation is observable in this regime, and the
-        degree of empirical support the explanatory hypothesis receives under
-        the evaluated backbone, layer, and task.
+  \item[\textbf{RQ1}] Can targeted geometric properties be systematically
+        manipulated while preserving task utility and domain information?
+  \item[\textbf{RQ2}] Within a fixed frozen backbone, do changes in
+        preregistered geometry metrics predict changes in distance-based OOD
+        ranking?
+  \item[\textbf{RQ3}] When geometry is matched across nominally different
+        intervention configurations, does OOD performance follow geometry or
+        intervention configuration?
+\end{itemize}
+
+The contributions are three.
+
+\begin{itemize}
+  \item \textbf{A scorer-relevant invariance formalization.} We separate raw
+        representation geometry, the geometry a scorer actually reads, score
+        magnitude, cross-domain ranking, and AUROC, which the literature
+        commonly treats as one chain. A geometry metric earns interpretation as
+        a predictor of ranking only after the first two are shown to coincide.
+        We supply that step for the operator used here
+        (Section~\ref{sec:invariance}): it sets the condition number in closed
+        form while leaving Mahalanobis scoring exactly invariant, so one of the
+        four estimators is structurally unable to respond to it, and three are
+        not.
+  \item \textbf{A gated within-backbone intervention protocol.} Cross-backbone
+        studies vary architecture, pretraining corpus, objective, dimension,
+        and feature layer together; when geometry and performance move
+        together there, geometry may be an explanation or merely a correlate of
+        backbone provenance. We hold backbone, extraction pipeline, feature
+        layer, splits, evaluation protocol, and scorer definitions fixed, and
+        intervene on the representation output alone, behind an
+        implementation-integrity gate and an explicit manipulation check.
+  \item \textbf{Empirical boundary evidence in a near-ceiling regime.} The
+        contribution is not that geometry fails to predict AUROC. It is a
+        characterisation of where the question can be asked: domain information
+        and task utility survive the intervention and the targeted geometry
+        moves, so a trivial explanation is excluded; the preregistered metrics
+        nonetheless do not account for ranking in the evaluated configuration;
+        and baseline performance above 0.99 for every estimator bounds what any
+        such account could have been observed to explain here.
 \end{itemize}

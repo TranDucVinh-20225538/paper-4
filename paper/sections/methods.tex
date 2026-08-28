@@ -88,6 +88,7 @@ of the evaluation embeddings onto the frozen nuisance direction,
 $\mathrm{Var}(z^{\top} w)$.
 
 \subsection{Representation Intervention and Dose Ladder}
+\label{sec:intervention}
 
 The intervention is a bottleneck adapter applied to the frozen embedding,
 \begin{equation}
@@ -277,15 +278,23 @@ Nothing in the proof is specific to tempering: it holds for any invertible
 linear map whose parameters are re-estimated afterwards. Tempering is simply
 the member of that family this protocol uses.
 
-Propositions~\ref{prop:kappa} and~\ref{prop:maha} together fix the status of one
-preregistered metric. Within this intervention family the condition number is
-moved by design while the Mahalanobis ranking cannot move at all, so no
-association between them is available to be found. A null result for that pair
-is entailed by the algebra and carries no information about whether
-representation geometry explains distance-based ranking in general. It is not
-evidence of a small effect, and it is not a shortfall of power at five seeds.
-We report it in Section~\ref{sec:results} as a bound on what the design can
-speak to, not as a finding about the account under evaluation.
+Propositions~\ref{prop:kappa} and~\ref{prop:maha} bound one comparison in this
+study, and it is important to be exact about which. They apply to the tempering
+operator of \eqref{eq:tempering}, which is used only for the geometry-matched
+comparison. They do \emph{not} apply to the dose ladder of
+Section~\ref{sec:intervention}: the adapter there is
+$z' = z + W_2\,\mathrm{GELU}(W_1 z)$, which is not affine, so no invariance
+follows and the condition-number association reported across $\alpha$ stands on
+its own footing.
+
+For the geometry-matched comparison the consequence is sharp. Condition number
+is set by design through \eqref{eq:kappa-law} while the Mahalanobis ranking
+cannot move at all, so for that estimator the comparison had no difference
+available to detect. Its null is entailed by the algebra rather than measured,
+and it is neither evidence of a small effect nor a shortfall of power at five
+seeds. Section~\ref{sec:results} reports it as a bound on what that comparison
+can speak to. The same comparison remains informative for the three estimators
+below, which are not invariant.
 
 The remaining estimators are not affine-invariant and are not covered by
 Proposition~\ref{prop:maha}. Cosine similarity is computed after
