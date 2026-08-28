@@ -80,7 +80,7 @@ We examined where that hypothesis can be evaluated, on a frozen dermatology
 foundation model, within a single fixed backbone rather than across backbones.
 Rather than proposing a new out-of-distribution detector, we characterised the
 conditions an explanatory reading requires,
-under a preregistered protocol incorporating implementation-integrity
+under a prespecified protocol incorporating implementation-integrity
 verification, manipulation checking, and prespecified statistical analysis
 with multiplicity correction fixed in advance of execution. Only checkpoints
 clearing both verification stages enter the causal comparison.
@@ -90,7 +90,7 @@ evaluated backbone, layer, and task, rather than adjudicating it.
 The probe--reliability dissociation remained statistically detectable, but at
 approximately two orders of magnitude smaller a margin than originally
 reported, with distance-based estimators already operating near ceiling on
-the unmodified representation. The two preregistered geometry metrics showed
+the unmodified representation. The two prespecified geometry metrics showed
 no Holm-significant association with estimator performance. These results
 indicate that associations observed across representations warrant direct
 intervention-based evaluation before being interpreted as explanatory.
@@ -101,7 +101,7 @@ This study is organised around three questions, fixed before execution.
   \item[\textbf{RQ1}] Can targeted geometric properties be systematically
         manipulated while preserving task utility and domain information?
   \item[\textbf{RQ2}] Within a fixed frozen backbone, do changes in
-        preregistered geometry metrics predict changes in distance-based OOD
+        prespecified geometry metrics predict changes in distance-based OOD
         ranking?
   \item[\textbf{RQ3}] When geometry is matched across nominally different
         intervention configurations, does OOD performance follow geometry or
@@ -133,7 +133,7 @@ The contributions are three.
         contribution is not that geometry fails to predict AUROC. It is a
         characterisation of where the question can be asked: domain information
         and task utility survive the intervention and the targeted geometry
-        moves, so a trivial explanation is excluded; the preregistered metrics
+        moves, so a trivial explanation is excluded; the prespecified metrics
         nonetheless do not account for ranking in the evaluated configuration;
         and baseline performance above 0.99 for every estimator bounds what any
         such account could have been observed to explain here.

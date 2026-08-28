@@ -62,7 +62,7 @@ was trained.
 \subsection{Geometry Metrics}
 
 Four geometric quantities are measured on every evaluated representation. Two
-are preregistered as the metrics the account under evaluation specifies; two
+are prespecified as the metrics the account under evaluation specifies; two
 are recorded alongside them.
 
 \emph{Local intrinsic dimensionality} (LID) is estimated per point by the
@@ -101,7 +101,7 @@ objective plus an orthogonality penalty against the frozen nuisance direction,
 weighted by $\lambda_{\mathrm{proj}} = 0.1$. Training uses AdamW, learning
 rate $10^{-3}$, batch size $512$, for $100$ epochs, repeated across five
 seeds $\{42, 52, 62, 72, 82\}$. Bottleneck width and $\lambda_{\mathrm{proj}}$
-were selected by a preregistered rule fixed before the canonical runs.
+were selected by a prespecified rule fixed before the canonical runs.
 
 Intervention strength is varied post hoc rather than by retraining. For each
 trained adapter we compute its displacement $\Delta z = W_2\,\mathrm{GELU}(W_1
@@ -144,7 +144,7 @@ than as evidence.
 
 \emph{Gate 1} (manipulation check) confirms that the intervention actually
 moved the geometry the account concerns. It is satisfied when at least one
-preregistered geometry metric shows reproducible dose dependence across the
+prespecified geometry metric shows reproducible dose dependence across the
 ladder; the criterion makes no assumption of linearity, strict monotonicity,
 or convexity, and the remaining metrics are recorded rather than discarded.
 An unmanipulated checkpoint tests nothing, so Gate 1 failures are excluded
@@ -175,12 +175,12 @@ does not aim to rank detectors.
 \subsection{Geometry Manipulation for the Causal Comparison}
 
 Testing whether geometry, rather than nominal intervention strength, tracks
-estimator degradation requires an operator that moves the preregistered
+estimator degradation requires an operator that moves the prespecified
 geometry metrics directly. The normalization-based knob originally specified
 for this role was found, on measurement, to move condition number
 substantially while leaving LID and spectral-decay slope unchanged. This is
 consistent with the operator's design, which adjusts feature radii while
-holding directions fixed~\cite{yu2510dissecting}; both preregistered metrics
+holding directions fixed~\cite{yu2510dissecting}; both prespecified metrics
 are invariant to such rescaling. It was therefore not used.
 
 The operator adopted instead is a fixed-exponent spectral
@@ -196,7 +196,7 @@ where $\gamma = 0$ is the identity and $\gamma = 1$ is full whitening. We use
 a fixed, manually specified $\gamma$ rather than the adaptive per-dimension
 exponent of the original formulation: adaptivity was introduced there to
 avoid per-task tuning where no validation signal is available, whereas the
-present protocol supplies an independent, preregistered criterion (Gate 1)
+present protocol supplies an independent, prespecified criterion (Gate 1)
 against which a prespecified $\gamma$ ladder is evaluated. This operator was
 subjected to the same manipulation check before use, and its effect on LID
 and spectral-decay slope is reported in Section~\ref{sec:results}.
@@ -333,7 +333,7 @@ five seeds. A closed-form statement would be weaker than that observation and
 would risk presenting an assumption as a derivation. It is reported as an
 empirical finding and left there.
 
-\subsection{Preregistered Claims and Statistical Analysis}
+\subsection{Prespecified Claims and Statistical Analysis}
 
 Claims, tests, and multiplicity correction were fixed before execution. We
 say the account is supported by \emph{mediation} if the association between

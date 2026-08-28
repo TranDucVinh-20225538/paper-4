@@ -37,7 +37,7 @@
 All Intervention-arm and Conventional-arm checkpoints cleared Gate 0 at every
 rung of the dose ladder, confirming that domain information and
 in-distribution task performance survived the intervention. Gate 1 was
-satisfied on the Intervention arm: at least one preregistered geometry metric
+satisfied on the Intervention arm: at least one prespecified geometry metric
 showed reproducible dose dependence across the ladder and across all five
 seeds. No checkpoint was excluded from the analyses below on gate grounds.
 
@@ -83,7 +83,7 @@ $0.8942$ (kernel density).
 
 Table~\ref{tab:c2} reports Kendall's $\tau$ between each geometry metric and
 each estimator's AUROC across the $30$ pooled configurations. Neither
-preregistered geometry metric reached Holm-corrected significance against any
+prespecified geometry metric reached Holm-corrected significance against any
 estimator: LID's strongest association was with Mahalanobis
 ($\tau = -0.24$, uncorrected $p = 0.065$), and spectral-decay slope's was
 also with Mahalanobis ($\tau = 0.22$, uncorrected $p = 0.088$). Condition
@@ -119,7 +119,7 @@ number on that caveat rather than leaving it qualitative, we repeated the
 condition-number analysis with an exact permutation test that permutes
 \emph{whole seeds} rather than individual configurations, preserving the
 within-seed structure. This is a post-hoc sensitivity analysis and was not
-preregistered.
+prespecified.
 
 The $\tau$ values are unchanged by construction; only the reference distribution
 differs. Under seed-level permutation the uncorrected $p$-values are $0.133$
@@ -161,7 +161,7 @@ respectively).
 The normalization-based operator originally specified for the causal
 comparison was measured across all twenty Intervention-arm checkpoints before
 use. It moved condition number substantially (mean change $-2.7\times10^{5}$)
-while leaving both preregistered metrics effectively unchanged: mean LID
+while leaving both prespecified metrics effectively unchanged: mean LID
 change $-4\times10^{-4}$ (SD $1.8\times10^{-3}$) and mean slope change below
 $10^{-6}$ (SD $10^{-6}$). It was therefore not used.
 
@@ -185,7 +185,7 @@ relationship; the operator's dose behaviour is characterized separately by
 the manipulation check reported above. At this
 $\gamma$, LID remained $0.60$ below the matched checkpoint's value: the
 comparison is therefore matched on spectral-decay slope, not on both
-preregistered metrics jointly. Three configurations were then evaluated
+prespecified metrics jointly. Three configurations were then evaluated
 across five seeds: full strength unmanipulated ($\alpha = 1.0$,
 $\gamma = 0$), weak strength unmanipulated ($\alpha = 0.25$, $\gamma = 0$),
 and full strength slope-matched to the weak checkpoint ($\alpha = 1.0$,
