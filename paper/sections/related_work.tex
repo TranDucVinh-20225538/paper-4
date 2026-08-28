@@ -54,10 +54,13 @@ measure what information a representation linearly
 encodes~\cite{alain2016probes}. The distinction matters here because a
 probe and a distance-based estimator can disagree: a probe may recover
 acquisition-domain identity from a representation on which distance-based
-scores are uninformative. Prior work on convolutional networks reported
-exactly this dissociation for skin-lesion representations, with probe
-accuracy on domain identity remaining high while Mahalanobis-family scores
-approached chance~\cite{tran2026decodable}. That report motivates the
+scores are uninformative. Prior work on convolutional networks reported exactly this dissociation for
+skin-lesion representations: probes recovered acquisition-domain identity at
+0.72--0.81 AUROC while Mahalanobis-family scores sat near 0.40 under the
+standard higher-distance-is-more-OOD convention~\cite{tran2026decodable}.
+That report is explicit that the scores did not approach chance but were
+directionally misaligned: their orientation-free separability was 0.58--0.60,
+so the ordering retained signal while pointing the wrong way. That report motivates the
 present evaluation; whether it describes the frozen foundation-model regime
 is the question we examine.
 
