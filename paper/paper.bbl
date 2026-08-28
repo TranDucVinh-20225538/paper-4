@@ -24,9 +24,10 @@
 \bibitem{tran2026decodable}
 D.-V. Tran and Q.-T. Huynh, ``Decodable but directionally misaligned: Auditing
   distance-based ood ranking on domain-adversarial skin-lesion
-  representations,'' 2026, preprint. Code and data at
-  \url{https://doi.org/10.5281/zenodo.22130029}. TODO: add arXiv identifier
-  once assigned.
+  representations,'' 2026, manuscript under review. No preprint is posted; the
+  per-checkpoint data underlying the comparison cited here are archived at
+  \url{https://doi.org/10.5281/zenodo.22130029}, so that figure is verifiable
+  independently of the manuscript.
 
 \bibitem{yu2510dissecting}
 D.~Janiak, J.~Binkowski, and T.~Kajdanowicz, ``A geometry-based view of
