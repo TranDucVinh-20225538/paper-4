@@ -150,6 +150,7 @@ An unmanipulated checkpoint tests nothing, so Gate 1 failures are excluded
 from causal interpretation rather than counted as negative evidence.
 
 \subsection{Reliability Estimators}
+\label{sec:estimators}
 
 Four distance-based estimators are evaluated on every checkpoint. The
 Mahalanobis detector fits class-conditional means and a shared precision
@@ -188,7 +189,8 @@ eigenvectors $U$, embeddings are transformed as
 \begin{equation}
   z' = \mu + U \operatorname{diag}\!\left(\lambda_i^{-\gamma/2}\right)
        U^{\top} (z - \mu),
-\end{equation}
+\label{eq:tempering}
+  \end{equation}
 where $\gamma = 0$ is the identity and $\gamma = 1$ is full whitening. We use
 a fixed, manually specified $\gamma$ rather than the adaptive per-dimension
 exponent of the original formulation: adaptivity was introduced there to
@@ -197,6 +199,127 @@ present protocol supplies an independent, preregistered criterion (Gate 1)
 against which a prespecified $\gamma$ ladder is evaluated. This operator was
 subjected to the same manipulation check before use, and its effect on LID
 and spectral-decay slope is reported in Section~\ref{sec:results}.
+
+\subsection{Scorer-Relevant Geometry: What the Operator Can and Cannot Move}
+\label{sec:invariance}
+
+A geometry metric is interpretable as a predictor of a scorer's ranking only if
+the operator that moves the metric also moves the structure the scorer reads.
+The two are routinely conflated: a metric is computed on a representation, an
+AUROC is computed from a scorer applied to the same representation, and their
+covariation across conditions is read as evidence that the geometry explains the
+ranking. That inference requires a step that is rarely checked. This subsection
+supplies it for the operator of \eqref{eq:tempering}, and the answer separates
+the estimators of Section~\ref{sec:estimators} into two classes.
+
+Write $\Sigma = U \operatorname{diag}(\lambda_i) U^{\top}$ for the
+in-distribution training covariance and
+$A_{\gamma} = U \operatorname{diag}(\lambda_i^{-\gamma/2}) U^{\top}$ for the
+tempering map, so that \eqref{eq:tempering} reads
+$z' = \mu + A_{\gamma}(z - \mu)$. Note that $A_{\gamma}$ is symmetric and, for
+$\lambda_i > 0$, invertible.
+
+\begin{proposition}[Condition number is a designed target]
+\label{prop:kappa}
+Under \eqref{eq:tempering} the transformed covariance is
+$\Sigma' = U \operatorname{diag}(\lambda_i^{1-\gamma}) U^{\top}$, and therefore
+\begin{equation}
+  \kappa(\Sigma') = \kappa(\Sigma)^{\,1-\gamma},
+  \qquad\text{equivalently}\qquad
+  \log \kappa(\Sigma') = (1-\gamma) \log \kappa(\Sigma).
+  \label{eq:kappa-law}
+\end{equation}
+\end{proposition}
+
+\begin{IEEEproof}
+$\Sigma' = A_{\gamma} \Sigma A_{\gamma}^{\top}
+ = U \operatorname{diag}(\lambda_i^{-\gamma/2}) \operatorname{diag}(\lambda_i)
+     \operatorname{diag}(\lambda_i^{-\gamma/2}) U^{\top}
+ = U \operatorname{diag}(\lambda_i^{1-\gamma}) U^{\top}$.
+The eigenvalues of $\Sigma'$ are $\lambda_i^{1-\gamma}$, and
+$x \mapsto x^{1-\gamma}$ is increasing for $\gamma < 1$, so extremal eigenvalues
+map to extremal eigenvalues and
+$\kappa(\Sigma') = (\lambda_{\max}/\lambda_{\min})^{1-\gamma}$.
+\end{IEEEproof}
+
+The dose ladder is thus not merely correlated with the condition number; it
+sets it, on a log scale, by construction. $\gamma = 0$ leaves $\kappa$
+unchanged and $\gamma = 1$ drives it to unity. This is the strongest position a
+manipulation check can be in, and it is what makes the next result consequential
+rather than a technicality.
+
+\begin{proposition}[Mahalanobis scoring is invariant to the operator]
+\label{prop:maha}
+Let the Mahalanobis parameters be refit on the tempered training population, as
+specified in Section~\ref{sec:estimators}. With ridge $\varepsilon = 0$, the
+squared Mahalanobis score is preserved pointwise,
+$d'^2(z') = d^2(z)$ for every $z$, and the AUROC of that score is therefore
+identical for every $\gamma$.
+\end{proposition}
+
+\begin{IEEEproof}
+Tempering is applied to every embedding, so class means map affinely,
+$\mu_c' = \mu + A_{\gamma}(\mu_c - \mu)$, and the pooled within-class scatter
+maps as $S' = A_{\gamma} S A_{\gamma}^{\top}$. With $\varepsilon = 0$ the refit
+precision is $P' = A_{\gamma}^{-\top} P A_{\gamma}^{-1}$, while residuals map as
+$z' - \mu_c' = A_{\gamma}(z - \mu_c)$. Hence
+\begin{align}
+  d'^2(z') &= (z' - \mu_c')^{\top} P' (z' - \mu_c') \nonumber\\
+           &= (z - \mu_c)^{\top} A_{\gamma}^{\top} A_{\gamma}^{-\top}
+              P A_{\gamma}^{-1} A_{\gamma} (z - \mu_c) \nonumber\\
+           &= (z - \mu_c)^{\top} P (z - \mu_c) = d^2(z).
+\end{align}
+Minimisation over $c$ preserves the identity, and AUROC depends on the scores
+only through their ordering.
+\end{IEEEproof}
+
+Nothing in the proof is specific to tempering: it holds for any invertible
+linear map whose parameters are re-estimated afterwards. Tempering is simply
+the member of that family this protocol uses.
+
+Propositions~\ref{prop:kappa} and~\ref{prop:maha} together fix the status of one
+preregistered metric. Within this intervention family the condition number is
+moved by design while the Mahalanobis ranking cannot move at all, so no
+association between them is available to be found. A null result for that pair
+is entailed by the algebra and carries no information about whether
+representation geometry explains distance-based ranking in general. It is not
+evidence of a small effect, and it is not a shortfall of power at five seeds.
+We report it in Section~\ref{sec:results} as a bound on what the design can
+speak to, not as a finding about the account under evaluation.
+
+The remaining estimators are not affine-invariant and are not covered by
+Proposition~\ref{prop:maha}. Cosine similarity is computed after
+$\ell_2$ normalisation and so depends on directions that $A_{\gamma}$ rotates
+relative to the sphere; nearest-neighbour and kernel-density scores depend on
+Euclidean neighbourhood structure, which $A_{\gamma}$ rescales anisotropically.
+For these three, condition number remains admissible as a candidate predictor,
+and the association reported for them is interpretable in a way the Mahalanobis
+association is not. Section~\ref{sec:results} reports a sweep confirming this
+separation on the reference embeddings: across $\gamma \in [0, 1]$ the realized
+condition number moves eight orders of magnitude while Mahalanobis AUROC moves
+$1.3 \times 10^{-5}$, against $1.5 \times 10^{-2}$ for cosine and
+$1.6 \times 10^{-3}$ for $k$-NN.
+
+Two limits of this analysis are worth stating plainly. First,
+\eqref{eq:kappa-law} is an identity in exact arithmetic. The smallest sample
+eigenvalue in these embeddings is of order $10^{-17}$, so $\lambda_i^{-\gamma/2}$
+on the tail of the spectrum is dominated by round-off and the recomputed
+condition number departs from $\kappa(\Sigma)^{1-\gamma}$ while remaining
+monotone in $\gamma$. We report the identity as algebra and the realized values
+as measurement, and do not treat them as the same quantity. Second, the ridge
+$\varepsilon = 10^{-5}$ used in practice breaks exact invariance, since
+$\varepsilon I$ does not transform with $A_{\gamma}$; the observed
+$1.3 \times 10^{-5}$ drift in Mahalanobis AUROC is consistent with that residual
+and with floating-point error, and no claim of exact numerical constancy is
+made.
+
+We do not attempt a corresponding result for local intrinsic dimensionality.
+LID is a property of local neighbourhood structure rather than of the global
+covariance spectrum, and the empirical profile reported in
+Section~\ref{sec:results} is non-monotonic in $\gamma$ and consistent across all
+five seeds. A closed-form statement would be weaker than that observation and
+would risk presenting an assumption as a derivation. It is reported as an
+empirical finding and left there.
 
 \subsection{Preregistered Claims and Statistical Analysis}
 

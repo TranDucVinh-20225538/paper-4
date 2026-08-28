@@ -19,6 +19,11 @@
 \usepackage{url}
 \usepackage[hidelinks]{hyperref}
 
+% Proposition environment for the invariance results in Methods. IEEEtran
+% supplies \newtheorem and IEEEproof directly; amsthm is not loaded, to
+% avoid the known conflict between the two.
+\newtheorem{proposition}{Proposition}
+
 \graphicspath{{figures/}}
 
 \begin{document}
