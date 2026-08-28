@@ -1,0 +1,20 @@
+{
+  "tier": 0,
+  "protocol_step": "Stage 3.2 -- Gate 0 (Tier 0, Implementation Integrity Gate)",
+  "criterion_1_domain_leakage_detected": {
+    "pass": true,
+    "probe_accuracy_mean": 0.9990045248868779,
+    "majority_class_baseline": 0.6879837067209776,
+    "shuffle_control_accuracy": 0.6135746606334842,
+    "paper1_cnn_reference_accuracy": 0.979,
+    "rule": "probe_accuracy_mean > majority_baseline + 0.05 AND probe_accuracy_mean > shuffle_control + 0.05 (operationalizes 'domain leakage present, not spurious' -- Risk Register item #3's concern; Paper 1's 0.979 reported as context, not a hard pass/fail threshold, since 'consistent with' was not specified as an exact-match criterion in 22_Experimental_Design.md SS3.5)"
+  },
+  "criterion_2_id_task_above_trivial": {
+    "pass": true,
+    "balanced_accuracy_mean": 0.5739691277090949,
+    "chance_balanced_accuracy": 0.125,
+    "rule": "balanced_accuracy_mean > chance + 0.10"
+  },
+  "gate_result": "PASS",
+  "timestamp": "2026-08-04T21:52:22.804393+00:00"
+}

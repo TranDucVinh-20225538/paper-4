@@ -1,0 +1,5 @@
+{
+  "per_direction_variance": "No resolved operationalization for the Reference arm alone -- flagged, PI decision needed.",
+  "group_b_reliability_scorers": "Mahalanobis/kNN/energy/ViM/KDE/cosine-to-centroid/relative-Mahalanobis NOT computed -- Paper 3's implementation needs a fitted ISIC-TRAIN reference population not present in ReferenceEmbedding/ (Stage 2.1 extracted only the held-out ID+OOD evaluation split). Genuine data-availability gap, PI decision needed (e.g. a Stage 2.2 extraction).",
+  "tier_3_claims_tested": []
+}

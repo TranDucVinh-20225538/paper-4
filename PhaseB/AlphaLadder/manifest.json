@@ -1,0 +1,12 @@
+{
+  "artifact": "Stage 4 Measurement Suite (Intervention + Conventional, alpha-ladder)",
+  "files": [
+    "alpha_ladder_results.json",
+    "gate1_ea03_rescored.json",
+    "geometry_completion_results.json",
+    "reliability_scorers_results.json"
+  ],
+  "qc": "PASS -- 5 seeds x 5 alphas (gate/geometry), 5 seeds x 4 nonzero alphas (reliability), no NaN/Inf, AUROC/FPR95 in range",
+  "status": "FROZEN",
+  "created_at": "2026-08-05T19:09:28.185685+00:00"
+}

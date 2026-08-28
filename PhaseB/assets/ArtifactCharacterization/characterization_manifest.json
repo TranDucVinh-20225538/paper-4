@@ -1,0 +1,21 @@
+{
+  "artifact": "ArtifactCharacterization",
+  "protocol_step": "Stage 3.1",
+  "purpose": "Scope-boundary manifest, added per Vinh's PI decision (2026-08-05), so Stage 3.1's output is never mistaken for Stage 3.2 (Claim C1+) analysis.",
+  "derived_from": {
+    "reference_embedding_artifact": "assets/reference_embeddings/ReferenceEmbedding/",
+    "reference_embedding_manifest": "assets/reference_embeddings/ReferenceEmbedding/manifest.json",
+    "embeddings.npy_sha256": "3a12b0e08440e63f4a6a2821705d1947a3063a4543c80d1ceafa323902eac9ff",
+    "metadata.csv_sha256": "26ad35e05e4a6820ac25f3bb21541653c09936c0b4433f1715ec23196fae72e5"
+  },
+  "known_issues_consulted": {
+    "register": "assets/ArtifactIssuesRegister/issues_register.json",
+    "issue_1": "34/7365 rows are pixel-identical duplicates; included as-is; noted as a small symmetric contribution to the descriptive statistics in characterization_report.json, not asserted negligible"
+  },
+  "contains_only_descriptive_statistics": true,
+  "claims_tested": [],
+  "boundary_statement": "This artifact contains shape/dtype/memory/norm-distribution/variance descriptive statistics and class/domain counts only. It does not test, support, or contradict any claim in 02_Claim_Matrix.md (C1-C5). No test statistic, significance value, distance score, or separability metric was computed anywhere in Stage 3.1. Claim-bearing analysis begins at Stage 3.2, not here.",
+  "created_at": "2026-08-04T21:23:20Z",
+  "status": "FROZEN",
+  "frozen_note": "Added after this directory's first freeze, per Vinh's same-day follow-up request -- documented in 26_Lab_Notebook.md as a one-time unfreeze/amend/re-freeze, not a silent edit. characterization_report.json and norm_histogram.png (the original frozen content) were not modified; only this new file and sha256.txt (to include it) were added."
+}

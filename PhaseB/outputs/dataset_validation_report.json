@@ -1,0 +1,23 @@
+{
+  "protocol_step": "Stage 1.3a -- Dataset Validation",
+  "protocol_version": "24_PreRegistration.md frozen 2026-08-04 (session 9)",
+  "date": "2026-08-05",
+  "timestamp": "2026-08-04T18:49:57.707521+00:00",
+  "csg_skin_commit": "12338983d87a35b3ad040687ad09f04908fb0c55",
+  "panderm_repo_commit": "fd7a80748ba7fc3e203fed88f909f4689d0d6f24",
+  "panderm_preprocessing_snapshot": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_preprocessing.json",
+  "panderm_preprocessing_sha256": "51953f48d2004fe7344f9fbf71628936e74d8bf42588077048784f23bd4f1979",
+  "metadata_csv": "/Users/cubo/Research/CSG-SKin/data/master_metadata.csv",
+  "isic_images": 25331,
+  "pad_images": 2299,
+  "metadata_rows": 27629,
+  "metadata_rows_isic": 25331,
+  "metadata_rows_pad_ufes": 2298,
+  "seed": 42,
+  "split_reproducible": true,
+  "isic_test_fraction": 0.2,
+  "val_fraction": 0.2,
+  "isic_test_n": 5067,
+  "preprocessing_attached": true,
+  "status": "PASS"
+}

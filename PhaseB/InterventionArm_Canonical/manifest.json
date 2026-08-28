@@ -1,0 +1,145 @@
+{
+  "artifact": "Canonical Intervention Arm (5 seeds)",
+  "protocol_step": "Stage 4 Execution Plan v2, Step 4 (canonical, not a probe)",
+  "hyperparameters": {
+    "r": 16,
+    "lambda_proj": 0.1,
+    "seeds": [
+      42,
+      52,
+      62,
+      72,
+      82
+    ],
+    "source": "Step 3/4 hyperparameter selection, EA-02 Gate 1 criterion"
+  },
+  "adapter_architecture": "z' = z + W2.GELU(W1.z), bottleneck r=16, zero-init up-projection",
+  "orthogonality_target": {
+    "artifact": "/Users/cubo/Research/Paper4/PhaseB/NuisanceDirection/manifest.json",
+    "formula": "cos(z',w)^2"
+  },
+  "training_population": {
+    "isic_train_artifact": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding/manifest.json",
+    "pad_ufes_from_artifact": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding/manifest.json",
+    "n_total": 18509
+  },
+  "eval_population_artifact": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding/manifest.json",
+  "per_seed": [
+    {
+      "seed": 42,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9983710407239819,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.5469978466759106,
+        "id_task_ece_mean": 0.1724885098802782,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 14.260953012030958,
+        "spectral_decay_slope": 0.006806696282725612,
+        "composite": 0.09706997585511574,
+        "n_samples": 7365
+      },
+      "gate1_pass": true,
+      "embeddings_file": "embeddings_seed42.npy",
+      "checkpoint_file": "adapter_seed42.pt"
+    },
+    {
+      "seed": 52,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9991855203619909,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.5573113671530227,
+        "id_task_ece_mean": 0.16746330683544264,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 14.949070429518091,
+        "spectral_decay_slope": 0.006779039833749923,
+        "composite": 0.10134034391923621,
+        "n_samples": 7365
+      },
+      "gate1_pass": true,
+      "embeddings_file": "embeddings_seed52.npy",
+      "checkpoint_file": "adapter_seed52.pt"
+    },
+    {
+      "seed": 62,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9984615384615385,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.566094841390833,
+        "id_task_ece_mean": 0.16284934751595787,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 14.650837706535087,
+        "spectral_decay_slope": 0.0067994315423439726,
+        "composite": 0.0996173680235771,
+        "n_samples": 7365
+      },
+      "gate1_pass": true,
+      "embeddings_file": "embeddings_seed62.npy",
+      "checkpoint_file": "adapter_seed62.pt"
+    },
+    {
+      "seed": 72,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9989140271493213,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.5641892988005156,
+        "id_task_ece_mean": 0.17077057501609222,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 14.733382836271996,
+        "spectral_decay_slope": 0.006787470751442855,
+        "composite": 0.10000240507100636,
+        "n_samples": 7365
+      },
+      "gate1_pass": true,
+      "embeddings_file": "embeddings_seed72.npy",
+      "checkpoint_file": "adapter_seed72.pt"
+    },
+    {
+      "seed": 82,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9989140271493213,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.586849581452556,
+        "id_task_ece_mean": 0.16845057350476106,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 14.815450892454669,
+        "spectral_decay_slope": 0.006784703091385606,
+        "composite": 0.10051843547030882,
+        "n_samples": 7365
+      },
+      "gate1_pass": true,
+      "embeddings_file": "embeddings_seed82.npy",
+      "checkpoint_file": "adapter_seed82.pt"
+    }
+  ],
+  "aggregate": {
+    "gate0_probe_accuracy_mean": 0.9987692307692306,
+    "gate0_id_task_balanced_accuracy_mean": 0.5642885870945675,
+    "gate0_pass": true,
+    "gate1_lid_mean": 14.681938975362158,
+    "gate1_spectral_decay_slope_mean": 0.006791468300329594,
+    "gate1_pass": true,
+    "baseline_alpha0": {
+      "lid_mean": 15.027931404443088,
+      "spectral_decay_slope": 0.006973340837017403
+    }
+  },
+  "both_gates_pass": true,
+  "not_computed_here": "No alpha-ladder, no Conventional arm, no measurement suite beyond Gate0/Gate1, no comparison, no claim.",
+  "created_at": "2026-08-05T14:04:21.417904+00:00",
+  "status": "FROZEN"
+}

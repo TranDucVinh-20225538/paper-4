@@ -1,0 +1,24 @@
+{
+  "tier": 2,
+  "group": "A",
+  "measurement": "domain_leakage_probe",
+  "seeds": [
+    42,
+    52,
+    62,
+    72,
+    82
+  ],
+  "accuracy_mean": 0.9990045248868779,
+  "accuracy_std": 0.0005276879542846408,
+  "auroc_mean": 0.9999969488939741,
+  "auroc_std": 2.0360561121269308e-06,
+  "majority_class_baseline": 0.6879837067209776,
+  "shuffle_label_sanity_check": {
+    "shuffle_seed": 123,
+    "probe_seed": 42,
+    "accuracy": 0.6135746606334842
+  },
+  "weight_diffuseness_participation_ratio": 385.3122025660483,
+  "weight_diffuseness_note": "seed=42 fit only; range [1, 1024]"
+}

@@ -1,0 +1,111 @@
+% related_work.tex
+%
+% Ordering mirrors the Introduction's phenomenon-then-account discipline:
+% estimators -> decodability -> the geometric account -> the FM regime.
+%
+% CITATION POLICY IN THIS FILE. Every \cite key below resolves to an entry in
+% refs.bib that was fetched and verified during this project (AR-01/AR-02
+% literature surveys, or the mechanism source). Where the argument needs a
+% citation this project has NOT verified, the text carries an explicit
+% \cite{TODO-...} marker rather than a plausible-looking invented key. Those
+% markers are the work list for the citation pass -- do not silently replace
+% them with remembered references.
+%
+% Outstanding TODO citations: medical-imaging OOD detection surveys; the
+% probing/decodability literature; PanDerm and comparable dermatology
+% foundation models; ISIC 2019; PAD-UFES-20; the prior CNN study whose
+% transfer this paper evaluates.
+%
+% PRIORITY within that list (PI direction, 2026-08-06): yan2025panderm is the
+% weakest load-bearing point in the manuscript. Subsection IV's claim that
+% clinical imaging has moved toward frozen foundation encoders carries the
+% entire motivation for the study, and currently rests on a single unresolved
+% citation. Resolve it with 2-3 strong references, not one: PanDerm itself,
+% at least one other medical-vision foundation model, and at least one study
+% using a frozen encoder with a lightweight trained head. A reviewer who finds
+% this claim thinly supported weakens the gap, not just the sentence.
+%
+% Claim-level note (governance rule, ../../27_One_Sentence_Paper.md): this
+% section reports what others found. It must not pre-empt our results, and it
+% must not characterize the prior CNN finding as mistaken -- our position is
+% that its transfer is untested, not that it was wrong.
+
+\section{Related Work}
+
+\subsection{Distance-Based Reliability Estimation}
+
+Distance-based out-of-distribution detection scores an input by its position
+relative to the training distribution in representation space. The
+Mahalanobis detector fits class-conditional Gaussians to training features
+and scores an input by its minimum Mahalanobis distance to any class
+centroid~\cite{lee2018simple}; nearest-neighbour, kernel-density, and
+cosine-to-centroid variants replace the parametric fit with local or
+directional statistics but retain the same premise, that distributional
+novelty manifests as geometric displacement. The family is well suited to
+clinical deployment because it requires no outlier data at training time and
+attaches to an existing classifier without retraining~\cite{lee2018simple}.
+The premise is nonetheless an assumption about representation geometry, and
+this paper concerns the conditions under which it holds.
+
+\subsection{Decodability Versus Accessibility}
+
+Linear probing trains a classifier independently of the model in order to
+measure what information a representation linearly
+encodes~\cite{alain2016probes}. The distinction matters here because a
+probe and a distance-based estimator can disagree: a probe may recover
+acquisition-domain identity from a representation on which distance-based
+scores are uninformative. Prior work on convolutional networks reported
+exactly this dissociation for skin-lesion representations, with probe
+accuracy on domain identity remaining high while Mahalanobis-family scores
+approached chance~\cite{tran2026decodable}. That report motivates the
+present evaluation; whether it describes the frozen foundation-model regime
+is the question we examine.
+
+\subsection{Representation Geometry and Estimator Performance}
+
+Estimator performance has been linked to two properties of the
+in-distribution representation: its local intrinsic dimensionality, estimated
+by the Levina--Bickel maximum-likelihood estimator~\cite{levina2004maximum},
+and the decay profile of its within-class covariance
+spectrum~\cite{yu2510dissecting}. That work evaluates a range of frozen
+vision foundation-model backbones and reports that these two quantities track
+how Mahalanobis-style detector performance varies across them. The
+relationship is characterized as tracking rather than causation, and the
+study does not employ probing classifiers or examine the dissociation
+described above. Its interventions target an internal term of its own
+derivation rather than detector performance itself.
+
+A substantial body of work manipulates related geometric quantities directly,
+mostly outside out-of-distribution detection. Post-hoc whitening and
+isotropy-oriented transforms reshape the covariance spectrum of frozen
+embeddings, either by removing dominant principal
+directions~\cite{mu2018allbutthetop}, by full or partial
+decorrelation~\cite{su2021whitening,diera2024isotropy}, or by graded
+per-dimension spectral reweighting~\cite{li2603spectral}. Evidence on
+semantic cost is mixed: partial-strength variants report downstream gains,
+while a systematic evaluation of five full-strength whitening variants
+reports degradation on classification tasks~\cite{forooghi2024whitening}.
+A separate line targets geometry during training rather than post
+hoc, through spectral or intrinsic-dimensionality
+regularizers~\cite{weng2023modulate,huang2024ldreg}. We draw the
+geometry-manipulation operator used in our causal comparison from the
+post-hoc, dose-controllable end of this literature, for reasons detailed in
+Section~\ref{sec:methods}.
+
+\subsection{Frozen Foundation Models and Cross-Backbone Comparison}
+
+Dermatological image analysis has moved toward large pretrained encoders used
+as frozen feature extractors, with lightweight task-specific components
+trained on top~\cite{yan2025panderm}. In frozen foundation models, the
+representation geometry is primarily inherited from large-scale pretraining
+rather than optimized end-to-end for the downstream clinical task. Comparing
+geometry and detector performance across such backbones establishes that the
+two covary, but backbones differ simultaneously in pretraining corpus,
+objective, architecture, and scale, so an association measured across them
+cannot separate a geometric explanation from a shared dependence on
+pretraining. Distinguishing these readings requires holding provenance fixed
+and intervening on geometry directly. Our contribution is an evaluation of
+that kind, in the same spirit as validation studies that test whether a
+reported effect survives a change of setting, applied here to the
+explanatory status of a reported association rather than to its
+reproducibility.

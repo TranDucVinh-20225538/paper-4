@@ -1,0 +1,35 @@
+{
+  "execution": "Group B Mahalanobis Family",
+  "protocol_step": "Stage 3.2 Group B (Mahalanobis-family)",
+  "execution_contract": "GroupBExecution/execution_contract.md",
+  "produced_by_script": "PhaseB/analysis/groupB_mahalanobis_family.py",
+  "status": "COMPLETE",
+  "review": "PASS",
+  "review_file": "GroupBExecution/review.md",
+  "sanity": "PASS",
+  "sanity_file": "GroupBExecution/review_results.md",
+  "scorers": ["mahalanobis", "cosine_to_centroid", "knn", "kde"],
+  "generated_outputs": [
+    "maha_results.json",
+    "cosine_results.json",
+    "knn_results.json",
+    "kde_results.json"
+  ],
+  "file_sha256": {
+    "execution_contract.md": "a7620cb914a62ae8b559ad1d5fd2ad6801a24fcb6afbd4eb86975945934ba7bb",
+    "review.md": "a53af5415d726b9a2342b421995c111c8d4a500c17d8a04c42e47ae9108764f8",
+    "review_results.md": "5c590aed25fd74e5946e9f18a5bad5af390b964009cc2ec72495935f612844cc",
+    "maha_results.json": "3256dab94a3aa4517c9155be1eaf8976c92af4b5feca734e6c22a43326d1544d",
+    "cosine_results.json": "a6c71f67a0aca8ce8d7e811a677624627771ca6e446241cb98cbc9397db9bddc",
+    "knn_results.json": "0b52a63b9a0a23d2e00f466d9bba960483e2fe6da1e777eba4d595b687f34422",
+    "kde_results.json": "7c7933a1228cabcb21f6e530a2daf000eb76ba3f17a12693d9f50a28cb9510c8"
+  },
+  "out_of_scope": {
+    "energy": "BLOCKED -- no trained classifier head for the Reference Instrument",
+    "vim": "PARTIALLY BLOCKED -- fitting population exists, classifier head still missing",
+    "relative_mahalanobis": "NOT IMPLEMENTED -- no code found anywhere in the reused codebases"
+  },
+  "frozen": true,
+  "frozen_at": "2026-08-05T07:05:12Z",
+  "created_at": "2026-08-05T07:05:12Z"
+}

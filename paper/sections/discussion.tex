@@ -1,0 +1,172 @@
+% discussion.tex
+%
+% This is the ONLY section permitted to interpret. Items deliberately held
+% back from results.tex and discharged here:
+%   - condition number as a scale-sensitive quantity (supported by this
+%     study's own normalization-operator measurement);
+%   - the ceiling observation as the organizing account of why the four
+%     results cohere.
+%
+% CLAIM CEILING (governance rule, ../../27_One_Sentence_Paper.md). These are
+% CUT, not softened, wherever they appear: "the mechanism does not transfer",
+% "geometry stops explaining reliability", "foundation models invalidate the
+% account", "the phenomenon is absent", "fails", "does not generalize".
+%
+% Distinction that must be preserved throughout (PI correction, 2026-08-06):
+% claims are about what OUR EXPERIMENTS SUPPORT, never about what exists in
+% the world. Write "our experiments provide limited support for testing the
+% account in this regime", never "there is little for the account to explain".
+%
+% VERIFICATION DEBT: \cite{tran2026decodable} carries the comparison figure
+% on which the two-orders-of-magnitude statement rests.
+
+\section{Discussion}
+
+\subsection{Principal Findings}
+
+We tested whether an association reported across representations---between
+in-distribution geometry and distance-based estimator performance---can
+account for a previously reported phenomenon, the probe--reliability
+dissociation, when geometry is intervened upon within a single fixed frozen
+backbone. Under the evaluated backbone, layer, and task, that explanatory
+reading received limited empirical support. The previously reported
+dissociation was reproduced in direction with high statistical confidence,
+but at a magnitude approximately two orders of magnitude smaller than
+originally reported. Neither preregistered geometry metric showed a
+Holm-corrected association with estimator performance, and a preregistered
+comparison that matched spectral-decay slope across differing nominal
+intervention strengths did not reach corrected significance in either
+direction. Three of sixteen intervention-type-by-geometry interactions
+remained Holm-significant after conditioning on geometry which, under the
+preregistered criterion, is inconsistent with full mediation.
+
+\subsection{A Coherent Reading of the Four Analyses}
+
+The four analyses address different aspects of the question, and they are
+consistent with a single observation: on this backbone, distance-based
+estimators were already operating near ceiling before any intervention, with
+Reference-arm AUROC of $0.9984$ for Mahalanobis and $0.9979$ for
+nearest-neighbour. The domain shift studied here was, for these estimators,
+already highly separable.
+
+This observation makes the remaining results easier to situate. Where an
+estimator has almost no headroom, there is correspondingly little variation
+in its performance for a geometry metric to covary with, which is consistent
+with the absence of corrected-significant associations for LID and
+spectral-decay slope. It is likewise consistent with the causal comparison,
+in which Mahalanobis and nearest-neighbour showed no separation between any
+configuration, and only the two estimators retaining measurable headroom---
+cosine and kernel density---separated at all. That two of the four estimators
+were insensitive to every configuration is itself a finding rather than an
+absence of one: it establishes that on this representation the two strongest
+distance-based detectors are unaffected by interventions of the magnitude
+studied here, which is directly relevant to whether geometry-targeted
+correction is warranted in deployment. And in the interaction models,
+where residual variation is at the fourth decimal place, a statistically
+detectable interaction term need not correspond to a substantively meaningful
+effect; the three Holm-significant coefficients were of order $10^{-4}$ to
+$10^{-2}$.
+
+We emphasize what this reading does and does not assert. It is a statement
+about the sensitivity our experiments could achieve, not about the account
+itself. An evaluation conducted where the phenomenon of interest is small
+provides limited power to test an explanation for that phenomenon; the
+appropriate conclusion is that this study offers limited empirical support
+for the account in this regime, not that the account is incorrect, nor that
+the geometric quantities it names are unimportant in regimes where the
+phenomenon is large.
+
+\subsection{Condition Number}
+
+Condition number was the one geometric quantity associated with all four
+estimators at corrected significance, while the two preregistered metrics
+were not. This study provides direct evidence bearing on how that association
+should be read. When we measured the normalization-based operator, it changed
+condition number by approximately $2.7\times10^{5}$ while leaving LID and
+spectral-decay slope unchanged to within $10^{-3}$ and $10^{-6}$
+respectively. Condition number therefore responds strongly to a
+transformation that leaves both shape metrics untouched, consistent with it
+behaving substantially as a scale-sensitive descriptor rather than as a
+measure of the spectral shape at issue. This reading is reinforced by the
+operator's own specification, which adjusts feature radii while holding
+directions fixed~\cite{yu2510dissecting}. Its association with estimator
+performance should accordingly not be read as support for the explanatory
+hypothesis, and we do not treat it as such.
+
+\subsection{Limitations}
+
+Several limitations bound these findings.
+
+The correlational result depends on how the pooled configurations are treated.
+Holm-corrected significance for condition number holds when the $30$
+configurations are treated as the unit of analysis; under an exact permutation
+test over whole seeds none of the four estimator associations survives
+correction. That sensitivity analysis is reported with the results and was not
+preregistered. The two analyses are not in conflict so much as differently
+powered: the seed-level test has only $5! = 120$ arrangements available and
+therefore very little resolution, so it cannot adjudicate an association of this
+size in either direction. What can be said is that the strength of the
+correlational claim is contingent on the resampling unit, and readers who take
+the seed as that unit should treat the association as suggestive rather than
+established.
+
+The evaluation covers one backbone, one representation layer, one diagnostic
+task, and one domain-shift pair. That pair differs in imaging modality, not
+only in acquisition conditions: ISIC 2019 comprises dermoscopic images and
+PAD-UFES-20 close-up clinical photographs. A modality difference is a
+stronger form of distribution shift than the device- or site-level shifts
+that motivate distance-based reliability estimation in deployment, and it is
+the most plausible reason the two populations are as separable as we observe.
+Whether the near-ceiling estimator performance reflects a property of frozen
+foundation-model representations in general, or the modality gap between
+these particular populations, cannot be determined from this study. A
+same-modality shift---for instance between dermoscopic cohorts acquired at
+different sites or with different devices---would produce lower baseline
+separability and a correspondingly more sensitive test. We regard
+constructing such a comparison as a precondition for a stronger evaluation of
+the explanatory hypothesis in this regime rather than as a refinement of the
+present one.
+
+The causal comparison was matched on spectral-decay slope alone. At the
+calibrated exponent, LID remained $0.60$ below the target checkpoint's value,
+so the comparison does not establish matching on both preregistered metrics
+jointly. Because the account names both quantities, this is a genuine
+restriction on what the comparison can support.
+
+The manipulation operator's effect on LID was reproducible but
+non-monotonic, rising at intermediate exponents before falling at full
+strength, with the same profile in all five seeds. A monotone dose--response
+was not assumed by the preregistered criterion, and the observed profile
+satisfies it; but it means the operator does not provide a simple
+one-directional LID control, which constrains the design of future
+comparisons.
+
+Finally, five seeds with an eight-comparison correction family afford limited
+statistical power for the causal comparison, and we report it as
+inconclusive at the significance-test level rather than as evidence in either
+direction.
+
+\subsection{Implications}
+
+For practitioners deploying distance-based reliability estimation on frozen
+foundation-model representations, these results provide no evidence that
+geometry-targeted correction is required before such estimators can be used
+in the configuration evaluated here. This is a statement about the evaluated
+setting, and does not extend to configurations where baseline separability is
+lower.
+
+Methodologically, the value of this study lies less in any individual
+statistic than in the sequence of checks that constrained them. Two elements
+proved decisive. The manipulation check identified, before any causal result
+was interpreted, that the operator originally specified for the comparison
+did not move the quantities at issue---a finding that would otherwise have
+surfaced only as an unexplained null. And preregistering the correction
+family before execution meant that several uncorrected $p$-values below
+$0.05$ could be reported as what they are, rather than selected after the
+fact.
+
+Rather than confirming an explanatory reading of the reported association,
+our results delineate the boundary under which such a reading can currently
+be supported: intervening on representation geometry within a single frozen
+backbone yielded limited empirical support for it, under the evaluated
+backbone, layer, and task.

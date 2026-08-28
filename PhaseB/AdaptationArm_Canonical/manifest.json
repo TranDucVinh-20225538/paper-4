@@ -1,0 +1,333 @@
+{
+  "artifact": "Canonical Adaptation Arm (3 rungs x 5 seeds)",
+  "protocol_step": "Stage 4 -- Adaptation arm, 22_Experimental_Design.md SS3",
+  "rung_definitions": {
+    "linear-probe": "no adapter, frozen z, linear task head only",
+    "partial-FT": "bottleneck adapter r=8, task-only loss (no orthogonality term)",
+    "full-adapter-FT": "bottleneck adapter r=16, task-only loss -- identical condition to ConventionalArm_Canonical/, reused not retrained"
+  },
+  "loss": "L_task only, no orthogonality term -- ordinary fine-tuning control, per 24_PreRegistration.md line 58",
+  "gates": "Gate 0 only -- Gate 1 not applicable (22_Experimental_Design.md SS3.5 names only Intervention/Conventional checkpoints)",
+  "rungs": {
+    "linear-probe": [
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5351217230467095,
+          "id_task_ece_mean": 0.18340256303339714,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 15.027931404443088,
+        "spectral_decay_slope": 0.006973340837017403,
+        "condition_number": 1338282.217424521,
+        "per_direction_variance_w": 20.19818878173828,
+        "maha_auroc": 0.9983847427929624,
+        "maha_fpr95": 0.008091572922834024,
+        "cosine_auroc": 0.9804878767251638,
+        "cosine_fpr95": 0.08071837379119795,
+        "knn_k10_auroc": 0.9978638721548998,
+        "knn_k10_fpr95": 0.011051904479968424,
+        "kde_auroc": 0.8941829613724396,
+        "kde_fpr95": 0.3897769883560292,
+        "seed": 42
+      },
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5351217230467095,
+          "id_task_ece_mean": 0.18340256303339714,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 15.027931404443088,
+        "spectral_decay_slope": 0.006973340837017403,
+        "condition_number": 1338282.217424521,
+        "per_direction_variance_w": 20.19818878173828,
+        "maha_auroc": 0.9983847427929624,
+        "maha_fpr95": 0.008091572922834024,
+        "cosine_auroc": 0.9804878767251638,
+        "cosine_fpr95": 0.08071837379119795,
+        "knn_k10_auroc": 0.9978638721548998,
+        "knn_k10_fpr95": 0.011051904479968424,
+        "kde_auroc": 0.8941829613724396,
+        "kde_fpr95": 0.3897769883560292,
+        "seed": 52
+      },
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5351217230467095,
+          "id_task_ece_mean": 0.18340256303339714,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 15.027931404443088,
+        "spectral_decay_slope": 0.006973340837017403,
+        "condition_number": 1338282.217424521,
+        "per_direction_variance_w": 20.19818878173828,
+        "maha_auroc": 0.9983847427929624,
+        "maha_fpr95": 0.008091572922834024,
+        "cosine_auroc": 0.9804878767251638,
+        "cosine_fpr95": 0.08071837379119795,
+        "knn_k10_auroc": 0.9978638721548998,
+        "knn_k10_fpr95": 0.011051904479968424,
+        "kde_auroc": 0.8941829613724396,
+        "kde_fpr95": 0.3897769883560292,
+        "seed": 62
+      },
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5351217230467095,
+          "id_task_ece_mean": 0.18340256303339714,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 15.027931404443088,
+        "spectral_decay_slope": 0.006973340837017403,
+        "condition_number": 1338282.217424521,
+        "per_direction_variance_w": 20.19818878173828,
+        "maha_auroc": 0.9983847427929624,
+        "maha_fpr95": 0.008091572922834024,
+        "cosine_auroc": 0.9804878767251638,
+        "cosine_fpr95": 0.08071837379119795,
+        "knn_k10_auroc": 0.9978638721548998,
+        "knn_k10_fpr95": 0.011051904479968424,
+        "kde_auroc": 0.8941829613724396,
+        "kde_fpr95": 0.3897769883560292,
+        "seed": 72
+      },
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5351217230467095,
+          "id_task_ece_mean": 0.18340256303339714,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 15.027931404443088,
+        "spectral_decay_slope": 0.006973340837017403,
+        "condition_number": 1338282.217424521,
+        "per_direction_variance_w": 20.19818878173828,
+        "maha_auroc": 0.9983847427929624,
+        "maha_fpr95": 0.008091572922834024,
+        "cosine_auroc": 0.9804878767251638,
+        "cosine_fpr95": 0.08071837379119795,
+        "knn_k10_auroc": 0.9978638721548998,
+        "knn_k10_fpr95": 0.011051904479968424,
+        "kde_auroc": 0.8941829613724396,
+        "kde_fpr95": 0.3897769883560292,
+        "seed": 82
+      }
+    ],
+    "partial-FT": [
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5502655539244212,
+          "id_task_ece_mean": 0.17354500119062632,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.847930515375381,
+        "spectral_decay_slope": 0.0067978869414748655,
+        "condition_number": 1297453.5028470473,
+        "per_direction_variance_w": 21.41165542602539,
+        "maha_auroc": 0.9984604042986728,
+        "maha_fpr95": 0.00789421748569173,
+        "cosine_auroc": 0.9811244295972695,
+        "cosine_fpr95": 0.08288928359976318,
+        "knn_k10_auroc": 0.9973869727891682,
+        "knn_k10_fpr95": 0.01263074797710677,
+        "kde_auroc": 0.8202688843303045,
+        "kde_fpr95": 0.5593053088612592,
+        "seed": 42
+      },
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5551386286625085,
+          "id_task_ece_mean": 0.17335127307155881,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.923322705369515,
+        "spectral_decay_slope": 0.006788840135473138,
+        "condition_number": 1249917.4822378922,
+        "per_direction_variance_w": 21.041828155517578,
+        "maha_auroc": 0.9983861168952228,
+        "maha_fpr95": 0.008091572922834024,
+        "cosine_auroc": 0.9727633179279295,
+        "cosine_fpr95": 0.09394118807973159,
+        "knn_k10_auroc": 0.9966373141247578,
+        "knn_k10_fpr95": 0.01677521215709493,
+        "kde_auroc": 0.8192901799953727,
+        "kde_fpr95": 0.5101638050128281,
+        "seed": 52
+      },
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5505967042709632,
+          "id_task_ece_mean": 0.17688889044523967,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.622042236645575,
+        "spectral_decay_slope": 0.0068071836062409226,
+        "condition_number": 1788076.8461754231,
+        "per_direction_variance_w": 21.61113166809082,
+        "maha_auroc": 0.9985436233668151,
+        "maha_fpr95": 0.007302151174264851,
+        "cosine_auroc": 0.9761676562779382,
+        "cosine_fpr95": 0.08900730215117426,
+        "knn_k10_auroc": 0.9971951996424585,
+        "knn_k10_fpr95": 0.014209591474245116,
+        "kde_auroc": 0.8514027780568924,
+        "kde_fpr95": 0.4815472666271956,
+        "seed": 62
+      },
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990950226244344,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5523661676165362,
+          "id_task_ece_mean": 0.16995954607920316,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.820756021395319,
+        "spectral_decay_slope": 0.006803457732294488,
+        "condition_number": 1289071.0684380373,
+        "per_direction_variance_w": 19.97812271118164,
+        "maha_auroc": 0.9983806204861815,
+        "maha_fpr95": 0.008091572922834024,
+        "cosine_auroc": 0.9700962713219876,
+        "cosine_fpr95": 0.10420367081113084,
+        "knn_k10_auroc": 0.9959122175382511,
+        "knn_k10_fpr95": 0.01993289915137162,
+        "kde_auroc": 0.7643662820726203,
+        "kde_fpr95": 0.6131833432011052,
+        "seed": 72
+      },
+      {
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5569736807942082,
+          "id_task_ece_mean": 0.1746088195229349,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.928456104812035,
+        "spectral_decay_slope": 0.006777516444117233,
+        "condition_number": 1287474.5499264821,
+        "per_direction_variance_w": 21.11084747314453,
+        "maha_auroc": 0.9983745229074011,
+        "maha_fpr95": 0.008091572922834024,
+        "cosine_auroc": 0.9796770275694725,
+        "cosine_fpr95": 0.07499506611407145,
+        "knn_k10_auroc": 0.9972774740152968,
+        "knn_k10_fpr95": 0.012433392539964476,
+        "kde_auroc": 0.8064848351498105,
+        "kde_fpr95": 0.5729228340240774,
+        "seed": 82
+      }
+    ],
+    "full-adapter-FT": [
+      {
+        "seed": 42,
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990950226244344,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5497322629559989,
+          "id_task_ece_mean": 0.17330400180371647,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.465342839621375,
+        "spectral_decay_slope": 0.00680667228713005,
+        "condition_number": null,
+        "per_direction_variance_w": null,
+        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+      },
+      {
+        "seed": 52,
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990950226244344,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5605511716313739,
+          "id_task_ece_mean": 0.16472534173840123,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.873392408163484,
+        "spectral_decay_slope": 0.006773683532122842,
+        "condition_number": null,
+        "per_direction_variance_w": null,
+        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+      },
+      {
+        "seed": 62,
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9986425339366516,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5578169624740854,
+          "id_task_ece_mean": 0.16907279504468004,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.736058000123615,
+        "spectral_decay_slope": 0.006791070330546099,
+        "condition_number": null,
+        "per_direction_variance_w": null,
+        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+      },
+      {
+        "seed": 72,
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990045248868779,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5675169415593057,
+          "id_task_ece_mean": 0.16853220807635627,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.717518168244355,
+        "spectral_decay_slope": 0.006784990813169225,
+        "condition_number": null,
+        "per_direction_variance_w": null,
+        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+      },
+      {
+        "seed": 82,
+        "gate0": {
+          "domain_probe_accuracy_mean": 0.9990950226244344,
+          "criterion_1_pass": true,
+          "id_task_balanced_accuracy_mean": 0.5840169299227834,
+          "id_task_ece_mean": 0.16836519430685204,
+          "criterion_2_pass": true,
+          "gate0_pass": true
+        },
+        "lid_mean": 14.705589796993815,
+        "spectral_decay_slope": 0.0067800891853162255,
+        "condition_number": null,
+        "per_direction_variance_w": null,
+        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+      }
+    ]
+  },
+  "gate0_pass_linear_probe_and_partial_ft": true,
+  "created_at": "2026-08-05T20:06:52.107670+00:00",
+  "status": "FROZEN",
+  "bugfix_note": "Reliability scorers originally fit on load_training_population()'s combined ISIC+PAD-UFES set (label=-1 for PAD-UFES), which corrupts compute_mahalanobis_params_from_arrays via negative indexing (label=-1 -> class_means[-1], i.e. class 7's mean, instead of exclusion). Refit on ISIC-only training population (TRAIN_DIR, matching stage4_reliability_scorers.py's already-correct approach). Gate 0 and geometry metrics were unaffected -- not recomputed."
+}

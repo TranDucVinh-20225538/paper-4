@@ -1,0 +1,20 @@
+{
+  "protocol_step": "EA-01 implementation -- Embedding Integrity Gate",
+  "timestamp": "2026-08-05T05:58:47.229908+00:00",
+  "shape_ok": true,
+  "embedding_shape": [
+    16211,
+    1024
+  ],
+  "sample_count_ok": true,
+  "n_total": 16211,
+  "ordering_preserved": true,
+  "fresh_reconstruction_matches_extraction_df": true,
+  "label_alignment_ok": true,
+  "all_paths_exist_on_disk": true,
+  "structural_checks_pass": true,
+  "sha256_embeddings_npy": "419ba2c73e95f3b97063f3d6c7fac5fd2faa0393b1a1cc267096b69d730a62df",
+  "sha256_labels_csv": "d32f22700f352d15d5d067f89f26863af6eb37c1793649af00cd935756a1287f",
+  "sha256_metadata_csv": "c6b960a1f991c48ee16208be6469ddfb059c324fc8658a1aef007d62710dcbb3",
+  "gate_result": "PASS"
+}

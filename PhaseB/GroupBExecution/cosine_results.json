@@ -1,0 +1,26 @@
+{
+  "scorer": "cosine_to_centroid",
+  "protocol_step": "Stage 3.2 Group B (Mahalanobis-family)",
+  "execution_contract": "/Users/cubo/Research/Paper4/PhaseB/GroupBExecution/execution_contract.md",
+  "produced_by_script": "/Users/cubo/Research/Paper4/PhaseB/analysis/groupB_mahalanobis_family.py",
+  "fit_artifact": {
+    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding",
+    "manifest_status": "FROZEN",
+    "n": 16211
+  },
+  "eval_artifact": {
+    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+    "manifest_status": "FROZEN",
+    "n_id": 5067,
+    "n_ood": 2298
+  },
+  "csg_skin_commit": "12338983d87a35b3ad040687ad09f04908fb0c55",
+  "hyperparameters": {
+    "means_source": "reused from the Mahalanobis fit above, same call, not refit"
+  },
+  "created_at": "2026-08-05T06:56:55.872381+00:00",
+  "tier": "Tier 1 (Measurement) -- single-arm raw scores, no cross-arm comparison, no claim test",
+  "not_computed_here": "No Energy, no ViM, no Relative Mahalanobis, no cross-arm comparison, no interpretation beyond the raw AUROC/FPR95 numbers themselves.",
+  "auroc": 0.9804878767251638,
+  "fpr95": 0.08071837379119795
+}

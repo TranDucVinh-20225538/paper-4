@@ -1,0 +1,113 @@
+% introduction.tex -- v2 (2026-08-06).
+%
+% REBUILT, not patched. Primary-source verification (arXiv:2510.15202v3, PDF
+% full text) overturned v1's central premise. v1 asserted that both the
+% phenomenon and the geometric account were established on convolutional
+% networks and that transfer to foundation models was untested. Verified:
+% that paper is itself "a large-scale study across diverse foundation-model
+% backbones", contains ZERO uses of "probe", and never discusses the
+% probe-reliability dissociation.
+%
+% STRUCTURE (three positions, kept distinct -- see ../../27_One_Sentence_Paper.md):
+%   1. the dissociation      -- reported on CNNs
+%   2. the association       -- geometry vs detector performance, correlational,
+%                               across frozen foundation-model backbones
+%   3. the link between them -- THIS PAPER's hypothesis, tested causally
+%                               within one fixed backbone
+%
+% Do not reintroduce: "transfer", any priority claim, or any sentence
+% attributing to prior work an account OF THE DISSOCIATION.
+%
+% Ordering constraint: phenomenon before account, throughout.
+% Vocabulary: "account"/"explanation" only. "Mediation" is defined in Methods.
+%
+% VERIFICATION STATUS: prior-work characterizations in paragraphs 2-3 are now
+% verified against primary sources (paper-3 abstract; arXiv:2510.15202v3 PDF).
+% Remaining \cite keys to resolve: tran2026decodable, TODO-medical-ood-survey.
+
+\section{Introduction}
+
+Automated diagnostic systems deployed in dermatology routinely encounter
+images acquired under conditions their training data does not represent:
+different capture devices, illumination, populations, and clinical settings.
+Because a classifier's confidence is unreliable on such inputs, deployed
+systems commonly pair the classifier with a separate safeguard that estimates
+whether an input falls outside the training distribution. Distance-based
+estimators---Mahalanobis distance to class centroids and its
+relatives---remain the dominant choice for this role, and they rest on a
+geometric premise: that inputs from an unseen acquisition domain occupy a
+measurably different region of the representation space than the training
+population does.
+
+Two lines of evidence complicate that premise, and they have so far remained
+separate.
+
+The first concerns whether the premise holds at all. On convolutional
+representations of skin lesions, a linear probe recovered acquisition-domain
+identity at high accuracy---establishing that the domain signal was present
+and linearly decodable---while distance-based estimators operating on the
+same representations performed near chance~\cite{tran2026decodable}. The
+information distinguishing the domains was decodable, but not accessible to
+the estimator intended to exploit it. This dissociation is clinically
+relevant because it describes a failure mode in which the safeguard reports
+normality precisely where a probe could establish that the input is
+anomalous.
+
+The second concerns what governs estimator performance. Across a range of
+frozen vision foundation-model backbones, two properties of the
+in-distribution representation---its local intrinsic dimensionality (LID) and
+the decay profile of its within-class covariance spectrum---were found to
+track how well Mahalanobis-style estimators perform~\cite{yu2510dissecting}.
+That work reports an association measured across representations produced by
+different pretraining regimes, and characterizes it as tracking rather than
+causation.
+
+Whether the second line of evidence explains the first is an open question,
+and it is the question we take up. An association observed across
+representations is consistent with several readings: geometry may govern what
+distance-based estimators can recover; or both geometry and estimator
+performance may follow jointly from properties of the pretraining regime that
+distinguish one backbone from another. These readings are not separable by
+comparing backbones, because backbones differ in many respects at once.
+Distinguishing them requires holding the representation's provenance fixed
+and intervening on geometry directly---and if geometry governs accessibility
+in the sense the dissociation would require, such an intervention should
+change what distance-based estimators recover from a representation whose
+domain content is otherwise preserved.
+
+We evaluated that hypothesis on a frozen dermatology foundation model, within
+a single fixed backbone rather than across backbones. Rather than proposing a
+new out-of-distribution detector, we assessed an explanatory hypothesis,
+under a preregistered protocol incorporating implementation-integrity
+verification, manipulation checking, and prespecified statistical analysis
+with multiplicity correction fixed in advance of execution. Only checkpoints
+clearing both verification stages enter the causal comparison.
+
+Our findings provide limited empirical support for a causal explanatory
+reading of the association, under the evaluated backbone, layer, and task.
+The probe--reliability dissociation remained statistically detectable, but at
+approximately two orders of magnitude smaller a margin than originally
+reported, with distance-based estimators already operating near ceiling on
+the unmodified representation. The two preregistered geometry metrics showed
+no Holm-significant association with estimator performance. These results
+indicate that associations observed across representations warrant direct
+intervention-based evaluation before being interpreted as explanatory.
+
+The contributions of this work are as follows.
+
+\begin{itemize}
+  \item We present a preregistered evaluation protocol for testing whether an
+        observed representation-level association supports a causal
+        explanatory reading, incorporating implementation-integrity gating,
+        explicit manipulation checking, and multiplicity correction fixed
+        before execution.
+  \item We formulate and test the hypothesis that links two previously
+        separate observations---the probe--reliability dissociation and the
+        geometry--performance association---by intervening on representation
+        geometry within a single fixed frozen backbone, rather than comparing
+        geometry across backbones that differ in many respects at once.
+  \item We characterize the extent to which the previously reported
+        probe--reliability dissociation is observable in this regime, and the
+        degree of empirical support the explanatory hypothesis receives under
+        the evaluated backbone, layer, and task.
+\end{itemize}

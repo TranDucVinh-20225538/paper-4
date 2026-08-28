@@ -1,0 +1,35 @@
+{
+  "artifact": "Reference Embedding Artifact",
+  "artifact_path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/panderm_reference_embedding_artifact.npz",
+  "artifact_sha256": "34134fa4d3e77f925220e9c5a91621fda497db2db874380060bcedf35b21d832",
+  "artifact_bytes": 30937996,
+  "produced_by_protocol_step": "Stage 2.1",
+  "produced_by_script": "/Users/cubo/Research/Paper4/PhaseB/analysis/stage2_1_extract_reference_embeddings.py",
+  "extraction_started_utc": "2026-08-04T19:39:16.725678+00:00",
+  "extraction_finished_utc": "2026-08-04T20:53:21.193516+00:00",
+  "n_id_isic": 5067,
+  "n_ood_pad_ufes": 2298,
+  "n_total": 7365,
+  "embedding_dim": 1024,
+  "extraction_batch_size": 32,
+  "id_throughput_images_per_sec": 3.1349023527961393,
+  "ood_throughput_images_per_sec": 2.9174883719565528,
+  "instrument": {
+    "checkpoint_metadata": "/Users/cubo/Research/Paper4/PhaseB/assets/panderm_vitl16_checkpoint_metadata.json",
+    "preprocessing_snapshot": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_preprocessing.json",
+    "panderm_repo_commit": "fd7a80748ba7fc3e203fed88f909f4689d0d6f24"
+  },
+  "dataset": {
+    "csg_skin_commit": "12338983d87a35b3ad040687ad09f04908fb0c55",
+    "metadata_csv": "/Users/cubo/Research/CSG-SKin/data/master_metadata.csv",
+    "dataset_validation_report": "/Users/cubo/Research/Paper4/PhaseB/outputs/dataset_validation_report.json"
+  },
+  "embedding_integrity_gate_report": "/Users/cubo/Research/Paper4/PhaseB/outputs/embedding_integrity_gate_report.json",
+  "columns": {
+    "embeddings": "(n_total, 1024) float32 -- CLS token, post-final-LayerNorm",
+    "labels": "(n_total,) int -- CSG-Skin label_idx (0..7, see src/datasets/constants.py LABELS)",
+    "domain": "(n_total,) str -- 'isic' (ID) or 'pad_ufes' (OOD)",
+    "path": "(n_total,) str -- source image file path"
+  },
+  "not_computed_here": "No probe, no Mahalanobis or other distance scorer, no geometry metric, no PCA/UMAP, no statistics. Extraction and integrity checks only."
+}

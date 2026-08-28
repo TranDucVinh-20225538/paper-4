@@ -1,0 +1,23 @@
+{
+  "instrument": "PanDerm ViT-L/16 (PanDerm_Large_LP)",
+  "frozen_from": {
+    "repo": "https://github.com/SiyuanYan1/PanDerm",
+    "commit": "fd7a80748ba7fc3e203fed88f909f4689d0d6f24",
+    "function": "models.builder.get_eval_transforms(which_img_norm='imagenet', img_resize=256, center_crop=True)",
+    "verified_stage": "1.2",
+    "frozen_date": "2026-08-05"
+  },
+  "pipeline": [
+    { "op": "Resize", "size": 256, "interpolation": "bilinear", "max_size": null, "antialias": true },
+    { "op": "CenterCrop", "size": [224, 224] },
+    { "op": "ToTensor" },
+    {
+      "op": "Normalize",
+      "mean": [0.485, 0.456, 0.406],
+      "std": [0.228, 0.224, 0.225],
+      "note": "As hard-coded in the repo's get_norm_constants('imagenet'). The std's first value (0.228) is NOT the textbook ImageNet constant (0.229) -- recorded verbatim from the repo, not corrected, since fidelity to what produced the checkpoint's embeddings matters more than matching the textbook constant."
+    }
+  ],
+  "purpose": "Reproducibility pin, per Vinh (2026-08-05): if the PanDerm repo is ever updated in place, this file is the record of exactly what preprocessing produced Stage 1.2/1.3's validated results, independent of the live repo state. Code still calls the repo's own get_eval_transforms() at runtime (not a reimplementation) -- this file is the audit snapshot to check that call against, not a replacement for it.",
+  "modified": false
+}

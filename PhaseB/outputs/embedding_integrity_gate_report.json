@@ -1,0 +1,45 @@
+{
+  "protocol_step": "Stage 2.1 -- Embedding Integrity Gate (final, ReferenceEmbedding/ layout)",
+  "date": "2026-08-05",
+  "timestamp": "2026-08-04T21:02:18.419583+00:00",
+  "check_1_sample_count": {
+    "isic": 5067,
+    "expected_isic": 5067,
+    "pad": 2298,
+    "expected_pad": 2298,
+    "pass": true
+  },
+  "check_2_embedding_tensor_shape": {
+    "shape": [
+      7365,
+      1024
+    ],
+    "expected": [
+      7365,
+      1024
+    ],
+    "pass": true
+  },
+  "check_3_ordering_metadata_row_i_to_embedding_row_i": {
+    "method": "Freshly reconstructed the ID (ISIC-test) + OOD (PAD-UFES) dataframes from master_metadata.csv using the same split logic (independent function call, not reading anything cached from the extraction run), then compared path/label_idx arrays element-by-element against the extraction artifact's stored path/label arrays.",
+    "paths_match_fresh_reconstruction": true,
+    "labels_match_fresh_reconstruction": true,
+    "n_compared": 7365,
+    "conclusion": "PROVEN: metadata row i corresponds to embedding row i, for all i, independently re-derived"
+  },
+  "check_4_label_alignment": {
+    "pass": true,
+    "method": "see row_ordering_proof"
+  },
+  "check_5_sha256": {
+    "embeddings.npy": "3a12b0e08440e63f4a6a2821705d1947a3063a4543c80d1ceafa323902eac9ff",
+    "labels.csv": "17ead2bff75d614659b860c875d4e00a73c53dc7e60c2ef1e0174e597247f658",
+    "metadata.csv": "26ad35e05e4a6820ac25f3bb21541653c09936c0b4433f1715ec23196fae72e5"
+  },
+  "check_6_manifest": {
+    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding/manifest.json",
+    "pass": true
+  },
+  "target_directory": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+  "gate_result": "PASS"
+}

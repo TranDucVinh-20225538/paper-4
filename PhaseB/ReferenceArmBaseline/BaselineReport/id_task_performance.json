@@ -1,0 +1,56 @@
+{
+  "tier": "1+2",
+  "group": null,
+  "per_seed": [
+    {
+      "seed": 42,
+      "accuracy": 0.7081447963800905,
+      "balanced_accuracy": 0.5760066954829091,
+      "n_test": 2210,
+      "ece": 0.1875501563828657
+    },
+    {
+      "seed": 52,
+      "accuracy": 0.7067873303167421,
+      "balanced_accuracy": 0.5800817022484889,
+      "n_test": 2210,
+      "ece": 0.1904824881348401
+    },
+    {
+      "seed": 62,
+      "accuracy": 0.7230769230769231,
+      "balanced_accuracy": 0.5819239517007984,
+      "n_test": 2210,
+      "ece": 0.17045445222291633
+    },
+    {
+      "seed": 72,
+      "accuracy": 0.7126696832579186,
+      "balanced_accuracy": 0.5464482550281408,
+      "n_test": 2210,
+      "ece": 0.17939342878654735
+    },
+    {
+      "seed": 82,
+      "accuracy": 0.7058823529411765,
+      "balanced_accuracy": 0.5853850340851374,
+      "n_test": 2210,
+      "ece": 0.18243466536395175
+    }
+  ],
+  "summary": {
+    "seeds": [
+      42,
+      52,
+      62,
+      72,
+      82
+    ],
+    "balanced_accuracy_mean": 0.5739691277090949,
+    "balanced_accuracy_std": 0.014089115133175473,
+    "ece_mean": 0.18206303817822422,
+    "ece_std": 0.006971653931668435,
+    "majority_class_baseline_accuracy": 0.3827562797012899,
+    "chance_balanced_accuracy": 0.125
+  }
+}

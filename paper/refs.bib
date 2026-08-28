@@ -1,0 +1,163 @@
+% refs.bib -- bibliography for the manuscript.
+%
+% Seeded with the references already verified during this project (fetched and
+% checked, not recalled). Entries still needed: PanDerm, ISIC 2019, PAD-UFES-20,
+% and the prior CNN-based work this paper evaluates the transfer of.
+
+% Title verified against arXiv:2510.15202v3 PDF (3 Mar 2026). v1 was titled
+% "Dissecting Mahalanobis..."; the paper was retitled. Cite the current title.
+@article{yu2510dissecting,
+  title   = {A Geometry-Based View of Mahalanobis {OOD} Detection},
+  author  = {Janiak, Denis and Binkowski, Jakub and Kajdanowicz, Tomasz},
+  journal = {arXiv preprint arXiv:2510.15202},
+  year    = {2026},
+  note    = {Study across frozen vision foundation-model backbones; LID and within-class spectral slope reported to track Mahalanobis performance}
+}
+
+% Verified from the model's own source (classification/models/modeling_finetune.py:
+% panderm_large_patch16_224 -> patch_size=16, embed_dim=1024, depth=24) and the
+% arXiv:2410.15038 PDF (pretraining corpus: 2,149,706 images, 11 named sources).
+@article{yan2025panderm,
+  title   = {A Multimodal Vision Foundation Model for Clinical Dermatology},
+  author  = {Yan, Siyuan and others},
+  journal = {Nature Medicine},
+  year    = {2025},
+  note    = {doi:10.1038/s41591-025-03747-y; preprint arXiv:2410.15038}
+}
+
+% PUBLICATION STATUS UNRESOLVED -- the prior CNN study is the authors' own
+% earlier manuscript, prepared for BSPC submission. Confirm whether it is
+% published, under review, or a preprint, and update this entry and the
+% self-citation handling accordingly BEFORE submission. Do not submit with
+% this note unresolved.
+@unpublished{tran2026decodable,
+  title  = {Decodable but Not Accessible: Auditing Distance-Based Reliability Estimation on Disentangled Skin-Lesion Representations},
+  author = {Tran, Duc-Vinh},
+  year   = {2026},
+  note   = {Manuscript; publication status to be confirmed before submission}
+}
+
+@article{alain2016probes,
+  title   = {Understanding Intermediate Layers Using Linear Classifier Probes},
+  author  = {Alain, Guillaume and Bengio, Yoshua},
+  journal = {arXiv preprint arXiv:1610.01644},
+  year    = {2016}
+}
+
+% --- Datasets (citations taken from PanDerm's published reference list) ---
+
+@article{tschandl2018ham10000,
+  title   = {The {HAM10000} Dataset, a Large Collection of Multi-Source Dermatoscopic Images of Common Pigmented Skin Lesions},
+  author  = {Tschandl, Philipp and Rosendahl, Cliff and Kittler, Harald},
+  journal = {Scientific Data},
+  volume  = {5},
+  pages   = {180161},
+  year    = {2018}
+}
+
+@article{hernandezperez2024bcn20000,
+  title   = {{BCN20000}: Dermoscopic Lesions in the Wild},
+  author  = {Hern{\'a}ndez-P{\'e}rez, Carlos and others},
+  journal = {Scientific Data},
+  volume  = {11},
+  pages   = {641},
+  year    = {2024}
+}
+
+@inproceedings{codella2018isbi,
+  title     = {Skin Lesion Analysis Toward Melanoma Detection: A Challenge at the 2017 International Symposium on Biomedical Imaging (ISBI), Hosted by the International Skin Imaging Collaboration (ISIC)},
+  author    = {Codella, Noel C. F. and others},
+  booktitle = {IEEE 15th International Symposium on Biomedical Imaging (ISBI)},
+  pages     = {168--172},
+  year      = {2018}
+}
+
+@article{pacheco2020padufes,
+  title   = {{PAD-UFES-20}: A Skin Lesion Dataset Composed of Patient Data and Clinical Images Collected from Smartphones},
+  author  = {Pacheco, Andre G. C. and others},
+  journal = {Data in Brief},
+  volume  = {32},
+  pages   = {106221},
+  year    = {2020}
+}
+
+@inproceedings{lee2018simple,
+  title     = {A Simple Unified Framework for Detecting Out-of-Distribution Samples and Adversarial Attacks},
+  author    = {Lee, Kimin and Lee, Kibok and Lee, Honglak and Shin, Jinwoo},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume    = {31},
+  year      = {2018}
+}
+
+@article{levina2004maximum,
+  title   = {Maximum Likelihood Estimation of Intrinsic Dimension},
+  author  = {Levina, Elizaveta and Bickel, Peter J.},
+  journal = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume  = {17},
+  year    = {2004}
+}
+
+@article{li2603spectral,
+  title   = {Spectral Tempering for Embedding Compression in Dense Passage Retrieval},
+  author  = {Li, Yongkang and Eustratiadis, Panagiotis and Kanoulas, Evangelos},
+  journal = {Proceedings of SIGIR},
+  year    = {2026},
+  note    = {arXiv:2603.19339. AR-02's selected geometry-manipulation operator; instantiated here with fixed gamma}
+}
+
+@article{holm1979simple,
+  title   = {A Simple Sequentially Rejective Multiple Test Procedure},
+  author  = {Holm, Sture},
+  journal = {Scandinavian Journal of Statistics},
+  volume  = {6},
+  number  = {2},
+  pages   = {65--70},
+  year    = {1979}
+}
+
+% --- Post-hoc geometry/isotropy transforms (verified in the AR-02 survey,
+% --- 2026-08-06; abstracts fetched, not recalled) ---
+
+@inproceedings{mu2018allbutthetop,
+  title     = {All-but-the-Top: Simple and Effective Postprocessing for Word Representations},
+  author    = {Mu, Jiaqi and Viswanath, Pramod},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2018},
+  note      = {arXiv:1702.01417}
+}
+
+@article{su2021whitening,
+  title   = {Whitening Sentence Representations for Better Semantics and Faster Retrieval},
+  author  = {Su, Jianlin and Cao, Jiarun and Liu, Weijie and Ou, Yangyiwen},
+  journal = {arXiv preprint arXiv:2103.15316},
+  year    = {2021}
+}
+
+@article{diera2024isotropy,
+  title   = {Isotropy Matters: Soft-ZCA Whitening of Embeddings for Semantic Code Search},
+  author  = {Diera, Andor and Galke, Lukas and Scherp, Ansgar},
+  journal = {arXiv preprint arXiv:2411.17538},
+  year    = {2024}
+}
+
+@article{forooghi2024whitening,
+  title   = {Whitening Not Recommended for Classification Tasks in {LLM}s},
+  author  = {Forooghi, Ali and Sadeghi, Shaghayegh and Lu, Jianguo},
+  journal = {arXiv preprint arXiv:2407.12886},
+  year    = {2024}
+}
+
+@article{weng2023modulate,
+  title   = {Modulate Your Spectrum in Self-Supervised Learning},
+  author  = {Weng, Xi and Ni, Yunhao and Song, Tengwei and Luo, Jie and Anwer, Rao Muhammad and Khan, Salman and Khan, Fahad Shahbaz and Huang, Lei},
+  journal = {arXiv preprint arXiv:2305.16789},
+  year    = {2023}
+}
+
+@inproceedings{huang2024ldreg,
+  title     = {{LDR}eg: Local Dimensionality Regularized Self-Supervised Learning},
+  author    = {Huang, Hanxun and Campello, Ricardo J. G. B. and Erfani, Sarah Monazam and Ma, Xingjun and Houle, Michael E. and Bailey, James},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2024},
+  note      = {arXiv:2401.10474}
+}

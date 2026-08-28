@@ -1,0 +1,77 @@
+{
+  "lambda_proj_probe": 0.1,
+  "baseline_alpha0": {
+    "lid_mean": 15.027931404443088,
+    "spectral_decay_slope": 0.006973340837017403
+  },
+  "r_grid_results": [
+    {
+      "r": 16,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9983710407239819,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.5469978466759106,
+        "id_task_ece_mean": 0.1724885098802782,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 14.260953012030958,
+        "spectral_decay_slope": 0.006806696282725612,
+        "composite": 0.09706997585511574,
+        "n_samples": 7365
+      }
+    },
+    {
+      "r": 32,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9987330316742081,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.5715394893808177,
+        "id_task_ece_mean": 0.16441415143349908,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 14.381980160645167,
+        "spectral_decay_slope": 0.006799359144479077,
+        "composite": 0.09778824832099937,
+        "n_samples": 7365
+      }
+    },
+    {
+      "r": 64,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9987330316742081,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.6039174300714134,
+        "id_task_ece_mean": 0.14530163350659492,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 13.482478675316,
+        "spectral_decay_slope": 0.006825991927059254,
+        "composite": 0.09203129059445557,
+        "n_samples": 7365
+      }
+    },
+    {
+      "r": 128,
+      "gate0": {
+        "domain_probe_accuracy_mean": 0.9988235294117647,
+        "criterion_1_pass": true,
+        "id_task_balanced_accuracy_mean": 0.6374518337176882,
+        "id_task_ece_mean": 0.12004987880594822,
+        "criterion_2_pass": true,
+        "gate0_pass": true
+      },
+      "gate1_measurement": {
+        "lid_mean": 12.780068210401177,
+        "spectral_decay_slope": 0.006801736770216144,
+        "composite": 0.08692665987255613,
+        "n_samples": 7365
+      }
+    }
+  ]
+}

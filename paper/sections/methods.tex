@@ -1,0 +1,227 @@
+% methods.tex
+%
+% Every number in this section is taken from a frozen artifact under
+% ../../PhaseB/ (manifests + sha256, chmod 444). Do not recompute, and do not
+% substitute remembered values:
+%   ../../22_Experimental_Design.md          -- design, gates (SS3.5), analysis plan (SS6)
+%   ../../24_PreRegistration.md              -- preregistered claims C1-C5
+%   ../../PhaseB/ExecutionAmendments/        -- EA-01, EA-03
+%   ../../PhaseB/ArchitectureResolutions/    -- AR-01 (adapter family), AR-02 (geometry operator)
+%   ../../PhaseB/Stage5_manifest_sha256.txt  -- frozen C2-C5 outputs
+%
+% This is the first section permitted to use "mediation" -- it is defined here
+% (Subsection VIII) and only then used. Before this point the manuscript says
+% "account" / "explanation" throughout.
+%
+% VERIFICATION DEBT: dataset citations (ISIC 2019, PAD-UFES-20), the backbone
+% citation (PanDerm), and the prior CNN study remain \cite{TODO-...}. See
+% related_work.tex's header for the full citation work list.
+
+\section{Methods}
+\label{sec:methods}
+
+\subsection{Backbone and Populations}
+
+All experiments use a single frozen pretrained dermatology foundation model,
+PanDerm ViT-L/16~\cite{yan2025panderm}, as a feature extractor. The backbone is never
+updated: every intervention described below operates on its output
+embeddings, which are $1024$-dimensional. Embeddings were extracted once
+under a fixed preprocessing pipeline and stored as an immutable artifact with
+checksum verification, so that all downstream analyses share bit-identical
+inputs.
+
+The in-distribution population is ISIC 2019~\cite{tschandl2018ham10000,%
+hernandezperez2024bcn20000,codella2018isbi}, comprising $25{,}331$
+dermoscopic images across eight diagnostic classes. We partition it with a
+fixed seed into a held-out evaluation set ($20\%$, $n = 5{,}067$), a
+validation set ($20\%$ of the remainder, $n = 4{,}053$), and a training
+population ($n = 16{,}211$) used to fit all distribution-dependent
+quantities. The validation split is not used in the analyses reported here.
+This partition is specific to the present study and does not correspond to
+the challenge's own splits.
+
+The domain-shifted population is PAD-UFES-20~\cite{pacheco2020padufes},
+contributing $2{,}298$ close-up clinical images collected in Brazil; the
+modality difference from ISIC's dermoscopic images accompanies differences in
+device, population, and clinical setting. PAD-UFES-20 is mapped into the same
+eight-class label space and populates six of the eight classes. The
+evaluation population combines held-out ISIC and PAD-UFES images, $n =
+7{,}365$ in total. Class labels are used for the in-distribution task and for
+class-conditional estimator fitting; the domain label (ISIC versus PAD-UFES)
+is the target of the domain probe.
+
+Neither ISIC 2019 nor PAD-UFES-20 forms part of the backbone's pretraining
+corpus, which draws on eleven separately described
+sources~\cite{yan2025panderm}.
+
+We additionally define a fixed nuisance direction
+$w = \mathrm{unit}(\mu_{\mathrm{ISIC}} - \mu_{\mathrm{PAD}})$, the unit vector
+between population means, computed once and frozen before any intervention
+was trained.
+
+\subsection{Geometry Metrics}
+
+Four geometric quantities are measured on every evaluated representation. Two
+are preregistered as the metrics the account under evaluation specifies; two
+are recorded alongside them.
+
+\emph{Local intrinsic dimensionality} (LID) is estimated per point by the
+Levina--Bickel maximum-likelihood estimator~\cite{levina2004maximum} with
+$k = 50$ neighbours,
+\begin{equation}
+  \mathrm{LID}_k(z) = -\left[\frac{1}{k}\sum_{j=1}^{k}
+    \log \frac{r_j(z)}{r_k(z)}\right]^{-1},
+\end{equation}
+where $r_j(z)$ is the distance from $z$ to its $j$-th nearest neighbour in the
+same feature set, and reported as the dataset mean.
+
+\emph{Within-class spectral-decay slope} is obtained from the within-class
+scatter matrix $S_w = \frac{1}{N}\sum_c \sum_{i: y_i = c} (z_i - \mu_c)(z_i -
+\mu_c)^{\top}$, computed without regularization so that tail eigenvalues are
+not distorted. Its eigenvalues are sorted in descending order and fitted by
+ordinary least squares as $\log \lambda_i = a + b\,i$ over the full range
+$i = 1,\dots,d$; the reported slope is $|b|$.
+
+\emph{Condition number} is computed on the fitted Mahalanobis precision
+matrix, and \emph{per-direction variance} is the variance of the projection
+of the evaluation embeddings onto the frozen nuisance direction,
+$\mathrm{Var}(z^{\top} w)$.
+
+\subsection{Representation Intervention and Dose Ladder}
+
+The intervention is a bottleneck adapter applied to the frozen embedding,
+\begin{equation}
+  z' = z + W_2\,\mathrm{GELU}(W_1 z),
+\end{equation}
+with bottleneck width $r = 16$ and the up-projection $W_2$ initialized to
+zero, so that the adapter is exactly the identity at initialization. The
+Intervention arm is trained with a task loss on the eight-class diagnostic
+objective plus an orthogonality penalty against the frozen nuisance direction,
+weighted by $\lambda_{\mathrm{proj}} = 0.1$. Training uses AdamW, learning
+rate $10^{-3}$, batch size $512$, for $100$ epochs, repeated across five
+seeds $\{42, 52, 62, 72, 82\}$. Bottleneck width and $\lambda_{\mathrm{proj}}$
+were selected by a preregistered rule fixed before the canonical runs.
+
+Intervention strength is varied post hoc rather than by retraining. For each
+trained adapter we compute its displacement $\Delta z = W_2\,\mathrm{GELU}(W_1
+z)$ and evaluate the ladder
+\begin{equation}
+  z'(\alpha) = z + \alpha\,\Delta z, \qquad
+  \alpha \in \{0, 0.25, 0.5, 0.75, 1.0\},
+\end{equation}
+so that $\alpha = 0$ recovers the unmodified representation and $\alpha = 1$
+the fully trained adapter. This isolates strength from optimization variance:
+every rung of a given seed's ladder derives from one optimization run.
+
+\subsection{Control Arms}
+
+Two controls accompany the Intervention arm. The \emph{Conventional} arm is
+trained identically---same adapter, same width, same schedule, same
+seeds---but with the task loss alone and no orthogonality penalty, giving a
+matched-budget ordinary fine-tuning comparison that separates intervention
+\emph{type} from intervention \emph{budget}. The \emph{Adaptation} arm spans
+three capacity rungs (linear probe with the embedding unchanged; partial
+fine-tuning at $r = 8$; full adapter fine-tuning at $r = 16$), all trained
+with the task loss alone, and supplies the additional configurations required
+by the correlational analysis.
+
+\subsection{Verification Gates}
+
+No checkpoint contributes to a reported comparison before clearing two gates
+specified in advance.
+
+\emph{Gate 0} (implementation integrity) confirms that the intervention left
+the representation usable and the domain signal present. It requires domain
+probe accuracy above the majority-class baseline by a fixed margin
+($> 0.688 + 0.05$) and in-distribution eight-class balanced accuracy above
+chance by a fixed margin ($> 0.125 + 0.10$). Both probes are
+$\ell_2$-regularized logistic regressions on standardized features, averaged
+over five probe seeds. Thresholds were fixed before execution. A Gate 0
+failure means the intervention destroyed either the signal being studied or
+the task itself, and is reported as inconclusive for that checkpoint rather
+than as evidence.
+
+\emph{Gate 1} (manipulation check) confirms that the intervention actually
+moved the geometry the account concerns. It is satisfied when at least one
+preregistered geometry metric shows reproducible dose dependence across the
+ladder; the criterion makes no assumption of linearity, strict monotonicity,
+or convexity, and the remaining metrics are recorded rather than discarded.
+An unmanipulated checkpoint tests nothing, so Gate 1 failures are excluded
+from causal interpretation rather than counted as negative evidence.
+
+\subsection{Reliability Estimators}
+
+Four distance-based estimators are evaluated on every checkpoint. The
+Mahalanobis detector fits class-conditional means and a shared precision
+matrix on the adapted training population, with regularization
+$\varepsilon = 10^{-5}$, and scores an input by its minimum squared
+Mahalanobis distance to any class centroid~\cite{lee2018simple}. The cosine
+estimator scores by maximum cosine similarity to a class centroid; the
+nearest-neighbour estimator uses $k = 10$; the kernel-density estimator scores
+by class-conditional density. All four are fitted on the adapted
+\emph{training} population and evaluated on the held-out population.
+Performance is reported as AUROC for separating in-distribution from
+domain-shifted inputs, with FPR at 95\% TPR recorded alongside.
+
+These four estimators are the family the hypothesis under evaluation concerns,
+all of them scoring an input by its position relative to the training
+distribution in representation space. Logit- and energy-based detectors are
+not evaluated: they depend on classifier outputs rather than on representation
+geometry alone, and so fall outside the hypothesis being tested. This study
+does not aim to rank detectors.
+
+\subsection{Geometry Manipulation for the Causal Comparison}
+
+Testing whether geometry, rather than nominal intervention strength, tracks
+estimator degradation requires an operator that moves the preregistered
+geometry metrics directly. The normalization-based knob originally specified
+for this role was found, on measurement, to move condition number
+substantially while leaving LID and spectral-decay slope unchanged. This is
+consistent with the operator's design, which adjusts feature radii while
+holding directions fixed~\cite{yu2510dissecting}; both preregistered metrics
+are invariant to such rescaling. It was therefore not used.
+
+The operator adopted instead is a fixed-exponent spectral
+tempering~\cite{li2603spectral}. Given the eigendecomposition of the
+in-distribution training covariance with eigenvalues $\lambda_i$ and
+eigenvectors $U$, embeddings are transformed as
+\begin{equation}
+  z' = \mu + U \operatorname{diag}\!\left(\lambda_i^{-\gamma/2}\right)
+       U^{\top} (z - \mu),
+\end{equation}
+where $\gamma = 0$ is the identity and $\gamma = 1$ is full whitening. We use
+a fixed, manually specified $\gamma$ rather than the adaptive per-dimension
+exponent of the original formulation: adaptivity was introduced there to
+avoid per-task tuning where no validation signal is available, whereas the
+present protocol supplies an independent, preregistered criterion (Gate 1)
+against which a prespecified $\gamma$ ladder is evaluated. This operator was
+subjected to the same manipulation check before use, and its effect on LID
+and spectral-decay slope is reported in Section~\ref{sec:results}.
+
+\subsection{Preregistered Claims and Statistical Analysis}
+
+Claims, tests, and multiplicity correction were fixed before execution. We
+say the account is supported by \emph{mediation} if the association between
+intervention and estimator degradation is carried by the geometry metrics
+rather than by intervention type or nominal strength.
+
+To evaluate the correlational claim, we compute Kendall's $\tau$ between each
+geometry metric and each estimator's AUROC, pooling Intervention-arm
+strengths and Adaptation-arm rungs. Because configurations from a common seed
+share an optimization run, these pooled points are not fully independent, and
+the resulting $\tau$ values are interpreted as descriptive associations across
+the configuration set rather than as estimates from independent draws. The
+control-arm analysis below models the seed dependence explicitly, and a post-hoc
+sensitivity analysis reported with the results quantifies what the correlational
+$p$-values become when the seed, rather than the configuration, is taken as the
+unit of resampling. To evaluate the causal claim, we compare
+estimator degradation between a geometry-matched pair and a
+nominal-strength-matched pair, using a paired $t$-test with a Wilcoxon
+signed-rank test reported alongside, normality being assessed at analysis
+time rather than assumed. To evaluate the control-arm claim, we fit a
+mixed-effects model with an intervention-type-by-geometry interaction and
+seed as grouping factor. To evaluate probe decodability, we test probe AUROC
+against chance and against the corresponding Mahalanobis AUROC across seeds.
+Holm--Bonferroni correction is applied across the estimator-by-metric
+comparison families, and both corrected and uncorrected $p$-values are
+reported.

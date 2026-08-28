@@ -1,0 +1,165 @@
+{
+  "n_configs": 10,
+  "results": [
+    {
+      "config": "Intervention_alpha0.25",
+      "probe_auroc_mean": 0.9999948893974067,
+      "maha_auroc_mean": 0.9984093735759793,
+      "probe_vs_chance": {
+        "t": 540412.0435267736,
+        "p": 7.03479059189644e-23,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 21.973492934895503,
+        "p": 2.5385286737759674e-05,
+        "mean_diff": 0.0015855158214273634,
+        "note": "ok"
+      }
+    },
+    {
+      "config": "Intervention_alpha0.5",
+      "probe_auroc_mean": 0.9999927154843631,
+      "maha_auroc_mean": 0.9984078277109363,
+      "probe_vs_chance": {
+        "t": 292523.2880389762,
+        "p": 8.1942548131596185e-22,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 16.974672454154362,
+        "p": 7.06258409842639e-05,
+        "mean_diff": 0.0015848877734268019,
+        "note": "ok"
+      }
+    },
+    {
+      "config": "Intervention_alpha0.75",
+      "probe_auroc_mean": 0.9999898932112892,
+      "maha_auroc_mean": 0.9984050623301373,
+      "probe_vs_chance": {
+        "t": 189866.59505226137,
+        "p": 4.616969460847341e-21,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 15.411004689458577,
+        "p": 0.0001034508304498101,
+        "mean_diff": 0.0015848308811517553,
+        "note": "ok"
+      }
+    },
+    {
+      "config": "Intervention_alpha1.0",
+      "probe_auroc_mean": 0.9999879099923723,
+      "maha_auroc_mean": 0.9984013866065908,
+      "probe_vs_chance": {
+        "t": 129399.87852440722,
+        "p": 2.1400098665453566e-20,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 14.73504077680535,
+        "p": 0.00012346028635777166,
+        "mean_diff": 0.0015865233857813577,
+        "note": "ok"
+      }
+    },
+    {
+      "config": "Conventional_alpha0.25",
+      "probe_auroc_mean": 0.9999963768115941,
+      "maha_auroc_mean": 0.9983602150676154,
+      "probe_vs_chance": {
+        "t": 3133866.704404911,
+        "p": 6.220555500281048e-26,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 128.55754908116302,
+        "p": 2.1957644469139507e-08,
+        "mean_diff": 0.0016361617439788478,
+        "note": "ok"
+      }
+    },
+    {
+      "config": "Conventional_alpha0.5",
+      "probe_auroc_mean": 0.9999960335621662,
+      "maha_auroc_mean": 0.9983455637022643,
+      "probe_vs_chance": {
+        "t": 642765.5338947459,
+        "p": 3.515126232985134e-23,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 103.72767123946575,
+        "p": 5.1796891047930814e-08,
+        "mean_diff": 0.0016504698599019373,
+        "note": "ok"
+      }
+    },
+    {
+      "config": "Conventional_alpha0.75",
+      "probe_auroc_mean": 0.9999948893974067,
+      "maha_auroc_mean": 0.9983351033488074,
+      "probe_vs_chance": {
+        "t": 381481.34384582285,
+        "p": 2.8330747598647107e-22,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 96.4175273437632,
+        "p": 6.937706308721209e-08,
+        "mean_diff": 0.00165978604859911,
+        "note": "ok"
+      }
+    },
+    {
+      "config": "Conventional_alpha1.0",
+      "probe_auroc_mean": 0.9999935163996948,
+      "maha_auroc_mean": 0.998327047674306,
+      "probe_vs_chance": {
+        "t": 221123.24314019186,
+        "p": 2.509652949962703e-21,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 92.015017255304,
+        "p": 8.36323922985277e-08,
+        "mean_diff": 0.0016664687253887367,
+        "note": "ok"
+      }
+    },
+    {
+      "config": "Adaptation_linear-probe",
+      "probe_auroc_mean": 0.9999969488939741,
+      "maha_auroc_mean": 0.9983847427929625,
+      "probe_vs_chance": {
+        "t": null,
+        "p": 0.0,
+        "note": "zero variance in probe AUROC across seeds -- t-test degenerate, reporting as trivially significant (constant value != 0.5)"
+      },
+      "probe_vs_maha_paired": {
+        "t": null,
+        "p": 0.0,
+        "mean_diff": 0.0016122061010116484,
+        "note": "zero variance in (probe-maha) difference across seeds -- paired t-test degenerate"
+      }
+    },
+    {
+      "config": "Adaptation_partial-FT",
+      "probe_auroc_mean": 0.9999960717009916,
+      "maha_auroc_mean": 0.9984290575908588,
+      "probe_vs_chance": {
+        "t": 5142124.663947969,
+        "p": 8.581848532727865e-27,
+        "note": "ok"
+      },
+      "probe_vs_maha_paired": {
+        "t": 47.97513946073079,
+        "p": 1.1293521198887514e-06,
+        "mean_diff": 0.001567014110132914,
+        "note": "ok"
+      }
+    }
+  ]
+}

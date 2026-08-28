@@ -1,0 +1,33 @@
+{
+  "model": "PanDerm",
+  "architecture": "ViT-L/16",
+  "paper": "arXiv:2410.15038 / Nature Medicine 2025",
+  "source_repo": "https://github.com/SiyuanYan1/PanDerm",
+  "source_repo_commit_at_download": "fd7a80748ba7fc3e203fed88f909f4689d0d6f24",
+  "checkpoint_filename_upstream": "panderm_ll_data6_checkpoint-499.pth",
+  "download_url": "https://drive.google.com/file/d/1SwEzaOlFV_gBKf2UzeowMC8z9UH7AQbE/view",
+  "local_path": "PhaseB/assets/checkpoints/panderm_vitl16_checkpoint-499.pth",
+  "download_date": "2026-08-05",
+  "download_timestamp_utc": "2026-08-04T17:11:38Z",
+  "download_tool": "gdown 6.1.0",
+  "file_size_bytes": 1418820654,
+  "sha256": "23405e92f853c6f7ac9da80ccf4cfde84d4feb22cd9d7b98c7e850e3875554b2",
+  "license": "CC-BY-NC-ND 4.0",
+  "license_note": "non-commercial academic research purposes with proper attribution",
+  "modified": false,
+  "structural_verification": {
+    "loads_with_torch_load": true,
+    "top_level_type": "collections.OrderedDict (raw state_dict, no wrapper)",
+    "total_tensors": 458,
+    "total_parameters": 354660064,
+    "encoder_subtree_tensors": 366,
+    "encoder_subtree_parameters": 303326208,
+    "encoder_num_blocks": 24,
+    "encoder_embed_dim": 1024,
+    "encoder_patch_size": 16,
+    "encoder_num_tokens": 197,
+    "non_encoder_top_level_keys": ["decoder", "mask_token", "rd_pos_embed", "regresser"],
+    "verified_date": "2026-08-05"
+  },
+  "next_gated_step": "instantiate PanDerm encoder class + single-image inference (not yet done)"
+}

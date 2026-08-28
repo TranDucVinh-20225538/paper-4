@@ -1,0 +1,24 @@
+{
+  "register": "Artifact Issues Register",
+  "artifact": "Reference Embedding Artifact (ReferenceEmbedding/, frozen 2026-08-04T21:05:42Z)",
+  "created_at": "2026-08-04T21:14:16.420988+00:00",
+  "issues": [
+    {
+      "issue_id": 1,
+      "category": "duplicate_images_with_label_conflict",
+      "discovered_at_protocol_step": "Stage 3.0 (Artifact Audit)",
+      "description": "17 groups of pixel-identical images (34 rows) found in the preregistered ISIC 2019 / PAD-UFES-20 datasets, detected via bitwise-identical embedding vectors and independently confirmed via pixel-array comparison. 13/17 of these groups carry conflicting diagnostic labels for the same pixel-identical image.",
+      "evidence": {
+        "duplicate_groups_csv": "/Users/cubo/Research/Paper4/PhaseB/assets/DuplicateRegistry/duplicate_groups.csv",
+        "montage": "/Users/cubo/Research/Paper4/PhaseB/assets/DuplicateRegistry/montage.png",
+        "notes": "/Users/cubo/Research/Paper4/PhaseB/assets/DuplicateRegistry/notes.md"
+      },
+      "severity": "unclassified \u2014 a property of the source data, not yet assessed for impact on any claim",
+      "status": "logged, no action taken",
+      "action_taken": "none",
+      "resolution": "open \u2014 requires a PI decision before Stage 3.2+ (claim-bearing analysis) treats this as resolved one way or another"
+    }
+  ],
+  "policy": "Every future claim computed on this artifact should reference this register. New issues found by later audits are APPENDED as new issue_id entries, never edited into or removed from existing entries.",
+  "status": "FROZEN"
+}

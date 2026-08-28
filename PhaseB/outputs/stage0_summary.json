@@ -1,0 +1,10 @@
+{
+  "gate": "Stage 0 / C1",
+  "primary_metric": "composite_lid_x_slope",
+  "tau_full": -0.15384615384615383,
+  "p_full_exact": 0.5097745711721406,
+  "n_full": 13,
+  "tau_common_seed": -0.1111111111111111,
+  "p_common_seed_exact": 0.761414241622575,
+  "n_common_seed": 9
+}

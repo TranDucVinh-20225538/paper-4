@@ -1,0 +1,135 @@
+{
+  "n": 40,
+  "model": "mixedlm(scorer ~ type_bin*geometry_z, groups=seed, method=lbfgs, maxiter=2000)",
+  "all_converged": true,
+  "results": [
+    {
+      "geometry_metric": "LID",
+      "scorer": "Mahalanobis",
+      "interaction_coef": -0.00011748187915250096,
+      "p": 2.8685561206959824e-06,
+      "converged": true,
+      "holm_significant": true
+    },
+    {
+      "geometry_metric": "LID",
+      "scorer": "Cosine",
+      "interaction_coef": -0.002383236814813065,
+      "p": 0.5136559361117068,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "LID",
+      "scorer": "kNN10",
+      "interaction_coef": -0.0008083560169364639,
+      "p": 0.08681074860268753,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "LID",
+      "scorer": "KDE",
+      "interaction_coef": -0.04303108916061127,
+      "p": 0.002594989390080151,
+      "converged": true,
+      "holm_significant": true
+    },
+    {
+      "geometry_metric": "slope",
+      "scorer": "Mahalanobis",
+      "interaction_coef": 7.408650949315892e-05,
+      "p": 0.008906188378179435,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "slope",
+      "scorer": "Cosine",
+      "interaction_coef": -0.0031967215762917747,
+      "p": 0.2742680315374493,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "slope",
+      "scorer": "kNN10",
+      "interaction_coef": 2.8774488638039505e-05,
+      "p": 0.9254877127010064,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "slope",
+      "scorer": "KDE",
+      "interaction_coef": 0.01755734974392775,
+      "p": 0.09164912928402047,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "Mahalanobis",
+      "interaction_coef": 0.000290490690602416,
+      "p": 3.859167929631944e-05,
+      "converged": true,
+      "holm_significant": true
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "Cosine",
+      "interaction_coef": 0.0013595230866798936,
+      "p": 0.9196479818484512,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "kNN10",
+      "interaction_coef": 0.00044369934135274943,
+      "p": 0.8459192869766388,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "KDE",
+      "interaction_coef": 0.024094136335621644,
+      "p": 0.7459233391423633,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "pdv",
+      "scorer": "Mahalanobis",
+      "interaction_coef": 0.00012275011603522798,
+      "p": 0.20728560730959822,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "pdv",
+      "scorer": "Cosine",
+      "interaction_coef": 0.032127387738071306,
+      "p": 0.033770354984902176,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "pdv",
+      "scorer": "kNN10",
+      "interaction_coef": 0.005721118285467429,
+      "p": 0.02132143399018677,
+      "converged": true,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "pdv",
+      "scorer": "KDE",
+      "interaction_coef": 0.1718007668277968,
+      "p": 0.015431723093047276,
+      "converged": true,
+      "holm_significant": false
+    }
+  ]
+}

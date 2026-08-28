@@ -1,0 +1,12 @@
+{
+  "tier": "1+2",
+  "group": "A",
+  "population": "combined ID(ISIC-test)+OOD(PAD-UFES), n=7365, 8-class label_idx grouping",
+  "condition_number": 1338282.217424521,
+  "lid_mean": 15.027931404443088,
+  "lid_k": 50,
+  "spectral_decay_slope": 0.006973340837017403,
+  "composite_lid_x_slope": 0.10479488775849928,
+  "per_direction_variance": null,
+  "per_direction_variance_note": "NOT COMPUTED. 'Per-direction variance of the intervened direction' (22_Experimental_Design.md SS4 measurement 3, Mechanism 2) has no resolved operationalization on the Reference arm alone -- there is no 'intervened direction' yet, since no intervention has been designed or run (Stage 4 doesn't exist). Flagged for a PI decision, not invented here."
+}

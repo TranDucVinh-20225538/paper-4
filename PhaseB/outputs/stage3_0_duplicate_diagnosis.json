@@ -1,0 +1,196 @@
+{
+  "root_cause": "Genuine duplicate source images in the underlying public datasets (ISIC 2019 / PAD-UFES-20), not an extraction pipeline defect.",
+  "method": "For every embedding-duplicate group found by Stage 3.0 check 2, independently loaded and pixel-compared (not just file-hash-compared) the source images.",
+  "all_groups_confirmed_pixel_identical": true,
+  "n_groups": 17,
+  "n_rows_involved": 34,
+  "groups": [
+    {
+      "rows": [
+        1377,
+        1550
+      ],
+      "paths": [
+        "/Users/cubo/Research/Paper4/archive/BKL/ISIC_0060857.jpg",
+        "/Users/cubo/Research/Paper4/archive/BKL/ISIC_0059011.jpg"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5083,
+        6205
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_380_1540_959.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_380_773_362.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5085,
+        5955
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_759_1538_566.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_759_1433_914.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5095,
+        6820
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_302_651_529.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_302_650_477.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5140,
+        6424
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_701_4056_457.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_701_1321_156.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5277,
+        6986
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_56_86_479.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_56_88_274.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5341,
+        5925
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_691_3994_671.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_691_1311_2.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5543,
+        5604
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_38_1002_34.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_38_1003_68.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5673,
+        7278
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_202_307_424.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_202_308_721.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5744,
+        6565
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_570_1085_429.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_570_1084_939.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        5793,
+        6699
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_311_666_191.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_311_667_416.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        6027,
+        6059
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_528_3072_615.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_528_993_589.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        6069,
+        6917
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_38_1003_226.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_38_1002_668.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        6154,
+        6991
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_419_2767_323.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_419_833_148.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        6206,
+        7049
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_834_1574_276.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_834_1572_430.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        6385,
+        6406
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_691_3994_791.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_691_1311_890.png"
+      ],
+      "pixel_identical_confirmed": true
+    },
+    {
+      "rows": [
+        7064,
+        7065
+      ],
+      "paths": [
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_570_1084_637.png",
+        "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_570_1085_344.png"
+      ],
+      "pixel_identical_confirmed": true
+    }
+  ]
+}

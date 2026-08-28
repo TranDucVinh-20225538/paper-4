@@ -1,0 +1,53 @@
+{
+  "artifact": "Reference Train Embedding Artifact",
+  "population": "ISIC2019_train",
+  "purpose": "Reference fitting population for Group B scorers only",
+  "not_for": ["held-out evaluation", "cross-arm comparison", "claim testing"],
+  "execution_amendment": "EA-01",
+  "produced_by_protocol_step": "EA-01 implementation (Stage 2.1-equivalent scope, ISIC-train population)",
+  "produced_by_script": "/Users/cubo/Research/Paper4/PhaseB/analysis/ea01_extract_reference_train_embeddings.py",
+  "extraction_started_utc": "2026-08-05T04:08:14.831344+00:00",
+  "extraction_finished_utc": "2026-08-05T05:58:47.229908+00:00",
+  "n_total": 16211,
+  "domain": "isic (always -- no PAD-UFES-20 train population in this design)",
+  "embedding_dim": 1024,
+  "split": {
+    "random_state": 42,
+    "isic_test_fraction": 0.2,
+    "val_fraction": 0.2,
+    "note": "isic_train = complement of isic_test within isic_train_val; same split already validated by Stage 1.3a's Dataset Validation gate."
+  },
+  "instrument": {
+    "checkpoint_metadata": "/Users/cubo/Research/Paper4/PhaseB/assets/panderm_vitl16_checkpoint_metadata.json",
+    "preprocessing_snapshot": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_preprocessing.json",
+    "panderm_repo_commit": "fd7a80748ba7fc3e203fed88f909f4689d0d6f24"
+  },
+  "csg_skin_commit": "12338983d87a35b3ad040687ad09f04908fb0c55",
+  "metadata_csv": "/Users/cubo/Research/CSG-SKin/data/master_metadata.csv",
+  "files": {
+    "embeddings.npy": {
+      "sha256": "419ba2c73e95f3b97063f3d6c7fac5fd2faa0393b1a1cc267096b69d730a62df",
+      "shape": [
+        16211,
+        1024
+      ],
+      "dtype": "float32"
+    },
+    "labels.csv": {
+      "sha256": "d32f22700f352d15d5d067f89f26863af6eb37c1793649af00cd935756a1287f",
+      "rows": 16211
+    },
+    "metadata.csv": {
+      "sha256": "c6b960a1f991c48ee16208be6469ddfb059c324fc8658a1aef007d62710dcbb3",
+      "rows": 16211
+    }
+  },
+  "row_ordering_proof": {
+    "method": "Freshly reconstructed the isic_train dataframe a SECOND time (independent function call, not read from the extraction run's own memory), compared path/label_idx arrays element-by-element against the extraction's collected arrays.",
+    "matches_fresh_reconstruction": true,
+    "n_compared": 16211
+  },
+  "not_computed_here": "No probe, no Mahalanobis or other distance scorer, no geometry metric, no PCA/UMAP, no statistics. Extraction and integrity verification only.",
+  "created_at": "2026-08-05T05:58:47.229908+00:00",
+  "status": "FROZEN"
+}

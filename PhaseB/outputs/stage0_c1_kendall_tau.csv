@@ -1,0 +1,5 @@
+metric,role,target,tau_full,p_full_exact,n_full,tau_common_seed,p_common_seed_exact,n_common_seed
+composite_lid_x_slope,PRIMARY (C1 pre-registered test),auroc,-0.15384615384615383,0.5097745711721406,13,-0.1111111111111111,0.761414241622575,9
+lid_mean,secondary (composite decomposition),auroc,-0.025641025641025637,0.9523619079608663,13,0.0,1.0,9
+spectral_slope,secondary (composite decomposition),auroc,-0.12820512820512817,0.5900407829053662,13,-0.1111111111111111,0.761414241622575,9
+condition_number,secondary (Paper 3 continuity metric),auroc,-0.12820512820512817,0.5900407829053662,13,-0.1111111111111111,0.761414241622575,9

@@ -1,0 +1,87 @@
+{
+  "protocol_step": "Stage 3.1 -- Artifact Characterization",
+  "date": "2026-08-05",
+  "timestamp": "2026-08-04T21:19:37.326060+00:00",
+  "artifact_dir": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+  "basic": {
+    "shape": [
+      7365,
+      1024
+    ],
+    "dtype": "float32",
+    "nbytes": 30167040,
+    "human_size": "28.77 MB"
+  },
+  "norm_distribution_pooled": {
+    "n": 7365,
+    "mean": 23.076805114746094,
+    "std": 0.8577869534492493,
+    "min": 20.69782829284668,
+    "max": 26.017807006835938,
+    "p5": 22.00094223022461,
+    "p25": 22.44312286376953,
+    "median": 22.837505340576172,
+    "p75": 23.63454818725586,
+    "p95": 24.730520248413086
+  },
+  "norm_distribution_by_domain_DESCRIPTIVE_ONLY": {
+    "isic": {
+      "n": 5067,
+      "mean": 22.61894416809082,
+      "std": 0.452536404132843,
+      "min": 20.69782829284668,
+      "max": 24.609697341918945,
+      "p5": 21.92576789855957,
+      "p25": 22.31822395324707,
+      "median": 22.59416389465332,
+      "p75": 22.903291702270508,
+      "p95": 23.39398765563965
+    },
+    "pad_ufes": {
+      "n": 2298,
+      "mean": 24.08637237548828,
+      "std": 0.6520624160766602,
+      "min": 21.692461013793945,
+      "max": 26.017807006835938,
+      "p5": 22.954395294189453,
+      "p25": 23.63934326171875,
+      "median": 24.121620178222656,
+      "p75": 24.543773651123047,
+      "p95": 25.112560272216797
+    }
+  },
+  "variance_statistics": {
+    "total_variance_sum_of_per_dim": 90.04838562011719,
+    "per_dim_variance_mean": 0.08793787658214569,
+    "per_dim_variance_std": 0.06783632934093475,
+    "per_dim_variance_min": 7.478176655695279e-08,
+    "per_dim_variance_max": 0.8955873847007751,
+    "per_dim_variance_median": 0.07269404828548431
+  },
+  "class_counts": {
+    "AK": 903,
+    "BCC": 1510,
+    "BKL": 760,
+    "DF": 48,
+    "MEL": 956,
+    "NV": 2819,
+    "SCC": 318,
+    "VASC": 51
+  },
+  "domain_counts": {
+    "isic": 5067,
+    "pad_ufes": 2298
+  },
+  "integrity_summary_by_reference": {
+    "source": "Stage 3.0 Artifact Audit (not recomputed in this stage)",
+    "no_nan": true,
+    "no_inf": true,
+    "row_count": 7365,
+    "known_issues_registered": 1,
+    "known_issues_note": "17 groups of pixel-identical images (34 rows) found in the preregistered ISIC 2019 / PAD-UFES-20 datasets, detected via bitwise-identical embedding vectors and independently confirmed via pixel-array comparison. 13/17 of these groups carry conflicting diagnostic labels for the same pixel-identical image. (Issue #1, logged, no action taken). 34/7365 rows (~0.46%) are pixel-identical duplicate pairs, included as-is per Stage 3.0's 'no action taken' decision. Their contribution to the descriptive statistics below is a small, symmetric double-count (each pair counted twice), not expected to shift any pooled statistic meaningfully at this sample size -- noted for completeness, not asserted as negligible without this note."
+  },
+  "figures": {
+    "norm_histogram": "/Users/cubo/Research/Paper4/PhaseB/assets/ArtifactCharacterization/norm_histogram.png"
+  },
+  "not_computed_here": "No Mahalanobis, no probe accuracy, no LID, no spectral-decay slope, no Energy, no ViM, no KDE, no AUROC, no hypothesis-testing statistic of any kind. Per-domain breakdowns above are descriptive counts/means/percentiles only -- not a separability, distance, or significance claim; no comparison test was run."
+}

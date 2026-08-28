@@ -1,0 +1,42 @@
+{
+  "tier": 1,
+  "group": "A",
+  "measurement": "domain_leakage_probe",
+  "per_seed": [
+    {
+      "seed": 42,
+      "accuracy": 0.9986425339366516,
+      "balanced_accuracy": 0.9982217772692601,
+      "n_test": 2210,
+      "auroc": 0.9999961861174675
+    },
+    {
+      "seed": 52,
+      "accuracy": 0.9995475113122172,
+      "balanced_accuracy": 0.9992753623188406,
+      "n_test": 2210,
+      "auroc": 0.9999990465293669
+    },
+    {
+      "seed": 62,
+      "accuracy": 0.9981900452488688,
+      "balanced_accuracy": 0.9978928299008392,
+      "n_test": 2210,
+      "auroc": 0.9999933257055683
+    },
+    {
+      "seed": 72,
+      "accuracy": 0.9990950226244344,
+      "balanced_accuracy": 0.9989464149504195,
+      "n_test": 2210,
+      "auroc": 0.9999980930587338
+    },
+    {
+      "seed": 82,
+      "accuracy": 0.9995475113122172,
+      "balanced_accuracy": 0.9992753623188406,
+      "n_test": 2210,
+      "auroc": 0.9999980930587339
+    }
+  ]
+}

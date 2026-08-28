@@ -1,0 +1,13 @@
+# Upstream source vendored at PhaseB/external/PanDerm, excluded from this
+# repository and pinned here instead. Verified clean at the commit below:
+# `git diff` reports no modified tracked file, and the only untracked entries
+# are __pycache__ byte-code.
+#
+# Restore with:
+#   git clone https://github.com/SiyuanYan1/PanDerm.git PhaseB/external/PanDerm
+#   git -C PhaseB/external/PanDerm checkout fd7a80748ba7fc3e203fed88f909f4689d0d6f24
+
+url     = https://github.com/SiyuanYan1/PanDerm.git
+commit  = fd7a80748ba7fc3e203fed88f909f4689d0d6f24
+date    = 2026-02-17
+branch  = main

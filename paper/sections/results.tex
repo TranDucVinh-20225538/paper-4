@@ -1,0 +1,213 @@
+% results.tex
+%
+% Every number below is transcribed from a frozen artifact under
+% ../../PhaseB/outputs/ (sha256 recorded in
+% ../../PhaseB/Stage5_manifest_sha256.txt; all files chmod 444). Do not
+% regenerate, and do not round differently from the source:
+%   stage5_c5_raw.json / stage5_c5_results.json  -- probe decodability, 10 configs
+%   stage5_c2_correlation_v2.json                -- geometry-estimator association, n=30
+%   stage5_c4_interaction.json                   -- type x geometry interaction, n=40, 16 models
+%   stage5_c3_manipulation_check.json            -- normalization knob (not used, reported)
+%   stage5_c3_spectral_tempering_check.json      -- adopted operator's manipulation check
+%   stage5_c3_results.json                       -- causal comparison, configs A/B/C, 5 seeds
+%
+% REPORTING DISCIPLINE (governance rule, ../../27_One_Sentence_Paper.md).
+% This section reports; it does not explain. Specifically:
+%   - Condition number: report the ASSOCIATION ONLY. The scale-descriptor
+%     interpretation is Discussion material and must not appear here.
+%   - Probe decodability: the dissociation WAS reproduced (probe > Mahalanobis,
+%     paired-significant in 9/10 configs). Report direction AND magnitude
+%     collapse. Never "not reproduced", never "absent".
+%   - Causal comparison: report the null honestly, including that five seeds
+%     under an eight-way correction is underpowered.
+%   - Interaction models: 3/16 Holm-significant. Per 22_Experimental_Design.md
+%     SS7 this is the "inconsistent with full mediation under the preregistered
+%     criterion" branch. Do not write "contradicts".
+%   - Report corrected AND uncorrected p-values (SS6 transparency requirement).
+%
+% ORDERING: probe decodability comes first. Per the governance rule the
+% phenomenon precedes the account throughout the manuscript, and this section
+% is no exception -- it is the foundation of the paper, not a secondary result.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Gate Outcomes}
+
+All Intervention-arm and Conventional-arm checkpoints cleared Gate 0 at every
+rung of the dose ladder, confirming that domain information and
+in-distribution task performance survived the intervention. Gate 1 was
+satisfied on the Intervention arm: at least one preregistered geometry metric
+showed reproducible dose dependence across the ladder and across all five
+seeds. No checkpoint was excluded from the analyses below on gate grounds.
+
+\subsection{Probe Decodability and the Distance-Based Estimators}
+
+Across all ten evaluated configurations, a linear probe recovered
+acquisition-domain identity essentially perfectly, with mean probe AUROC
+ranging from $0.99999$ to $1.00000$. Mahalanobis AUROC on the same
+representations ranged from $0.9983$ to $0.9984$. Probe AUROC exceeded chance
+in every configuration ($p < 10^{-19}$ throughout), and exceeded the
+corresponding Mahalanobis AUROC in every configuration where the paired test
+was defined, with $p$ between $2.5\times10^{-5}$ and $8.4\times10^{-8}$ across
+nine configurations; the remaining configuration (Adaptation, linear-probe
+rung) produced zero variance across seeds and is reported as degenerate
+rather than assigned a $t$-statistic.
+
+The direction of the previously reported dissociation was therefore
+reproduced, and reproduced with high statistical confidence. Its magnitude
+was not. The mean probe-minus-Mahalanobis AUROC gap was
+$1.6\times10^{-3}$ (range $1.567\times10^{-3}$ to $1.666\times10^{-3}$ across
+configurations), against a gap of approximately $0.3$ in the convolutional
+setting where the dissociation was originally
+reported~\cite{tran2026decodable} --- a ratio of roughly $200$. Distance-based estimators were already operating near
+ceiling on the unmodified representation, with Reference-arm AUROC of
+$0.9984$ (Mahalanobis), $0.9979$ (nearest-neighbour), $0.9805$ (cosine), and
+$0.8942$ (kernel density).
+
+\subsection{Geometry--Estimator Associations}
+
+Table~\ref{tab:c2} reports Kendall's $\tau$ between each geometry metric and
+each estimator's AUROC across the $30$ pooled configurations. Neither
+preregistered geometry metric reached Holm-corrected significance against any
+estimator: LID's strongest association was with Mahalanobis
+($\tau = -0.24$, uncorrected $p = 0.065$), and spectral-decay slope's was
+also with Mahalanobis ($\tau = 0.22$, uncorrected $p = 0.088$). Condition
+number was associated with all four estimators at Holm-corrected significance
+($\tau$ between $0.42$ and $0.58$, uncorrected $p$ between
+$1.1\times10^{-5}$ and $1.3\times10^{-3}$). Per-direction variance along the
+nuisance direction reached uncorrected significance against three estimators
+($p$ between $0.009$ and $0.014$) but did not survive correction.
+
+\begin{table}[!t]
+\caption{Kendall's $\tau$ between geometry metrics and estimator AUROC
+($n=30$). Bold indicates Holm-corrected significance across the
+$16$-comparison family.}
+\label{tab:c2}
+\centering
+\begin{tabular}{lrrrr}
+\toprule
+Metric & Mahal. & Cosine & $k$NN & KDE \\
+\midrule
+LID                & $-0.24$ & $0.01$ & $0.19$ & $0.10$ \\
+Spectral slope     & $0.22$  & $0.16$ & $0.12$ & $0.05$ \\
+Condition number   & $\mathbf{0.56}$ & $\mathbf{0.58}$ & $\mathbf{0.42}$ & $\mathbf{0.55}$ \\
+Per-dir.\ variance & $0.32$  & $0.34$ & $0.33$ & $0.15$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection*{Sensitivity to the unit of resampling}
+
+The Methods note that configurations drawn from a common seed share an
+optimization run, so the $30$ pooled points are not fully independent. To put a
+number on that caveat rather than leaving it qualitative, we repeated the
+condition-number analysis with an exact permutation test that permutes
+\emph{whole seeds} rather than individual configurations, preserving the
+within-seed structure. This is a post-hoc sensitivity analysis and was not
+preregistered.
+
+The $\tau$ values are unchanged by construction; only the reference distribution
+differs. Under seed-level permutation the uncorrected $p$-values are $0.133$
+(Mahalanobis), $0.075$ (cosine), $0.108$ ($k$NN) and $0.025$ (kernel density).
+None survives Holm correction across the four-estimator family, whose first
+threshold is $0.0125$.
+
+Two things follow, and they pull in opposite directions. The Holm-corrected
+significance reported above rests on treating the pooled configurations as
+independent draws, which the Methods already declined to claim; a reader who
+takes the seed as the resampling unit should not read Table~\ref{tab:c2} as
+establishing significance. But the permutation test is also very weak here: with
+five seeds its reference distribution admits only $5! = 120$ arrangements, so its
+$p$-values are quantised at multiples of $1/120 \approx 0.008$ and it has little
+power to resolve an association of any size. These $p$-values therefore record a
+failure to resolve, not a demonstration of absence, and we report both analyses
+rather than choosing between them.
+
+In the companion analysis, probe accuracy was associated with LID
+($\tau = 0.39$, $p = 0.005$) and with per-direction variance
+($\tau = 0.48$, $p = 5.4\times10^{-4}$), and was not associated with
+spectral-decay slope ($\tau = -0.03$, $p = 0.85$) or with condition number
+($\tau = -0.04$, $p = 0.77$).
+
+\subsection{Intervention Type and Geometry}
+
+All sixteen mixed-effects models converged. Three interaction terms reached
+Holm-corrected significance: LID with Mahalanobis
+($p = 2.9\times10^{-6}$), LID with kernel density ($p = 2.6\times10^{-3}$),
+and condition number with Mahalanobis ($p = 3.9\times10^{-5}$). The
+remaining thirteen did not, including all four slope interactions and all
+four per-direction-variance interactions. Interaction coefficients for the
+Holm-significant terms were small in absolute magnitude
+($-1.2\times10^{-4}$, $-4.3\times10^{-2}$, and $2.9\times10^{-4}$
+respectively).
+
+\subsection{Geometry Manipulation and the Causal Comparison}
+
+The normalization-based operator originally specified for the causal
+comparison was measured across all twenty Intervention-arm checkpoints before
+use. It moved condition number substantially (mean change $-2.7\times10^{5}$)
+while leaving both preregistered metrics effectively unchanged: mean LID
+change $-4\times10^{-4}$ (SD $1.8\times10^{-3}$) and mean slope change below
+$10^{-6}$ (SD $10^{-6}$). It was therefore not used.
+
+The adopted fixed-exponent spectral tempering operator was subjected to the
+same check. Across five seeds it moved spectral-decay slope reproducibly and
+near-monotonically ($-1.5\times10^{-3}$ at $\gamma = 0.25$, $-2.7\times10^{-3}$
+at $\gamma = 0.5$, $-3.6\times10^{-3}$ at $\gamma = 0.75$, $-3.5\times10^{-3}$
+at $\gamma = 1.0$), and moved LID reproducibly but non-monotonically, rising
+by $+2.7$ to $+5.8$ at $\gamma \in \{0.25, 0.5\}$ before falling by $-1.5$ to
+$-4.4$ at $\gamma = 1.0$; the same inverted profile appeared in all five
+seeds. Gate 0 passed in all twenty post-transform configurations.
+
+For the causal comparison, $\gamma$ was calibrated on a single seed to bring
+the full-strength checkpoint's spectral-decay slope to the level occurring
+naturally at the weakest intervention strength, giving $\gamma = 0.01$
+(slope $6.746\times10^{-3}$ against a target of $6.751\times10^{-3}$). A
+single calibrated value rather than a ladder is used here because the
+comparison requires one specific condition---geometry matched to a reference
+checkpoint while nominal strength differs---rather than a dose--response
+relationship; the operator's dose behaviour is characterized separately by
+the manipulation check reported above. At this
+$\gamma$, LID remained $0.60$ below the matched checkpoint's value: the
+comparison is therefore matched on spectral-decay slope, not on both
+preregistered metrics jointly. Three configurations were then evaluated
+across five seeds: full strength unmanipulated ($\alpha = 1.0$,
+$\gamma = 0$), weak strength unmanipulated ($\alpha = 0.25$, $\gamma = 0$),
+and full strength slope-matched to the weak checkpoint ($\alpha = 1.0$,
+$\gamma = 0.01$). Gate 0 passed in all five manipulated configurations.
+
+Table~\ref{tab:c3} reports estimator AUROC for the three configurations.
+Mahalanobis and nearest-neighbour showed no separation between any pair of
+configurations. Cosine and kernel density showed a separation between the
+two unmanipulated strengths ($0.025$ and $0.110$ AUROC respectively), and on
+both, configuration C was numerically closer to its nominal-strength
+counterpart (A) than to its slope-matched counterpart (B).
+
+\begin{table}[!t]
+\caption{Estimator AUROC (mean over five seeds) for the causal comparison.
+Configuration C is matched to B on spectral-decay slope and to A on nominal
+intervention strength.}
+\label{tab:c3}
+\centering
+\begin{tabular}{lrrr}
+\toprule
+ & A ($\alpha{=}1$) & B ($\alpha{=}0.25$) & C ($\alpha{=}1$, $\gamma{=}0.01$) \\
+\midrule
+Mahalanobis & $0.9984$ & $0.9984$ & $0.9984$ \\
+Cosine      & $0.9503$ & $0.9750$ & $0.9521$ \\
+$k$NN       & $0.9928$ & $0.9973$ & $0.9928$ \\
+KDE         & $0.7611$ & $0.8713$ & $0.7657$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+None of the eight paired comparisons reached Holm-corrected significance. The
+smallest corrected $p$-value was $0.111$ (nearest-neighbour,
+geometry-matched), and the smallest uncorrected $p$-values were $0.014$
+(nearest-neighbour, geometry-matched), $0.023$ (cosine,
+nominal-strength-matched), and $0.048$ (kernel density, geometry-matched);
+Wilcoxon signed-rank $p$-values were no smaller than $0.063$ throughout. With
+five seeds and an eight-comparison correction family, statistical power was
+limited, and the comparison is therefore reported as inconclusive at the
+significance-test level.

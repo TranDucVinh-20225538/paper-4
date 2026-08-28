@@ -1,0 +1,27 @@
+{
+  "execution": "Nuisance Direction Estimation",
+  "protocol_step": "Stage 4 Execution Plan v2, Step 2",
+  "execution_contract": "NuisanceDirection/execution_contract.md",
+  "produced_by_script": "PhaseB/analysis/compute_nuisance_direction.py",
+  "status": "COMPLETE",
+  "review": "PASS",
+  "review_file": "NuisanceDirection/review.md",
+  "sanity": "PASS",
+  "sanity_file": "NuisanceDirection/review_results.md",
+  "generated_outputs": [
+    "nuisance_direction.npz",
+    "manifest.json"
+  ],
+  "file_sha256": {
+    "execution_contract.md": "3b760869b45604c2452d57a4bb7f079af59ce87f4db76440307b4f3ed07f1282",
+    "review.md": "876d26cfce0e7ed0051a8062cb61c13c502dce96ed532ddaa5d41e9984cd467c",
+    "review_results.md": "e33b08f4aba04b0a1ca50255dda8286852dfc582f6db8800c8bfc2eaa1670fa3",
+    "manifest.json": "e6a26aabd769393ec975a011e5c164a5854fb20cc1943bdcc861b036b9be60c4",
+    "sha256.txt": "ba55e7d0ecca03de0927fa935c13ba996ca1fa6b1d2a88130643bfa2071b6733",
+    "nuisance_direction.npz": "e266dd4f26a049df33a940949fd8b21d5e6e621067e4bc6c0a863d97572de1e8"
+  },
+  "not_computed_here": "No adapter, no training, no Gate 0, no Gate 1, no measurement suite. This is Stage 4's first artifact-producing step, kept deliberately separate from adapter code so a later failure can be traced to direction estimation specifically.",
+  "frozen": true,
+  "frozen_at": "2026-08-05T10:48:33Z",
+  "created_at": "2026-08-05T10:48:33Z"
+}

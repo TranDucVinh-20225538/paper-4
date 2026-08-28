@@ -1,0 +1,149 @@
+{
+  "n": 30,
+  "sources_included": [
+    "Intervention (alpha .25-1)",
+    "Adaptation linear-probe",
+    "Adaptation partial-FT"
+  ],
+  "sources_excluded": [
+    "Adaptation full-adapter-FT (=Conventional data, excluded to avoid conflating C4 control with C2 population)"
+  ],
+  "results": [
+    {
+      "geometry_metric": "LID",
+      "scorer": "Mahalanobis",
+      "tau": -0.24235294117647055,
+      "p": 0.06469209306960594,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "LID",
+      "scorer": "Cosine",
+      "tau": 0.011764705882352941,
+      "p": 0.928542591682325,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "LID",
+      "scorer": "kNN10",
+      "tau": 0.18588235294117644,
+      "p": 0.15650559162699748,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "LID",
+      "scorer": "KDE",
+      "tau": 0.09647058823529411,
+      "p": 0.4621173325020601,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "LID",
+      "scorer": "probe_accuracy(companion)",
+      "tau": 0.3889222341312986,
+      "p": 0.00524852290318018
+    },
+    {
+      "geometry_metric": "spectral_decay_slope",
+      "scorer": "Mahalanobis",
+      "tau": 0.22352941176470584,
+      "p": 0.08840086821970415,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "spectral_decay_slope",
+      "scorer": "Cosine",
+      "tau": 0.1576470588235294,
+      "p": 0.22948220218379445,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "spectral_decay_slope",
+      "scorer": "kNN10",
+      "tau": 0.12470588235294117,
+      "p": 0.3418107359175575,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "spectral_decay_slope",
+      "scorer": "KDE",
+      "tau": 0.05411764705882353,
+      "p": 0.6799570522211059,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "spectral_decay_slope",
+      "scorer": "probe_accuracy(companion)",
+      "tau": -0.025928148942086574,
+      "p": 0.8523730713069189
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "Mahalanobis",
+      "tau": 0.5576470588235293,
+      "p": 2.1303926931692697e-05,
+      "holm_significant": true
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "Cosine",
+      "tau": 0.5764705882352941,
+      "p": 1.1115416231724415e-05,
+      "holm_significant": true
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "kNN10",
+      "tau": 0.42117647058823526,
+      "p": 0.001325064576006177,
+      "holm_significant": true
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "KDE",
+      "tau": 0.5482352941176469,
+      "p": 2.9276209027194627e-05,
+      "holm_significant": true
+    },
+    {
+      "geometry_metric": "condition_number",
+      "scorer": "probe_accuracy(companion)",
+      "tau": -0.04148503830733852,
+      "p": 0.765896825905642
+    },
+    {
+      "geometry_metric": "per_direction_variance_w",
+      "scorer": "Mahalanobis",
+      "tau": 0.32235294117647056,
+      "p": 0.014002677741830642,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "per_direction_variance_w",
+      "scorer": "Cosine",
+      "tau": 0.34117647058823525,
+      "p": 0.009303905665847967,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "per_direction_variance_w",
+      "scorer": "kNN10",
+      "tau": 0.32705882352941174,
+      "p": 0.012664525111138192,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "per_direction_variance_w",
+      "scorer": "KDE",
+      "tau": 0.15294117647058822,
+      "p": 0.24368629983723966,
+      "holm_significant": false
+    },
+    {
+      "geometry_metric": "per_direction_variance_w",
+      "scorer": "probe_accuracy(companion)",
+      "tau": 0.4822635703228103,
+      "p": 0.0005375726171991905
+    }
+  ]
+}

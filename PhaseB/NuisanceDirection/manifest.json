@@ -1,0 +1,34 @@
+{
+  "artifact": "Nuisance Direction",
+  "protocol_step": "Stage 4 Execution Plan v2, Step 2",
+  "execution_contract": "/Users/cubo/Research/Paper4/PhaseB/NuisanceDirection/execution_contract.md",
+  "produced_by_script": "/Users/cubo/Research/Paper4/PhaseB/analysis/compute_nuisance_direction.py",
+  "method": "closed-form, deterministic -- no optimization, no gradient, no training",
+  "formula": "w = unit(mean(ReferenceTrainEmbedding) - mean(ReferenceEmbedding[domain=='pad_ufes']))",
+  "fit_artifact_isic": {
+    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding",
+    "manifest_status": "FROZEN",
+    "n": 16211
+  },
+  "fit_artifact_pad_ufes": {
+    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+    "manifest_status": "FROZEN",
+    "n": 2298
+  },
+  "embedding_dim": 1024,
+  "w_raw_norm": 9.014975355083987,
+  "w_norm_post_normalization": 1.0,
+  "files": {
+    "nuisance_direction.npz": {
+      "sha256": "e266dd4f26a049df33a940949fd8b21d5e6e621067e4bc6c0a863d97572de1e8"
+    }
+  },
+  "not_computed_here": "No adapter, no training, no Gate 0, no Gate 1, no measurement suite. Direction estimation only.",
+  "created_at": "2026-08-05T10:47:14.205759+00:00",
+  "review": "PASS",
+  "review_file": "review.md",
+  "sanity": "PASS",
+  "sanity_file": "review_results.md",
+  "status": "FROZEN",
+  "frozen_note": "This is the last write to this file. Files in this directory are chmod'd read-only immediately after. Any future correction is a new Execution Amendment or successor artifact, never an edit to this one -- per the Artifact Immutability Rule."
+}
