@@ -62,16 +62,35 @@ def main():
                     ds = {"median": float(np.median(dist)), "max": float(dist.max())}
                     S = margin_mass(s0[~ood], s0[ood], list(ds.values()), rng)
                     items = [(q, d, S[d]) for q, d in ds.items()]
-                se = hanley_mcneil_se(a0, n1, n0)
-                mde = 2.80 * se / np.sqrt(len(SEEDS))
                 for q, d, sv in items:
                     rows.append(dict(pair=pair, seed=seed, scorer=sc, quantile=q,
-                                     delta=d, S=sv, auroc=a0,
-                                     obs_dAUROC=abs(a1 - a0), n_ood=n1,
-                                     mde=mde, ratio=sv / mde))
+                                     delta=d, S=sv, auroc=a0, auroc1=a1,
+                                     obs_dAUROC=abs(a1 - a0), n_ood=n1, n_id=n0,
+                                     se_hm=hanley_mcneil_se(a0, n1, n0)))
 
     df = pd.DataFrame(rows)
+
+    # MDE from the variance the design actually shows, not from a sampling
+    # formula that cannot see it. The comparison is paired within seed, so the
+    # relevant spread is that of the alpha 0 -> 1 difference across seeds;
+    # Hanley-McNeil is kept alongside as the reference it is, and where the two
+    # disagree the observed one is the one that governs.
+    per = df[df["quantile"] == "median"].drop_duplicates(["pair", "scorer", "seed"])
+    sd = (per.assign(d=per.auroc1 - per.auroc)
+             .groupby(["pair", "scorer"])
+             .agg(sd_paired=("d", "std"), sd_level=("auroc", "std"),
+                  se_hm=("se_hm", "mean")).reset_index())
+    sd["mde_observed"] = 2.80 * sd.sd_paired / np.sqrt(len(SEEDS))
+    sd["mde_hm"] = 2.80 * sd.se_hm / np.sqrt(len(SEEDS))
+    sd["mde"] = sd[["mde_observed", "mde_hm"]].max(axis=1)
+    df = df.merge(sd[["pair", "scorer", "mde", "mde_observed", "mde_hm",
+                      "sd_paired", "sd_level"]], on=["pair", "scorer"])
+    df["ratio"] = df.S / df.mde
     df.to_csv(OUT / "external_rq1_susceptibility.csv", index=False)
+    print("=== MDE: observed paired spread vs Hanley-McNeil ===")
+    print(sd[["pair", "scorer", "sd_level", "sd_paired", "mde_observed",
+              "mde_hm"]].round(5).to_string(index=False))
+    print()
 
     g = (df.groupby(["pair", "scorer", "quantile"])
            .agg(auroc=("auroc", "mean"), delta=("delta", "mean"), S=("S", "mean"),
