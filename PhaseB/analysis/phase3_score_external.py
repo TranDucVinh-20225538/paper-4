@@ -65,20 +65,26 @@ def main():
                 D_tr = displacement(ROOT, arm, seed)(Ztr)
                 D_ev = displacement(ROOT, arm, seed)(Zev_p)
                 for a in alphas:
+                    dest = OUT / "per_example" / f"{pair}_{arm}_a{a}_s{seed}.npz"
+                    if dest.is_file():
+                        continue
                     s, _, _ = score_all(Ztr + a * D_tr, ytr, Zev_p + a * D_ev)
                     rec = dict(pair=pair, arm=arm, seed=seed, alpha=a,
                                n_ood=len(ood))
                     for k, v in s.items():
                         rec[f"{k}_auroc"] = roc_auc_score(y, v)
                     rows.append(rec)
-                    np.savez_compressed(
-                        OUT / "per_example" / f"{pair}_{arm}_a{a}_s{seed}.npz",
-                        is_ood=y, **s)
-                print(f"   {arm} seed {seed}: "
-                      + "  ".join(f"{k[:4]}={rows[-1][k+'_auroc']:.4f}"
-                                  for k in ["maha", "cosine", "knn10", "kde"]))
+                    np.savez_compressed(dest, is_ood=y, **s)
+                    print(f"   {arm} s{seed} a{a}: "
+                          + "  ".join(f"{k[:4]}={rec[k+'_auroc']:.4f}"
+                                      for k in ["maha", "cosine", "knn10", "kde"]),
+                          flush=True)
     df = pd.DataFrame(rows)
-    df.to_csv(OUT / "external_auroc.csv", index=False)
+    prev = OUT / "external_auroc.csv"
+    if prev.is_file():
+        df = pd.concat([pd.read_csv(prev), df]).drop_duplicates(
+            ["pair", "arm", "seed", "alpha"], keep="last")
+    df.to_csv(prev, index=False)
     print(f"\n[score] wrote external_auroc.csv ({len(df)} rows)")
     print(df.groupby("pair")[["maha_auroc", "cosine_auroc",
                               "knn10_auroc", "kde_auroc"]].mean().round(4).to_string())
