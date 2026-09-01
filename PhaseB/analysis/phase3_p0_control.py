@@ -8,10 +8,15 @@ has to demonstrate it can still find the effect where the effect is known to be.
 So: same scoring path, same geometry path, same RQ3 code, pointed at the OOD set
 the primary result came from.
 
-This is not expected to match to the last digit. The primary matched input has
-45 rows because ten Adaptation configurations were dropped in a merge; this path
-computes all sixty directly. What it must reproduce is the finding -- a cosine
-contrast near -0.0085 whose interval excludes zero.
+The control mirrors the primary input's structure rather than the external
+pairs': the primary run scored only one Adaptation rung, partial-FT at alpha=1,
+so that arm contributes five rows and the table is 45, not 60. Using all sixty
+here would test a different design against the primary's number and prove
+nothing. Configurations with no per-example file are skipped rather than
+assumed.
+
+What this must reproduce is the finding -- a cosine contrast near -0.0085 whose
+interval excludes zero.
 """
 from __future__ import annotations
 import sys
@@ -47,12 +52,17 @@ def main():
                 # scores come from the per-example files the primary run produced,
                 # so this control cannot pass by rescoring differently
                 f = ROOT / "outputs" / "per_example" / f"{arm}_a{a}_s{seed}.npz"
+                if not f.is_file():
+                    continue          # primary scored only partial-FT for Adaptation
                 s = np.load(f)
                 rec = dict(arm=arm, config=f"alpha{a}", alpha=a, alpha_num=a, seed=seed,
                            lid_mean=g.lid_mean, spectral_decay_slope=g.spectral_slope)
                 for sc in ["maha", "cosine", "knn10", "kde"]:
                     rec[f"{sc}_auroc"] = roc_auc_score(s["is_ood"].astype(bool), s[sc])
                 rows.append(rec)
+                pd.DataFrame(rows).to_csv(DEST, index=False)
+            if not rows:
+                continue
             print(f"  {arm} s{seed}: lid={rows[-1]['lid_mean']:.3f} "
                   f"slope={rows[-1]['spectral_decay_slope']:.5f} "
                   f"cos={rows[-1]['cosine_auroc']:.5f}", flush=True)
