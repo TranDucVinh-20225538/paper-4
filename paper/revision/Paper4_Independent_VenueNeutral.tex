@@ -36,7 +36,7 @@ An Invariance-Aware Intervention Study}
 \maketitle
 
 \begin{abstract}
-Distance-based out-of-distribution (OOD) detection is often interpreted through global properties of a learned representation, including intrinsic dimensionality and covariance-spectrum decay. Evidence directly connecting these properties to OOD ranking is commonly observational: representations compared across backbones differ simultaneously in architecture, pretraining data, objective, scale, and normalization. Moreover, a geometric change can be irrelevant to a scorer when it lies inside that scorer's invariance class, and a near-ceiling baseline can leave too little ranking headroom for an effect to be observed. We study these issues through a controlled intervention on frozen PanDerm representations, using ISIC~2019 as the in-distribution population and PAD-UFES-20 as an exposed cross-modality stress-test domain. We formalize scorer-relative rank invariance, derive quantitative bounds for ridge-induced Mahalanobis violation and anisotropic cosine distortion, and connect bounded score perturbations to AUROC changes through local ID--OOD ranking margins. A gated dose ladder then separates manipulation and utility admissibility from scorer visibility and empirical susceptibility. Spectral slope moves reproducibly and nearly monotonically, while LID changes reproducibly but non-monotonically and in-distribution task utility remains above the prespecified threshold. Neither target metric has a Holm-corrected configuration-level association with scorer AUROC. Cosine and KDE are descriptively closer to intervention-history-matched than slope-matched configurations, but no paired contrast survives correction. The contribution is therefore an admissibility framework rather than a universal null claim.
+Distance-based out-of-distribution (OOD) detection is often interpreted through global properties of a learned representation, including intrinsic dimensionality and covariance-spectrum decay. Evidence directly connecting these properties to OOD ranking is commonly observational: representations compared across backbones differ simultaneously in architecture, pretraining data, objective, scale, and normalization. Moreover, a geometric change can be irrelevant to a scorer when it lies inside that scorer's invariance class, and a near-ceiling baseline can leave too little ranking headroom for an effect to be observed. We study these issues through a controlled intervention on frozen PanDerm representations, using ISIC~2019 as the in-distribution population and PAD-UFES-20 as an exposed cross-modality stress-test domain. We formalize scorer-relative rank invariance, derive quantitative bounds for ridge-induced Mahalanobis violation and anisotropic cosine distortion, and connect bounded score perturbations to AUROC changes through local ID--OOD ranking margins. A gated dose ladder then separates manipulation and utility admissibility from scorer visibility and empirical susceptibility. Spectral slope moves reproducibly and nearly monotonically, while LID changes reproducibly but non-monotonically in magnitude, and in-distribution task utility is non-inferior to baseline for any margin above .0022 balanced accuracy. Reconstructed image-level scores separate ranking insensitivity from a ceiling: at a common score perturbation the scorers' local susceptibility spans three orders of magnitude, and Mahalanobis's flat response is insensitivity rather than saturation. On three locked external pairs added under a protocol fixed before any external image was encoded, the two halves of the question separate. Changing geometry changes ranking: the tempering contrast is positive and excludes zero for cosine on every external pair. Holding geometry fixed, intervention identity adds nothing: no geometry-matched contrast excludes zero in any of twelve external pair--scorer combinations. Within the evaluated operator family the intervention acts through the measured geometry rather than beyond it.
 \end{abstract}
 
 \noindent\textbf{Keywords:} Out-of-distribution detection; representation geometry; scorer invariance; Mahalanobis distance; nearest neighbors; intervention study; foundation models.
@@ -320,7 +320,7 @@ The paired configuration-level estimands are
 \Delta g_{r,\alpha}=g_{r,\alpha}-g_{r,0},\qquad
 \Delta A_{j,r,\alpha}=A_{j,r,\alpha}-A_{j,r,0}.
 \end{equation}
-The available Kendall coefficients across 30 configurations are retained only as exploratory summaries because configurations sharing a seed are dependent. Mixed-effects interactions group by seed \cite{b18}; Holm correction controls the metric--scorer comparison family \cite{b19}. Hierarchical intervals require image-level score vectors \cite{b20}; aggregate AUROC means are not treated as image-level observations.
+The available Kendall coefficients across 30 configurations are retained only as exploratory summaries because configurations sharing a seed are dependent. Mixed-effects interactions group by seed \cite{b18}; Holm correction controls the metric--scorer comparison family \cite{b19}. Hierarchical intervals require image-level score vectors \cite{b20}; aggregate AUROC means are not treated as image-level observations. Those vectors were not retained during the original runs but are regenerable from the frozen embedding artifact and the retained adapters, and the regeneration reproduces every stored aggregate AUROC to six decimals, so the intervals reported here are computed at the image level rather than approximated from means.
 
 RQ3 uses three paired configurations: $A=(\alpha=1,\gamma=0)$; $B=(\alpha=.25,\gamma=0)$; and $C=(\alpha=1,\gamma=.01)$. Configuration $C$ matches $B$ on spectral slope and $A$ on adapter dose/intervention history. It does not match $B$ on LID. Paired $C-B$ and $C-A$ contrasts are tested for four scorers with Holm correction across eight comparisons. For Mahalanobis, $A-C$ is a near-invariance consistency check; it is not treated as a powered geometry-effect test.
 
@@ -353,7 +353,7 @@ Spectral slope changed reproducibly and near-monotonically by $-1.5,-2.7,-3.6,$ 
 \subsection{RQ3: Empirical Response Conditional on Admissibility and Manipulation}
 This section answers RQ3 using both the pooled configuration-level analysis and the geometry-matched paired contrast, conditional on RQ1's admissibility classification (Table~\ref{tab:rq1-admissibility}) and RQ2's manipulation evidence.
 
-\textbf{Pooled configuration-level associations.} Neither target metric had a Holm-corrected association with any scorer in the exploratory pooled analysis (Table~\ref{tab:rq2}). The largest LID and slope associations were both with Mahalanobis ($\tau=-.24$, uncorrected $p=.065$; $\tau=.22$, $p=.088$). Condition number was associated with all scorers in the pooled table, but no association survived whole-seed permutation sensitivity after correction. With $5!=120$ permutations, that sensitivity analysis has coarse resolution and is read as unresolved.
+\textbf{Pooled configuration-level associations.} Neither target metric had a Holm-corrected association with any scorer in the exploratory pooled analysis (Table~\ref{tab:rq2}). The largest LID and slope associations were both with Mahalanobis ($\tau=-.24$, uncorrected $p=.065$; $\tau=.22$, $p=.088$). Condition number was associated with all scorers in the pooled table, but no association survived whole-seed permutation sensitivity after correction. The permutation was applied symmetrically to all four geometry metrics rather than to condition number alone: across the resulting sixteen associations the smallest attainable $p$ is $.050$, against a design resolution of $1/120=.0083$, and no association reaches it. The more informative summary is the permutation null itself, whose 95th percentile of $|\tau|$ runs from $.14$ to $.66$ depending on metric and scorer. A design in which a $|\tau|$ of $.66$ arises by chance in one draw in twenty cannot adjudicate the observed coefficients, and the pooled table is reported as a descriptive summary on that basis rather than as weak evidence.
 
 \begin{table}[t]
 \centering
@@ -484,6 +484,59 @@ The near-duplicate screen operates in encoder space because the ISIC source imag
 Within a frozen dermatology foundation-model backbone, targeted representation geometry can be manipulated while in-distribution task utility remains above a prespecified admissibility threshold, and on locked external domains with headroom that manipulation moves distance-based OOD ranking reproducibly. Holding the measured geometry fixed, the intervention that produced a configuration adds nothing: no geometry-matched contrast excludes zero on any external pair, while the direct tempering contrast excludes zero for cosine on all of them. Within the evaluated operator family and the two-coordinate geometry vector used here, the intervention acts through geometry rather than beyond it.
 
 Scorer-relative transformation groups identify exact invisibility; perturbation bounds quantify departures from it; and local margin mass, rather than global headroom alone, bounds the AUROC response that a score perturbation can produce. Reconstructed image-level scores separate ranking insensitivity from a ceiling, a distinction aggregate AUROC cannot express and one that changes what a null response means. Geometry--OOD claims require manipulation, utility admissibility, scorer visibility, and evaluation susceptibility before a ranking response can be interpreted; the last of these is the condition most easily mistaken for evidence of invariance.
+
+\section*{Data and Code Availability}
+All analysis code, the frozen embedding artifact manifest, per-configuration
+scores and every table in this manuscript are in a version-controlled
+repository whose history is the audit trail for the ordering described below.
+The pretrained backbone is not vendored; it is pinned by SHA-256 against the
+release published by its authors. Image-level score vectors are regenerable
+from the frozen artifact and the retained adapters by a single script, and the
+regeneration is checked against the stored aggregates before any downstream
+analysis runs.
+
+\section*{Protocol Registration}
+This study followed an internal pre-registration frozen on 2026-08-04, before
+any experiment in the dose ladder was run. It is an internal dated record, not
+a filing with a registry, and it has no platform-based standing; the claim it
+supports is that the hypotheses, outcomes and analysis plan were fixed before
+the experiments, not that a third party attested to the date.
+
+The external-validation phase was registered differently and more strongly. Its
+protocol --- the label mapping and exclusions for both external sources, the
+overlap screen and its calibrated threshold, the frozen scorer and intervention
+settings, the per-pair reporting rule, and three predictions --- was committed
+to the repository before any external image was encoded, and the ordering of
+those commits is verifiable in the repository history rather than asserted.
+
+\begin{table}[t]
+\centering
+\caption{Registered predictions for the external phase, recorded before any external image was encoded, and their outcomes.}
+\label{tab:prereg}
+\small
+\begin{tabular}{p{5.4cm}p{7.4cm}}
+\toprule
+Prediction & Outcome\\
+\midrule
+Mahalanobis remains flat on every pair; $S/\mathrm{MDE}<1$ throughout, so headroom does not rescue it &
+Held. $S/\mathrm{MDE}$ reaches at most $.355$, on every pair, including where baseline AUROC falls to $.836$\\
+\addlinespace
+The same-modality pair yields lower AUROC than the cross-modality calibration pair; if it is also near-ceiling the phase has failed to deliver headroom and that is reported as a null &
+Held. Baseline cosine AUROC $.9805\rightarrow.7805$, and $.6322$ on PH2\\
+\addlinespace
+The clinical arm of the same lesions is easier to separate from dermoscopic ID than the dermoscopic arm &
+Held. $+.154$ AUROC for cosine, $+.075$ $k$-NN, $+.061$ Mahalanobis, $+.038$ KDE, on identical lesions\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Recording the first prediction mattered for how the result is read. It was
+derived from the calibration pair's own scores before any external data
+existed, so its confirmation is a successful prediction rather than a
+post-hoc explanation of Mahalanobis's flatness. The stopping rule was also
+fixed in advance: had the overlap screen demoted both external sources, the
+phase would report the screen and stop, since searching for a source that
+passes is selection on the outcome.
 
 \begin{thebibliography}{99}
 \bibitem{b1} K. Lee, K. Lee, H. Lee, and J. Shin, ``A simple unified framework for detecting out-of-distribution samples and adversarial attacks,'' in \emph{NeurIPS}, vol. 31, 2018.

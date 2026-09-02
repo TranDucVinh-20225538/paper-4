@@ -106,3 +106,52 @@ regenerated rather than retained, which is what Table 5 rests on.
 
 The choice of margin is left open on purpose. Which utility loss is clinically
 tolerable is a prior decision and the data cannot supply it.
+
+## Second pass — the rest of what could be done without a decision
+
+**Abstract.** Rewritten. It claimed "no paired contrast survives correction" and
+that cosine and KDE are "descriptively closer to intervention-history-matched
+than slope-matched configurations". Neither is the finding any more.
+
+**Whole-seed permutation.** The draft described it for condition number only and
+read it as unresolved. It was run symmetrically on all four geometry metrics:
+across the sixteen associations the smallest attainable p is .050 against a
+design resolution of 1/120 = .0083, so none reaches it. The permutation null is
+the more informative object and is now reported — its 95th percentile of |tau|
+runs .14 to .66, and a design where |tau| = .66 arises by chance once in twenty
+draws cannot adjudicate the observed coefficients.
+
+**Hierarchical intervals.** The draft said aggregate means are not treated as
+image-level observations, correctly, and left it there. The vectors were not
+retained but are regenerable, and the regeneration matches every stored
+aggregate to six decimals, so the intervals are computed at the image level.
+
+**Data and Code Availability** and **Protocol Registration** sections added,
+with a table of the three registered external-phase predictions and their
+outcomes. The registration section says plainly what each record is worth: the
+2026-08-04 pre-registration is an internal dated record with no platform
+standing, while the external-phase protocol was committed before any external
+image was encoded and that ordering is verifiable in the repository history
+rather than asserted.
+
+## Not touched, and why
+
+**Line 377, the mixed-effects claim.** The draft reports three Holm-significant
+interactions: LID x Mahalanobis at p = 2.9e-6, LID x KDE at 2.6e-3, and
+condition number x Mahalanobis at 3.9e-5.
+
+Reconstructing this from the retained data gives **one**: LID x Mahalanobis,
+raw p = .0024, Holm p = .038, coefficient -0.00009 AUROC per SD. Condition
+number x Mahalanobis comes out at raw p = .055, Holm p = .70. LID x KDE does
+not appear, which is explained — it was computed from the sklearn KDE scores.
+
+The other two are not explained. No script in the repository produces the
+reported p-values; the only mixed-effects code present is the reconstruction,
+so the provenance of 2.9e-6 and 3.9e-5 cannot be traced. This is the same
+class of problem as the C2 correlations, which had stored coefficients and no
+source script.
+
+Left as it stands because these are the advisor's numbers and replacing them is
+a decision about what the paper claims, not a correction I should make alone.
+It does need deciding before submission: the sentence currently rests on three
+values that cannot be reproduced from the retained artifacts.
