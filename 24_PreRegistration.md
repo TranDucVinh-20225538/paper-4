@@ -280,3 +280,46 @@ without extraordinary evidence, logged as a deviation, not a silent edit.
 **Next step is implementation (code)** — the first time in this project's Step 1–6 discipline
 that code is in scope, per Vinh's original workflow (coding forbidden before Step 6, and Step 6's
 sub-stages — Design → Contract → Amendments → Pre-Registration — are now all complete).
+
+---
+
+## Deviation log
+
+### D-1 (2026-09-02) — gamma ladder extended to small negative values
+
+**What changed.** The registered gamma ladder is positive-only. The fine grid
+run for the Stage 2 conditional item uses gamma in {-.006, -.005, -.004, -.003},
+which sharpens the covariance spectrum rather than whitening it.
+
+**Trigger.** The advisor's plan makes a fine gamma grid conditional on the
+current configurations lacking common support. That condition is met and was
+measured, not assumed: per identity, the fraction of configurations with a
+cross-identity neighbour inside the caliper is .00 for Adaptation at caliper
+.15 and .20 at the preregistered .25, against .40/.30 and .65/.55 for
+Conventional and Intervention.
+
+**Why the registered ladder could not satisfy it.** Adaptation sits at high
+standardised spectral slope, and positive gamma lowers slope -- the manuscript's
+own dose-response records slope falling by 1.5 to 3.6e-3 across the positive
+ladder. So refinement within the registered range moves away from the region
+needing coverage. A pilot over gamma in {0, .005, .01, .02, .05, .1, .15, .25}
+confirmed this before the extension was chosen: the closest reachable
+configuration sits at distance .95 from any Adaptation configuration, against a
+caliper of .25, and adding tempering made it worse rather than better
+(Conventional alpha=.75 moves from .95 at gamma=0 to 2.05 at gamma=.005).
+
+**Why the extension is inside the theory.** The bound the manuscript uses is
+kappa_2(A_gamma) = kappa_2(Sigma)^(|gamma|/2), which is stated on the absolute
+value. Negative gamma is a member of the same operator family, not a new one.
+
+**How the extension was chosen.** On geometry alone. The pilot and the grid
+script compute LID and spectral slope and nothing else; neither has access to
+any scorer or to AUROC, and neither imports a module that does. The claim that
+selection was blind to the outcome is therefore checkable from the code rather
+than taken on trust. The grid range was fixed from the pilot before any
+configuration in it was scored.
+
+**Effect on claims.** The augmented configurations enter the matched analysis
+only. Nothing in RQ1, RQ2, or the external-domain results depends on them. The
+matched analysis will be reported both with and without them, so a reader can
+see what the extension bought.
