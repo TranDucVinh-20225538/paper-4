@@ -87,3 +87,22 @@ is a difference of rounded values and rounds to .0019 from the full ones; the
 Delta-LID range "+2.7 to +5.8" omits gamma=.75, which falls to +0.26; and the
 configuration-C figures are seed 42's, where the five-seed means are 6.731e-3,
 6.744e-3 and 0.26.
+
+## Added after re-reading the advisor's README
+
+`README_VenueNeutral.txt` states that "paired non-inferiority remains future
+work". It is not future work any more — the two arms run at matched doses and
+matched seeds, so the twenty pairs give a paired answer directly: mean utility
+difference $-0.0000$, seed-clustered bootstrap interval $[-.0025,+.0029]$,
+one-sided lower bound $-.0022$. RQ2 now reports it, and the Gate 0 paragraph
+says plainly why the threshold alone was too weak to carry the word
+"preservation": it asks for .225 against a chance rate of .125, so a model
+falling from .75 to .30 would clear it.
+
+The README also says the theoretical bounds are "not presented as numerically
+validated from aggregate AUROC values" and that such validation "requires
+retained image-level score vectors and covariance spectra". Those vectors were
+regenerated rather than retained, which is what Table 5 rests on.
+
+The choice of margin is left open on purpose. Which utility loss is clinically
+tolerable is a prior decision and the data cannot supply it.
