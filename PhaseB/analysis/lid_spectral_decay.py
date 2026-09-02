@@ -34,6 +34,7 @@ from typing import NamedTuple
 import numpy as np
 from scipy.spatial import cKDTree
 
+RANK_RTOL = 1e-12   # relative numerical rank cutoff for S_w eigenvalues
 LID_K = 50  # arXiv:2510.15202 Appendix A: k fixed at 50 for the main composite metric.
 
 
@@ -116,11 +117,24 @@ def spectral_decay_slope(s_w: np.ndarray) -> float:
     """
     eigvals = np.linalg.eigvalsh(s_w)
     eigvals = np.sort(eigvals)[::-1]
-    if np.any(eigvals <= 0):
+
+    # The raw embeddings' within-class scatter is numerically rank d-1: the
+    # class-centred data's smallest singular value is 3.95e-7 against 5.47e-3
+    # for the next, so one eigenvalue sits at machine zero and lands on either
+    # side of it depending on the population. Left in, it contributes a point
+    # some 21 log units below its neighbour and drags the full-range fit --
+    # inflating the alpha=0 slope by 2.2% where it happens to be positive, and
+    # raising a positive-definiteness error where it is not. Neither is a
+    # statement about spectral decay. Eigenvalues below a relative numerical
+    # rank cutoff are dropped, and how many were dropped is reported.
+    cutoff = eigvals[0] * RANK_RTOL
+    kept = eigvals[eigvals > cutoff]
+    if kept.size < 2:
         raise ValueError(
-            "S_w has non-positive eigenvalue(s); spectral-decay slope requires a strictly "
-            "positive-definite within-class scatter matrix (unexpected at this project's n>>d)."
+            f"S_w has numerical rank {kept.size}; a spectral-decay slope needs at "
+            "least two positive eigenvalues above the rank cutoff."
         )
+    eigvals = kept
 
     d = eigvals.shape[0]
     i = np.arange(1, d + 1, dtype=np.float64)

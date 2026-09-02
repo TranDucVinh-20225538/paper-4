@@ -94,6 +94,11 @@ def main():
     idx_ood = np.flatnonzero(is_ood.astype(bool))
     rng = np.random.default_rng(args.seed)
 
+    # point estimate on the observed data, computed once and unresampled
+    point = {sc: {c: float(np.mean([fast_auroc(data[(c, sd)][sc], is_ood.astype(bool))
+                                    for sd in SEEDS]))
+                  for c in CONFIGS} for sc in SCORERS}
+
     reps = {sc: {c: np.empty(args.n_boot) for c in CONFIGS} for sc in SCORERS}
     for b in range(args.n_boot):
         drawn = rng.choice(SEEDS, len(SEEDS))
@@ -110,11 +115,17 @@ def main():
     for sc in SCORERS:
         for c in CONFIGS:
             v = reps[sc][c]
-            rows.append({"scorer": sc, "quantity": c, "estimate": v.mean(),
+            # estimate is the point estimate, not the bootstrap mean: the latter
+            # carries Monte Carlo noise of order 2e-4 here, which is 10% of the
+            # cosine C-A contrast and larger than the k-NN one
+            rows.append({"scorer": sc, "quantity": c, "estimate": point[sc][c],
+                         "boot_mean": v.mean(),
                          "lo": np.percentile(v, 2.5), "hi": np.percentile(v, 97.5)})
         for a, b_ in (("C", "A"), ("C", "B")):
             d = reps[sc][a] - reps[sc][b_]
-            rows.append({"scorer": sc, "quantity": f"{a}-{b_}", "estimate": d.mean(),
+            rows.append({"scorer": sc, "quantity": f"{a}-{b_}",
+                         "estimate": point[sc][a] - point[sc][b_],
+                         "boot_mean": d.mean(),
                          "lo": np.percentile(d, 2.5), "hi": np.percentile(d, 97.5)})
     df = pd.DataFrame(rows)
     df.to_csv(args.out / "hierarchical_auroc_ci.csv", index=False)
