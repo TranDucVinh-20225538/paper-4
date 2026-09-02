@@ -206,3 +206,36 @@ are seed 42's, where the five-seed means are 6.731e-3, 6.744e-3 and 0.26.
 
 **Venue.** The README notes the manuscript can be reformatted once a target is
 selected.
+
+## Closing the last two plan items
+
+Both were still open against the advisor's Section 8-9. Both produced findings.
+
+**Common support** (Stage 2, first item). The matched analysis reported the
+pairs it found, which is overlap after the fact; the plan asks for the check
+before it. Per identity, the fraction of configurations with a cross-identity
+neighbour inside the caliper is, at .15: Adaptation .00, Conventional .40,
+Intervention .30. At the preregistered .25 it is .20/.65/.55.
+
+Adaptation is the binding constraint and it is thin. At caliper .15 it has no
+overlap at all, and at .25 only a fifth of its configurations have any
+counterpart. The conclusion that intervention identity does not matter
+therefore rests mainly on the Intervention/Conventional contrast. That is now
+stated in the results rather than left for a reader to infer from the pair
+counts.
+
+**FPR@95%TPR** (classified "recommended, cheap once raw scores exist"). It was
+cheap, and it disagrees with the AUROC reading for two scorers.
+
+k-NN moves .0051 in AUROC, which is nothing, while its false-alarm rate at the
+operating point goes .0111 -> .0310, a factor of 2.8, rising in all five seeds.
+KDE shows the same weaker: .0057 -> .0143, rising in four of five, with seed 42
+flat. Mahalanobis is flat on both, 1.01x.
+
+So a scorer can be near-invariant in rank order and substantially worse where
+it is actually used. This is the same failure of aggregate summaries the
+manuscript already documents for near-ceiling AUROC, one level down, and it
+strengthens rather than complicates the argument.
+
+Reported per scorer rather than pooled, because k-NN's evidence is 5/5 seeds
+and KDE's is 4/5, and lumping them would overstate the weaker one.

@@ -457,6 +457,51 @@ Matched contrasts excluding zero & 2/4 & 0/4 & 0/4 & 0/4\\
 
 Image-level scores were regenerated from the frozen embedding artifact and the retained adapters, reproducing every stored aggregate AUROC to six decimals, so the local susceptibility that aggregate means cannot express is available directly (Table~\ref{tab:susceptibility}). Two readings follow. First, the bound of Corollary~1 is valid only at $\delta_{\max}$, and there it is uninformative: $S=1.000$ for cosine and KDE, $.832$ for $k$-NN, $.690$ for Mahalanobis. Second, at a common descriptive $\delta$ the scorers separate by three orders of magnitude, with Mahalanobis at $6.5\times10^{-5}$ against cosine's $4.8\times10^{-2}$ --- a factor of 735 --- even though Mahalanobis's score displacement is the larger of the two (median 7.44, 95th percentile $2.5\times10^{3}$). Mahalanobis's flat profile is therefore ranking insensitivity, not a ceiling artifact. This distinction is what the pooled aggregates could not make.
 
+\textbf{Common support.} The matched analysis reports the pairs it found; the
+prior question is whether the intervention identities occupy a shared region of
+$G$ at all. Per identity, the fraction of configurations with a cross-identity
+neighbour inside the caliper is: at $.15$, Adaptation $.00$, Conventional $.40$,
+Intervention $.30$; at $.25$, $.20/.65/.55$. Adaptation is the binding
+constraint and it is thin --- at the preregistered caliper only a fifth of its
+configurations have any counterpart. On the external pairs, which carry the full
+Adaptation ladder rather than the single rung that survived the primary merge,
+the same figure is $.40$, $.25$ and $.15$. Conclusions about intervention
+identity therefore rest mainly on the Intervention/Conventional contrast, and
+the Adaptation arm contributes little; that is a property of the configuration
+grid, not of the estimator.
+
+\textbf{Operating-point behaviour.} AUROC integrates over every threshold,
+while a deployed reliability estimator runs at one. Table~\ref{tab:fpr} reports
+FPR at 95\% TPR on the calibration pair, and it does not agree with the AUROC
+reading for two scorers. $k$-NN moves $.0051$ in AUROC, which is nothing, while
+its false-alarm rate at the operating point goes from $.0111$ to $.0310$ --- a
+factor of $2.8$, rising in all five seeds. KDE shows the same pattern more
+weakly, $.0057$ to $.0143$, rising in four of five. Mahalanobis is flat on both
+measures, $1.01\times$, which is the one place the two agree.
+
+A scorer can therefore be near-invariant in rank order and substantially worse
+where it is actually used. That is the same failure of aggregate summaries this
+manuscript documents for near-ceiling AUROC, one level further down, and it is
+the reason the susceptibility analysis is reported at the margin distribution
+rather than at the summary.
+
+\begin{table}[t]
+\centering
+\caption{FPR at 95\% TPR on the calibration pair, Intervention arm, mean over five seeds, against the AUROC change over the same dose interval.}
+\label{tab:fpr}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Scorer & $|\Delta$AUROC$|$ & FPR $\alpha{=}0$ & FPR $\alpha{=}1$ & Ratio\\
+\midrule
+Mahalanobis & .000160 & .0081 & .0082 & $1.01\times$\\
+$k$-NN & .005075 & .0111 & .0310 & $2.80\times$\\
+KDE & .002125 & .0057 & .0143 & $2.50\times$\\
+Cosine & .033715 & .0801 & .1580 & $1.97\times$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \label{sec:external}
 \textbf{External validation.} Three additional evaluation pairs were added under a protocol fixed before any external image was embedded: Derm7pt (Interactive Atlas of Dermoscopy) in both its dermoscopic and clinical arms, and PH2. Neither source contributes to ISIC~2019, and a near-duplicate screen in encoder space flagged no image in any set against the 21{,}278 frozen ISIC embeddings, at a threshold calibrated as the 99.9th percentile of within-ISIC nearest-neighbour similarity. The Derm7pt arms photograph the same 983 lesions under two modalities, which separates the modality gap from the site gap in a way the calibration pair cannot.
 
