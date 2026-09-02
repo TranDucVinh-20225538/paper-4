@@ -134,24 +134,75 @@ standing, while the external-phase protocol was committed before any external
 image was encoded and that ordering is verifiable in the repository history
 rather than asserted.
 
-## Not touched, and why
+## The mixed-effects claim: traced, and replaced
 
-**Line 377, the mixed-effects claim.** The draft reports three Holm-significant
-interactions: LID x Mahalanobis at p = 2.9e-6, LID x KDE at 2.6e-3, and
-condition number x Mahalanobis at 3.9e-5.
+The draft reported three Holm-significant interactions -- LID x Mahalanobis at
+p = 2.9e-6, LID x KDE at 2.6e-3, condition number x Mahalanobis at 3.9e-5.
 
-Reconstructing this from the retained data gives **one**: LID x Mahalanobis,
-raw p = .0024, Holm p = .038, coefficient -0.00009 AUROC per SD. Condition
-number x Mahalanobis comes out at raw p = .055, Holm p = .70. LID x KDE does
-not appear, which is explained — it was computed from the sklearn KDE scores.
+**Where it came from.** Not the advisor. The identical sentence is in
+`paper/sections/results.tex`, dated 2026-08-17, and the venue-neutral draft
+inherited it. That earlier record also carries coefficients, which matters:
+-1.2e-4 for LID x Mahalanobis against the reconstruction's -8.9e-5, and 2.9e-4
+for condition number x Mahalanobis against 1.6e-4. Same sign, same order. The
+convergence claim matches too. The analysis was run; nobody invented numbers.
 
-The other two are not explained. No script in the repository produces the
-reported p-values; the only mixed-effects code present is the reconstruction,
-so the provenance of 2.9e-6 and 3.9e-5 cannot be traced. This is the same
-class of problem as the C2 correlations, which had stored coefficients and no
-source script.
+**What cannot be recovered** is which population or model specification it was
+run on. Four retained sets were tried:
 
-Left as it stands because these are the advisor's numbers and replacing them is
-a decision about what the paper claims, not a correction I should make alone.
-It does need deciding before submission: the sentence currently rests on three
-values that cannot be reproduced from the retained artifacts.
+| set | n | converged | Holm-significant |
+|---|---|---|---|
+| draft's claim | 30 | 16/16 | LID x Maha, LID x KDE, cond x Maha |
+| matched_input | 45 | 16/16 | LID x Maha |
+| matched_input, C2 only | 25 | 16/16 | cond x Maha |
+| raw_run_matrix, C2 only | 30 | 15/16 | slope x cosine, slope x k-NN, slope x KDE |
+| raw_run_matrix, all | 55 | 16/16 | slope x k-NN, slope x cosine, LID x Maha |
+
+Two sets match one of the draft's own descriptors each -- n = 30, and 16/16
+converged -- and neither returns its triple. No script in the repository
+produces those p-values.
+
+**Why it was replaced rather than left.** The conclusion the sentence draws,
+that the coefficients are small and mechanism-dependent, survives every
+reconstruction, so the science does not turn on this. Two other things do.
+
+The manuscript now carries a Data and Code Availability section. This was the
+one claim a reviewer attempting reproduction would fail on, and an
+irreproducible number sitting next to a reproducibility statement costs more
+than the number is worth.
+
+And the sentence's sub-claim, "spectral slope is not supported in this
+stress-test regime", is contradicted twice over: by the reconstructions, where
+slope is the interaction that reaches significance on the two sets matching the
+draft's descriptors, and independently by the external validation, where C-A
+varies only the tempering exponent -- that is, only slope -- and moves ranking
+on all four domains. It has been dropped.
+
+**What replaced it.** The reconstruction on the 55-configuration run matrix,
+named in the text: slope x k-NN, slope x cosine, LID x Mahalanobis, with
+coefficients and Holm p-values. That set was chosen before looking at which
+result it gave, on the stated grounds that it is the widest retained set and
+the only one where all sixteen models converge.
+
+The instability itself is now reported as the substantive finding at this
+level: an association whose identity changes with the analysis population is
+not evidence about a mechanism. That is a better reason for the exploratory
+label than the draft had.
+
+The provenance gap is stated in Limitations rather than left in the change log.
+
+## Still needs a decision
+
+**Two numeric issues in the retained analyses**, both flagged earlier and still
+unpatched because both change published numbers: `estimate` in
+`hierarchical_auroc_ci.csv` is a bootstrap mean carrying about 2.4e-4 of Monte
+Carlo noise, 9.9% of the cosine C-A value; and the within-class scatter is
+numerically rank 1023, inflating the alpha=0 spectral slope by 2.2% against a
+0.1% effect size under discussion.
+
+**Three smaller discrepancies**: cosine C-A .0018 is a difference of rounded
+values and rounds to .0019 from the full ones; the Delta-LID range "+2.7 to
++5.8" omits gamma=.75, which falls to +0.26; and the configuration-C figures
+are seed 42's, where the five-seed means are 6.731e-3, 6.744e-3 and 0.26.
+
+**Venue.** The README notes the manuscript can be reformatted once a target is
+selected.
