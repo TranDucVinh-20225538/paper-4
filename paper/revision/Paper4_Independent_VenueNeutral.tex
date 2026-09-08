@@ -465,10 +465,49 @@ Intervention $.30$; at $.25$, $.20/.65/.55$. Adaptation is the binding
 constraint and it is thin --- at the preregistered caliper only a fifth of its
 configurations have any counterpart. On the external pairs, which carry the full
 Adaptation ladder rather than the single rung that survived the primary merge,
-the same figure is $.40$, $.25$ and $.15$. Conclusions about intervention
-identity therefore rest mainly on the Intervention/Conventional contrast, and
-the Adaptation arm contributes little; that is a property of the configuration
-grid, not of the estimator.
+the same figure is $.40$, $.25$ and $.15$.
+
+Thin support is the trigger for the conditional fine-grid item in the analysis
+plan, so the grid was run. The registered tempering ladder cannot satisfy it:
+Adaptation sits at high standardised slope and positive $\gamma$ lowers slope,
+so the nearest configuration reachable within the registered range is at
+distance $.95$ against a caliper of $.25$, and adding tempering moves further
+away rather than closer. Extending to small negative $\gamma$, which sharpens
+the spectrum instead of whitening it and stays inside the theory's
+$\kappa_2(A_\gamma)=\kappa_2(\Sigma)^{|\gamma|/2}$, does reach the region: 120
+configurations at $\gamma\in\{-.006,\dots,-.003\}$ raise Adaptation's support
+from $.00$ to $.80$ at caliper $.15$ and from $.20$ to $.80$ at $.25$. The
+extension is a departure from the registered ladder, was chosen on geometry
+before any of these configurations was scored, and is logged as such; the
+scripts that selected it compute geometry and have no code path to a scorer.
+
+\begin{table}[t]
+\centering
+\caption{Matched contrast at caliper $.25$ on three configuration sets. The augmented set pools two populations --- 30 of its 51 pairs lie entirely inside the extended $\gamma$ regime --- so the third row, which requires each pair to touch an originally registered configuration, is the like-for-like comparison.}
+\label{tab:support}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Configuration set & Pairs & $|$SMD$|$ & Cosine & $k$-NN & Mahalanobis\\
+\midrule
+Registered only & 10 & .136 & $-.00853^\ast$ & $-.00072^\ast$ & $+.00000$\\
+Augmented, all & 51 & .043 & $+.00260$ & $-.00016$ & $-.00003^\ast$\\
+Augmented, touching registered & 21 & .015 & $-.01095^\ast$ & $-.00148^\ast$ & $-.00006^\ast$\\
+\bottomrule
+\end{tabular}
+\\[2pt]
+\footnotesize $^\ast$ hierarchical interval excludes zero.
+\end{table}
+
+Table~\ref{tab:support} is the reason the grid was worth running, and it points
+the opposite way from the middle row read alone. On the best-balanced set ---
+$|$SMD$|$ $.015$ against the registered set's $.136$ --- the contrast is larger
+than originally reported, not smaller, and all four scorers exclude zero rather
+than two. Thin common support was suppressing the effect on this pair, not
+manufacturing it. Mahalanobis's interval excludes zero at $-6\times10^{-5}$,
+which is detectable at this precision and negligible at any other reading; it is
+the same point Table~\ref{tab:susceptibility} makes about the difference between
+a resolvable effect and a meaningful one.
 
 \textbf{Operating-point behaviour.} AUROC integrates over every threshold,
 while a deployed reliability estimator runs at one. Table~\ref{tab:fpr} reports
@@ -513,7 +552,40 @@ The geometry-matched contrast does not. Holding $G$ fixed and varying interventi
 
 Read together the two results are the two halves of one statement. Geometry change moves ranking, reliably. Intervention identity, once geometry is held fixed, adds nothing. Within the evaluated operator family the intervention acts \emph{through} the measured geometry rather than beyond it, and RQ3 is answered rather than left unresolved. The scope qualifier is that this holds for the two-coordinate $G$ evaluated here; a richer geometry vector could in principle leave residual identity structure that $(\mathrm{LID},\text{slope})$ does not capture.
 
-One asymmetry deserves emphasis rather than a footnote. PAD-UFES-20 is the only evaluation domain that participated in operator calibration, and it is the only domain on which the matched contrast is nonzero. We do not claim this establishes calibration leakage, but the ordering of the evidence is consistent with it, and it is a more specific candidate explanation than a ceiling artifact.
+Why the calibration pair is the only one that responds does not require a
+statistical argument, and is stronger for not needing one. The nuisance
+direction is defined in closed form as the normalised ISIC--PAD mean
+difference, so the Intervention arm is trained to suppress precisely the
+direction along which PAD-UFES-20 separates from the in-distribution
+population. Measuring that arm's effect on ISIC-versus-PAD detection therefore
+measures the operator against its own construction target. This is visible in
+the definition rather than inferred from the results, and no sample size makes
+it more or less true.
+
+The locked external domains project onto that direction at $.289$ (Derm7pt
+clinical), $.111$ (Derm7pt dermoscopic) and $.002$ (PH2), against $1.000$ for
+the pair the direction was built from. Suppressing a direction that carries a
+tenth of a domain's separation, or a five-hundredth of it, should do little to
+that domain's detectability, and none of the three shows a matched-contrast
+effect. Among the three domains with appreciable projection the response
+magnitude also orders with it --- cosine moves $-.030$, $-.017$ and $-.010$ at
+projections of $1.000$, $.289$ and $.111$ --- though that ordering rests on
+seed-level differences that are individually noisy and is offered as
+consistent, not as a dose-response result.
+
+PH2 does not fit and is reported as not fitting. At a projection of $.002$ the
+alignment account predicts no response, yet the intervention makes PH2 easier
+to detect in all five seeds for $k$-NN and for KDE, by about $+.022$ and
+$+.029$. Cosine on the same pair is unstable across seeds and carries no weight
+either way. We have no account of the two stable positive effects; offering one
+from a single domain without a mechanism test is the kind of reading this
+manuscript argues against, so the observation is recorded and left open.
+
+The practical statement is narrower than a claim about geometry in general and
+more useful for it: an intervention evaluated on the domain from which its
+operator was constructed is being evaluated against its own target, and the
+apparent effect need not survive contact with a domain the operator does not
+point at.
 
 The equal rounded Mahalanobis AUROC for $A$ and $C$ is consistent with the small ridge-induced deviation allowed by Theorem~2, not evidence of exact numerical identity. The theorem does not constrain $A-B$, which differs in nonlinear adapter dose, and makes no exact prediction for the other scorers under anisotropic tempering. $k$-NN's near-flat profile across $A$, $B$, and $C$ is likewise consistent with the bracket of Proposition~3 and the ratio-margin susceptibility of Corollary~2: both bounds are governed by the same $\kappa_2(A_\gamma)=\kappa_2(\Sigma)^{|\gamma|/2}$ that bounds cosine's deviation under Lemma~1, so a small violation is expected for $k$-NN whenever it is expected for cosine, but Table~\ref{tab:headroom}'s near-zero headroom for $k$-NN means this bound cannot by itself be distinguished from a ceiling effect with the retained aggregates. Lemma~1 predicts that angular deviation contracts as $\kappa(A_\gamma)\rightarrow1$, but the retained aggregates do not permit a numerical bound-to-observation comparison for cosine either. Minimal global headroom likewise does not establish irrelevance: Corollary~1 and Corollary~2 both require local margin or ratio-margin mass, which cannot be recovered from Table~\ref{tab:headroom}. With image-level scores available, Table~\ref{tab:susceptibility} distinguishes what the aggregates could not: Mahalanobis's and $k$-NN's flatness is governed by their low ranking susceptibility rather than by a ceiling, and the external pairs supply the headroom needed to test the matched property where no ceiling applies.
 
@@ -546,7 +618,7 @@ One provenance gap is reported rather than papered over. An earlier draft of thi
 The near-duplicate screen operates in encoder space because the ISIC source images were not retained. It is a weaker instrument than a perceptual hash for exact or cropped duplicates, though a stronger one for the same lesion rephotographed, and it can only fail to find evidence of overlap rather than establish its absence.
 
 \section{Conclusion}
-Within a frozen dermatology foundation-model backbone, targeted representation geometry can be manipulated while in-distribution task utility remains above a prespecified admissibility threshold, and on locked external domains with headroom that manipulation moves distance-based OOD ranking reproducibly. Holding the measured geometry fixed, the intervention that produced a configuration adds nothing: no geometry-matched contrast excludes zero on any external pair, while the direct tempering contrast excludes zero for cosine on all of them. Within the evaluated operator family and the two-coordinate geometry vector used here, the intervention acts through geometry rather than beyond it.
+Within a frozen dermatology foundation-model backbone, targeted representation geometry can be manipulated while in-distribution task utility remains above a prespecified admissibility threshold, and on locked external domains with headroom that manipulation moves distance-based OOD ranking reproducibly. Holding the measured geometry fixed, the intervention that produced a configuration adds nothing on any domain the operator was not built from: no geometry-matched contrast excludes zero on the three locked external pairs, while the direct tempering contrast excludes zero for cosine on all of them. On the calibration pair the matched contrast is nonzero and grows as the matching improves, which is what should be expected of a pair whose separation direction is, by construction, the direction the intervention suppresses. The scope statement that follows is narrower than a claim about geometry and more useful for it: an intervention evaluated on the domain its operator was constructed from is evaluated against its own target.
 
 Scorer-relative transformation groups identify exact invisibility; perturbation bounds quantify departures from it; and local margin mass, rather than global headroom alone, bounds the AUROC response that a score perturbation can produce. Reconstructed image-level scores separate ranking insensitivity from a ceiling, a distinction aggregate AUROC cannot express and one that changes what a null response means. Geometry--OOD claims require manipulation, utility admissibility, scorer visibility, and evaluation susceptibility before a ranking response can be interpreted; the last of these is the condition most easily mistaken for evidence of invariance.
 

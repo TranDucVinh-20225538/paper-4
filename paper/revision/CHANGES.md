@@ -239,3 +239,38 @@ strengthens rather than complicates the argument.
 
 Reported per scorer rather than pooled, because k-NN's evidence is 5/5 seeds
 and KDE's is 4/5, and lumping them would overstate the weaker one.
+
+## Final pass — the fine grid, and what it changed
+
+**Common support and the gamma extension.** The plan's conditional item fired.
+The registered positive-only ladder cannot satisfy it — Adaptation sits at high
+slope, positive gamma lowers slope, and the nearest reachable configuration is
+at distance .95 against a caliper of .25. Small negative gamma reaches the
+region and raises Adaptation's support from .00 to .80 at caliper .15. Logged as
+a protocol deviation, chosen on geometry before scoring, with scripts that have
+no code path to a scorer.
+
+**Table 8 changed the RQ3 reading, twice.** Read on the augmented set alone the
+original effect vanishes; read on the 21 pairs that touch a registered
+configuration — the best-balanced set at |SMD| .015 — it is larger than
+originally reported and all four scorers exclude zero. The middle row is
+pooling two populations, since 30 of its 51 pairs sit entirely inside the
+extended gamma regime. Thin support was suppressing the effect, not creating it.
+
+That reversal is worth stating plainly because the intermediate reading was
+wrong and briefly believed: an augmented analysis that looks better balanced can
+be worse targeted, and the pair composition has to be checked before the
+contrast is read.
+
+**The alignment argument replaces the leakage speculation.** The nuisance
+direction is the normalised ISIC-PAD mean difference, so measuring the
+Intervention arm against ISIC-versus-PAD detection measures the operator against
+its own construction target. External projections are .289, .111 and .002
+against 1.000. This is visible in the definition, needs no sample size, and is
+what the earlier "consistent with calibration leakage" sentence should have been
+all along.
+
+**PH2 is recorded as not fitting.** Projection .002 predicts no response; the
+intervention nonetheless makes PH2 easier to detect in 5/5 seeds for k-NN and
+KDE. No mechanism offered. Constructing one from a single domain without a
+mechanism test is the reading error the manuscript argues against.
