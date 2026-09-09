@@ -323,3 +323,38 @@ configuration in it was scored.
 only. Nothing in RQ1, RQ2, or the external-domain results depends on them. The
 matched analysis will be reported both with and without them, so a reader can
 see what the extension bought.
+
+### D-2 (2026-09-09) — seed set extended from five to ten
+
+**What changed.** The registered seed set is {42, 52, 62, 72, 82}. Five more
+were trained: {92, 102, 112, 122, 132}.
+
+**Why.** Not to gain power for a result, but to remove a constraint this study
+itself identified. A whole-seed permutation over k seeds attains no p below
+1/k!. At five seeds that floor is 1/120 = .0083, above Holm's first threshold
+for any family larger than six tests, so two families here could not have
+produced a corrected rejection whatever the data showed. At ten seeds the floor
+is 1/10! = 2.8e-7 and the constraint is gone. Identifying a design defect and
+then remaining inside it is a weaker position than fixing it.
+
+**How the seeds were chosen.** By continuing the registered arithmetic rule,
+step 10, rather than by selection. No seed was inspected before being added and
+none was discarded. Every analysis is rerun on all ten; no result is reported
+on a chosen subset.
+
+**Hyperparameters unchanged.** r=16, lambda_proj=0.1, 100 epochs, lr 1e-3,
+batch 512 — the canonical values, not re-selected for the new seeds.
+
+**Verification before writing anything.** The extension script retrains seed 42
+and asserts the result is bit-identical to the stored adapter. It is, to
+0.000e+00 on all four tensors, so the training path is the registered one and
+not a re-implementation of it.
+
+**Artifact separation.** The canonical arm directories are chmod-frozen. They
+were left frozen; the added seeds are written to parallel `*Arm_Extended`
+directories and the loader resolves canonical first, so which seeds are
+registered and which were added stays visible in the layout rather than being
+merged away.
+
+**Reporting.** Both the five-seed and ten-seed results are reported, so the
+effect of the extension on every conclusion is visible rather than assumed.

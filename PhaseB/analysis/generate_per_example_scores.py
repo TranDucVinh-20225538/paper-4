@@ -63,8 +63,21 @@ def load(root: Path):
     return Ztr, Zev, ytr, (dom != "isic").astype(int)
 
 
+def adapter_path(root: Path, arm: str, seed: int) -> Path:
+    """Registered seeds live in the frozen canonical directory; the five added
+    later live beside it. The canonical one is chmod-frozen and stays that way,
+    so the resolver looks there first and falls back rather than merging them."""
+    p = root / f"{arm}Arm_Canonical/{ARMS[arm]}_seed{seed}.pt"
+    if p.is_file():
+        return p
+    q = root / f"{arm}Arm_Extended/{ARMS[arm]}_seed{seed}.pt"
+    if q.is_file():
+        return q
+    raise FileNotFoundError(f"no adapter for {arm} seed {seed} in either location")
+
+
 def displacement(root: Path, arm: str, seed: int):
-    sd = torch.load(root / f"{arm}Arm_Canonical/{ARMS[arm]}_seed{seed}.pt",
+    sd = torch.load(adapter_path(root, arm, seed),
                     map_location="cpu", weights_only=False)["adapter"]
     W1, b1 = sd["down.weight"].numpy(), sd["down.bias"].numpy()
     W2, b2 = sd["up.weight"].numpy(), sd["up.bias"].numpy()
