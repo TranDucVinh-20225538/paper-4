@@ -436,7 +436,11 @@ a non-flat one that fails the third carries less than that.
 This section is a worked example of Section~\ref{sec:three}'s three checks
 rather than a generalization claim: the values below are properties of this
 backbone and these four evaluation domains, and each of the three checks
-changed a reading here that had previously gone unquestioned.
+changed a reading here that had previously gone unquestioned. A companion
+preregistered study across ten backbones, discussed in Section~7, finds that the
+geometry--performance association does not transfer across representation
+families; the results here are reported as an instance, not as evidence for a
+general regularity.
 RQ1 was answered analytically in Section~3 and does not depend on the data reported below: Table~\ref{tab:rq1-admissibility} classifies each scorer's admissibility under the accepted operator $T_\gamma$ prior to, and independent of, any dose-response evidence. This section reports the empirical evidence for RQ2 (manipulation and preservation) and RQ3 (empirical response, read conditional on RQ1's admissibility classification and RQ2's manipulation evidence).
 \subsection{RQ2: Manipulation and Preservation}
 \label{sec:rq2-manipulation}
@@ -712,7 +716,41 @@ The three RQs delineate a methodological boundary rather than a general verdict 
 
 The central lesson is an admissibility rule: a geometry--OOD claim requires successful manipulation, preservation, scorer visibility, and sufficient local ranking susceptibility. Failure of any condition changes the meaning of a null response. Exact group invariance supplies a theoretical zero; Theorem~2 and Lemma~1 replace the remaining binary judgment by scorer-specific quantitative bounds; Proposition~1 and Corollary~1 connect those bounds to ranking and AUROC; and Proposition~2 identifies a concrete spectral attenuation mechanism for Mahalanobis scoring. Global headroom remains a useful warning but is not a substitute for the pairwise margin distribution. None of these conditions supports a universal conclusion that geometry is irrelevant.
 
-The evaluation covers one backbone, one layer, one diagnostic task, five optimization seeds, and four evaluation domain pairs, of which three are locked and same-modality or lesion-matched. Generalization beyond a single encoder is the principal remaining limitation: every statement here is, strictly, a statement about PanDerm ViT-L/16, and whether the susceptibility ordering across scorers is a property of distance-based OOD detection or of this representation cannot be settled with one backbone.
+The evaluation covers one backbone, one layer, one diagnostic task, five optimization seeds, and four evaluation domain pairs, of which three are locked and same-modality or lesion-matched. Generalization beyond a single encoder is the principal remaining limitation,
+and it is not left as an open question. A companion preregistered study applies
+the same dose ladder, matched control arms and gates independently to ten
+frozen backbones, sampled as five representation families with two instances
+each so that within-family variance is measured rather than assumed, spanning
+supervised CNNs, medical and general self-supervised encoders, and medical and
+general vision--language models. Its analysis was frozen in a single commit
+before any cross-backbone association was computed. It found no confirmatory
+evidence that the geometry--performance association generalizes: no backbone
+cleared the Holm-corrected threshold, and the pattern across families was
+heterogeneous, with six of ten backbones nonetheless showing $|\tau|\ge.29$ in
+both directions. On the backbone studied here it reproduced the original
+association exactly, $\tau=+.5576$ against a published $+.5576$, which removes
+the analysis pipeline as an explanation for the null elsewhere.
+
+Two consequences, and they pull in opposite directions. The first is that no
+claim in this manuscript should be read as a claim about distance-based OOD
+detection in general, and none is intended as one. The values reported here ---
+the susceptibility ordering across the four scorers, the response magnitudes,
+the alignment projections --- are properties of this representation and these
+four evaluation domains.
+
+The second is that the companion null is itself constrained by the second
+condition of Section~\ref{sec:three}. At five seeds its whole-seed permutation
+attains no $p$ below $1/120=.0083$, while Holm's first threshold across its ten
+backbones is $.005$; the floor lies above the threshold, so that family could
+not have produced a corrected rejection whatever the ten backbones had shown.
+Its own report states this and reads the result as a boundary of validity
+rather than a refutation, which is the correct reading and the one we adopt
+here. What the two studies jointly establish is narrower than either a positive
+or a negative generalization claim: the association is not robust across
+representation families, the design that would settle whether it is absent
+needs more seeds than either study has, and the diagnostic framework of
+Section~\ref{sec:three} is what remains applicable in the meantime, because
+none of its three checks depends on the association holding.
 
 Five seeds estimate the seed-level variance component coarsely, so hierarchical intervals are narrower than a seed-only analysis and should not be read as though more seeds were available. The observed between-seed spread of the paired contrast exceeds the Hanley--McNeil sampling standard error by up to a factor of two for cosine, and minimum detectable effects here are computed from the observed spread rather than the formula for that reason. PH2 contributes 200 OOD images, which yields a minimum detectable effect of .059 for cosine; it is retained as a second point on the difficulty ladder and does not stand alone.
 
@@ -758,8 +796,10 @@ configuration adds nothing on any domain its operator was not constructed from.
 On the domain it \emph{was} constructed from, it adds a great deal, and more as
 the matching improves.
 
-Those values belong to this representation. The three tests do not, and they
-are the part we would ask a reader to take away. The most consequential
+Those values belong to this representation, and a companion study across ten
+backbones finds that the association they describe does not transfer across
+representation families. The three tests do not depend on it transferring, and
+they are the part we would ask a reader to take away. The most consequential
 sentence in a distance-based reliability study is often the one reporting that
 nothing happened, and it is the sentence most rarely accompanied by evidence
 that something could have.
