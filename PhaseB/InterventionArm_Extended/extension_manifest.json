@@ -1,0 +1,22 @@
+{
+  "registered_seeds": [
+    42,
+    52,
+    62,
+    72,
+    82
+  ],
+  "added_seeds": [
+    92,
+    102,
+    112,
+    122,
+    132
+  ],
+  "rule": "arithmetic continuation of the registered set, step 10",
+  "hyperparameters": {
+    "r": 16,
+    "lambda_proj": 0.1
+  },
+  "guard": "seed 42 retrained and asserted bit-identical before writing"
+}

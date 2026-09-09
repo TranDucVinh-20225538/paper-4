@@ -412,7 +412,10 @@ at five seeds and $\alpha=.05$, wherever $m>6$ --- no permutation $p$-value can
 clear the first step, and the family's null is a statement about the design.
 This is one division. It costs nothing to check when the analysis plan is
 written and is uncomfortable to discover afterwards, as we did: two families in
-our own earlier analysis are in that regime.
+our own earlier analysis were in that regime. Section~\ref{sec:seeds} reports
+what happened when the constraint was removed, which is the check the condition
+implies and not an optional extra --- a null reported from an unreachable
+family says nothing until someone makes the family reachable.
 
 \textbf{Was the operator built from the domain it is evaluated on?} Nuisance
 removal, domain-adversarial training and shortcut suppression commonly define
@@ -721,6 +724,76 @@ not claimed either way. The three checks of Section~\ref{sec:three} are stated
 at the level of a design rather than a representation precisely because they do
 not depend on that question being settled.
 
+\subsection{Seed extension}
+\label{sec:seeds}
+The second condition of Section~\ref{sec:three} applies to this study's own
+analysis, and identifying a design defect while remaining inside it is a weaker
+position than removing it. The registered seed set of five was therefore
+extended to ten, by continuing the registered arithmetic rule rather than by
+selecting seeds, with every analysis rerun on all ten and both sets reported.
+The extension is logged as a protocol deviation. Before any new adapter was
+written, seed 42 was retrained and asserted bit-identical to the stored one on
+all four tensors, so the added seeds come from the registered training path
+rather than a re-implementation of it.
+
+\begin{table}[t]
+\centering
+\caption{Every conclusion at five and at ten seeds. The permutation floor is $1/k!$ exhaustively and $1/n$ when sampled; at ten seeds $10!$ is not enumerable and 20{,}000 arrangements are drawn, which lowers the floor to $5\times10^{-5}$ and leaves it below Holm's threshold.}
+\label{tab:seeds}
+\small
+\begin{tabular}{lrr}
+\toprule
+& Five seeds & Ten seeds\\
+\midrule
+Permutation floor & $8.3\times10^{-3}$ & $5.0\times10^{-5}$\\
+Holm's first threshold, $m{=}16$ & \multicolumn{2}{c}{$3.1\times10^{-3}$}\\
+Family reachable & no & \textbf{yes}\\
+Associations attaining the floor & 0/16 & \textbf{0/16}\\
+Associations surviving Holm & 0/16 & \textbf{0/16}\\
+\midrule
+Matched pairs at caliper $.25$ & 10 & 27\\
+Worst $|$SMD$|$ & .137 & .021\\
+Cosine contrast & $-.00853^\ast$ & $-.01015^\ast$\\
+$k$-NN contrast & $-.00072^\ast$ & $-.00121^\ast$\\
+KDE contrast & $-.00025$ & $-.00044^\ast$\\
+Mahalanobis contrast & $+.00000$ & $-.00001$\\
+\midrule
+$S(\delta_{\mathrm{med}})$, Mahalanobis & .000065 & .000066\\
+$S(\delta_{\mathrm{med}})$, cosine & .0478 & .0472\\
+Mixed-effects interactions surviving Holm & 1/16 & 7/16\\
+Largest $|$coefficient$|$ & .0240 & .0276\\
+\bottomrule
+\end{tabular}
+\\[2pt]
+\footnotesize $^\ast$ hierarchical interval excludes zero.
+\end{table}
+
+Table~\ref{tab:seeds} reports all four. The first is the one the extension was
+run for and it is the one that matters most. At five seeds the permutation
+family could not reject whatever the data showed, so its null carried no
+information about the phenomenon. At ten seeds it can reject, and the result is
+still zero of sixteen. The null was not an artifact of the unreachable
+threshold; removing the constraint leaves the conclusion where it was, which is
+what a design defect should do when the defect was not the reason for the
+finding.
+
+The matched contrast strengthens rather than dilutes. Ten seeds yield 27 pairs
+against 10 and reduce the worst standardised mean difference from $.137$ to
+$.021$; every contrast grows and KDE's interval now excludes zero as well. This
+is the same direction as the fine-grid result of Section~5: on this pair, better
+balance makes the effect larger, so thin support was suppressing it rather than
+manufacturing it.
+
+Susceptibility is unchanged to the fourth decimal and the ordering across the
+four scorers is identical, which says the five-seed estimate was already stable
+rather than fortunate. The mixed-effects family moves from one surviving
+interaction to seven, as more seeds should do to a parametric test that was
+never subject to the permutation floor; the largest coefficient is $.0276$
+AUROC per standard deviation, about three percent of the AUROC scale, and the
+seven span all four scorers. Both halves of the reading that section already
+gave --- small, and dependent on which scorer is asked --- hold on seven points
+more firmly than they did on one.
+
 Five seeds estimate the seed-level variance component coarsely, so hierarchical intervals are narrower than a seed-only analysis and should not be read as though more seeds were available. The observed between-seed spread of the paired contrast exceeds the Hanley--McNeil sampling standard error by up to a factor of two for cosine, and minimum detectable effects here are computed from the observed spread rather than the formula for that reason. PH2 contributes 200 OOD images, which yields a minimum detectable effect of .059 for cosine; it is retained as a second point on the difficulty ladder and does not stand alone.
 
 LID and spectral slope are correlated at $-.836$ on the calibration pair, so ``after geometry is accounted for'' is ambiguous there in a way it is less so on the external pairs ($-.53$ to $-.64$); matching on a two-coordinate $G$ whose coordinates are nearly redundant is closer to matching on one. RQ3 matches slope alone at $\gamma=.01$; as reported in Section~\ref{sec:rq2-manipulation}, LID remains 0.26 below target on the calibration pair, averaged over five seeds.
@@ -751,7 +824,8 @@ being measured against the domain it was built from. The three tests that
 separate these are cheap and none of them requires more data. Local ranking
 susceptibility needs image-level scores, which regenerate if they were not
 kept. The correction-family check is one division, available when the analysis
-plan is written. The construction-target check is one inner product, available
+plan is written; where it fails, the repair is more seeds, and we report what
+the repair changed rather than only that it was made. The construction-target check is one inner product, available
 from the operator's definition.
 
 We apply them to a frozen dermatology foundation model and four evaluation

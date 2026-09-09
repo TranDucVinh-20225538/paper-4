@@ -35,7 +35,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import roc_auc_score
 
-SEEDS = (42, 52, 62, 72, 82)
+SEEDS_5 = (42, 52, 62, 72, 82)          # registered
+SEEDS_10 = SEEDS_5 + (92, 102, 112, 122, 132)   # registered + logged extension
+SEEDS = SEEDS_10
 SCORERS = ("maha", "cosine", "knn10", "kde")
 N_PAIRS = 2_000_000
 
@@ -63,7 +65,10 @@ def main():
     ap.add_argument("--scores", type=Path, default=Path("PhaseB/outputs/per_example"))
     ap.add_argument("--out", type=Path, default=Path("PhaseB/outputs/rq1"))
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--nseeds", type=int, default=10, choices=[5, 10])
     args = ap.parse_args()
+    global SEEDS
+    SEEDS = SEEDS_5 if args.nseeds == 5 else SEEDS_10
     args.out.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(args.seed)
 

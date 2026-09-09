@@ -47,7 +47,7 @@ from src.utils.ood_metrics import (  # noqa: E402
 NUM_CLASSES, REG_EPS, PRIMARY_K = 8, 1e-5, 10
 ALPHAS = (0.0, 0.25, 0.5, 0.75, 1.0)
 ARMS = {"Intervention": "adapter", "Conventional": "adapter", "Adaptation": "partialFT_adapter"}
-SEEDS = (42, 52, 62, 72, 82)
+SEEDS = (42, 52, 62, 72, 82, 92, 102, 112, 122, 132)
 
 
 def gelu(x):

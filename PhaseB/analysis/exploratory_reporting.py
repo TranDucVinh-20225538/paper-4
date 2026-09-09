@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import argparse
 import itertools
+import math
 import warnings
 from pathlib import Path
 
@@ -48,18 +49,34 @@ def holm(pvals):
     return adj
 
 
+EXHAUSTIVE_CAP = 200_000   # 5 seeds = 120, 7 seeds = 5040, 8 = 40320
+N_SAMPLED = 20_000         # floor 5e-5, below Holm's .0031 at m=16
+
+
 def whole_seed_permutation(df, g, s):
     """Permute which seed's outcome vector accompanies which seed's geometry."""
     seeds = sorted(df.seed.unique())
     by_seed = {k: v.sort_values("config") for k, v in df.groupby("seed")}
     obs = kendalltau(df[g], df[s]).statistic
-    null = []
-    for perm in itertools.permutations(seeds):
-        gv = np.concatenate([by_seed[k][g].to_numpy() for k in seeds])
-        yv = np.concatenate([by_seed[p][s].to_numpy() for p in perm])
-        null.append(kendalltau(gv, yv).statistic)
-    null = np.array(null)
-    return obs, null, float((np.abs(null) >= abs(obs) - 1e-12).mean())
+    gv = np.concatenate([by_seed[k][g].to_numpy() for k in seeds])
+
+    # k! is enumerable at five seeds and not at ten. Below the cap every
+    # arrangement is used and the floor is exactly 1/k!; above it, arrangements
+    # are sampled and the floor is 1/n_sample. Which was used is returned, so a
+    # reported p is never read against the wrong floor.
+    n_exact = math.factorial(len(seeds))
+    if n_exact <= EXHAUSTIVE_CAP:
+        arrangements = itertools.permutations(seeds)
+        n_used, exhaustive = n_exact, True
+    else:
+        rng = np.random.default_rng(0)
+        arrangements = (tuple(rng.permutation(seeds)) for _ in range(N_SAMPLED))
+        n_used, exhaustive = N_SAMPLED, False
+
+    null = np.array([kendalltau(gv, np.concatenate(
+        [by_seed[p][s].to_numpy() for p in perm])).statistic
+        for perm in arrangements])
+    return obs, null, float((np.abs(null) >= abs(obs) - 1e-12).mean()), n_used, exhaustive
 
 
 def main():
@@ -77,9 +94,10 @@ def main():
 
     rows = []
     for g, s in itertools.product(GEOMETRY, SCORERS):
-        obs, null, p = whole_seed_permutation(lad, g, s)
+        obs, null, p, n_perm, exhaustive = whole_seed_permutation(lad, g, s)
         rows.append({"geometry": g, "scorer": s, "tau": obs, "perm_p": p,
-                     "null_sd": null.std(), "null_p95_abs": np.percentile(np.abs(null), 95)})
+                     "null_sd": null.std(), "null_p95_abs": np.percentile(np.abs(null), 95),
+                     "n_perm": n_perm, "exhaustive": exhaustive})
     tau = pd.DataFrame(rows)
     tau["perm_p_holm"] = holm(tau.perm_p.to_numpy())
     tau.to_csv(args.out / "kendall_whole_seed_permutation.csv", index=False)
@@ -90,8 +108,15 @@ def main():
     for _, r in tau.iterrows():
         print(f"{r.geometry:<26}{r.scorer:<14}{r.tau:+8.3f}{r.perm_p:9.4f}"
               f"{r.perm_p_holm:8.4f}{r.null_p95_abs:16.3f}")
-    print(f"\nfinest resolvable p is 1/120 = {1/120:.4f}; "
-          f"{(tau.perm_p <= 1/120 + 1e-9).sum()} of 16 reach it\n")
+    floor = 1.0 / tau.n_perm.iloc[0]
+    kind = "exhaustive" if tau.exhaustive.iloc[0] else "sampled"
+    holm_first = 0.05 / len(tau)
+    print(f"\n{len(tau)} associations, {kind} permutation over {tau.n_perm.iloc[0]:,} "
+          f"arrangements at {lad.seed.nunique()} seeds")
+    print(f"floor 1/{tau.n_perm.iloc[0]:,} = {floor:.2e}; Holm's first threshold "
+          f"{holm_first:.5f} -> {'reachable' if floor < holm_first else 'UNREACHABLE'}")
+    print(f"{(tau.perm_p <= floor + 1e-12).sum()} of {len(tau)} attain the floor; "
+          f"{(tau.perm_p_holm < .05).sum()} survive Holm\n")
 
     # ---- mixed-effects interactions, all sixteen ----
     d = df.copy()

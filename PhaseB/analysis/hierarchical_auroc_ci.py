@@ -32,7 +32,9 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).parent))
 from generate_per_example_scores import load, displacement, score_all  # noqa: E402
 
-SEEDS = (42, 52, 62, 72, 82)
+SEEDS_5 = (42, 52, 62, 72, 82)          # registered
+SEEDS_10 = SEEDS_5 + (92, 102, 112, 122, 132)   # registered + logged extension
+SEEDS = SEEDS_10
 SCORERS = ("maha", "cosine", "knn10", "kde")
 CONFIGS = {"A": (1.0, 0.0), "B": (0.25, 0.0), "C": (1.0, 0.01)}
 
@@ -86,7 +88,10 @@ def main():
     ap.add_argument("--out", type=Path, default=Path("PhaseB/outputs/rq3"))
     ap.add_argument("--n-boot", type=int, default=5000)
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--nseeds", type=int, default=10, choices=[5, 10])
     args = ap.parse_args()
+    global SEEDS
+    SEEDS = SEEDS_5 if args.nseeds == 5 else SEEDS_10
     args.out.mkdir(parents=True, exist_ok=True)
 
     data, is_ood = build(args.root, args.cache)
