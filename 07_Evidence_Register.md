@@ -36,7 +36,7 @@ with quotes:
 - Their "Cross-Domain Shift" (Scenario 1) treats clinical-vs-dermoscopic modality itself as the near-OOD split (PAD-UFES-20 + Derm7pt-clinic as ID, HAM10000 as near-OOD) — structurally different from our acquisition-shortcut framing, where ISIC (dermoscopic) and PAD-UFES-20 (smartphone) are combined as ID and acquisition source is the shortcut predicted from the shared representation.
 
 **Access status (superseded):** Could not obtain primary-source *text* automatically this project
-(CVF fetch attempts and Claude in Chrome all failed for structural reasons, documented in prior
+(CVF fetch attempts and browser automation all failed for structural reasons, documented in prior
 entries below for the record). **Resolved 2026-08-04 (session 5) by direct user upload of the PDF.**
 
 **Prior update (2026-08-04, session 4) — proceedings *location* Level A verified** (kept for

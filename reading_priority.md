@@ -4,7 +4,7 @@
 1. **Gallo et al. (CVPR 2026W) — STILL NOT READ.** All prior claims about this paper are
    Level B/C (search-engine summaries) only. Attempted this session: direct fetch of the
    `openaccess.thecvf.com` HTML page (empty), direct fetch of the corresponding PDF URL (empty),
-   Claude in Chrome (extension not connected). Next attempts: retry Claude in Chrome once
+   browser automation (extension not connected). Next attempts: retry browser automation once
    reconnected; try a Semantic Scholar or ResearchGate mirror; try emailing the authors
    (Ignazio Gallo, Leonardo Sgroi, Mattia Gatti, Silvia Corchs) directly; or check institutional
    library access to the CVPR 2026 Workshops proceedings. **This is the single highest-priority

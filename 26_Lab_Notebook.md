@@ -697,8 +697,8 @@ the domain-leakage probe data split in the protocol before any analysis code is 
 
 Stage 3.2 execution still not authorized. Stage 4 and Stage 5 don't exist yet.
 
-**Vinh reviewed the refactor favorably** — "first time in Phase B Claude fixed the workflow
-architecture, not just wording" — and added four refinements, none authorizing execution:
+**Vinh reviewed the refactor favorably** — the first time in Phase B the workflow
+architecture was fixed rather than only its wording — and added four refinements, none authorizing execution:
 
 1. **Paper-facing wording for the probe methodology**, distinct from the implementation-grounding
    detail: "Domain-leakage probing follows the protocol established in CSG-Skin by fitting a linear
@@ -1447,7 +1447,7 @@ every prior turn. Waiting for Vinh's decision on how to resolve the gap before S
 
 ---
 
-**Vinh: "Claude đã dừng đúng chỗ."** Confirmed the finding, and ruled precisely on its category —
+**Vinh confirmed the stop was made at the right point.** Confirmed the finding, and ruled precisely on its category —
 neither of the two paths this project has used until now:
 
 - **Not a Protocol Deviation.** The protocol never specifies CSG-Lite as the required

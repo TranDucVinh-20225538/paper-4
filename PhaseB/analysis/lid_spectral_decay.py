@@ -21,8 +21,8 @@ metrics beyond what Prediction 1 and C1 (02_Claim_Matrix.md) specify.
 
 This module reads only already-extracted (features, labels) arrays. It does
 not load checkpoints or datasets, and it does not import from or modify
-paper-3/ or CSG-Skin/ -- Paper 4 owns this code independently, per
-paper-3/CLAUDE.md's scope boundary (paper-3's own geometry_metric_audit.md
+paper-3/ or CSG-Skin/ -- Paper 4 owns this code independently, per the scope
+boundary recorded in paper-3 (paper-3's own geometry_metric_audit.md
 locked a different, closed 3-metric set for Paper 3's own E1; this is a
 separate, Paper-4-owned computation over the same read-only npz inputs).
 """

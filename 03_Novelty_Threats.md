@@ -24,8 +24,8 @@ primary-source reading (Level A). Under that standard:
 
 **This satisfies the Research Gate rule as literally stated** (see below) — every threat rated
 HIGH risk is now Level A. Threat 2 remains partial (56%) but was rated MODERATE, not HIGH, so it
-does not block under the rule as written. **Per Vinh's earlier explicit instruction ("Không cho
-Claude sang Step 6"), this document reports the Gate status but does not itself initiate Step 6.**
+does not block under the rule as written. **Per Vinh's earlier explicit instruction not to proceed to Step 6, this document
+reports the Gate status but does not itself initiate Step 6.**
 See the Net Assessment and Gate Status sections below.
 
 **Project rule (added 2026-08-04, session 3) — the Research Gate:**
@@ -37,7 +37,7 @@ Novelty Threat → Verified (Level A) → RQ Lock → Experimental Design (Step 
 Step 6 may not begin while any novelty threat rated HIGH or "highest risk" is still Level B/C
 ("Status: UNVERIFIED"). This is a hard gate, not a soft preference.
 
-**Access plan for Gallo et al. — resolved.** Automated access (CVF fetch, Claude in Chrome) had
+**Access plan for Gallo et al. — resolved.** Automated access (CVF fetch, browser automation) had
 failed for structural reasons and was not going to be re-attempted per project decision. The user
 resolved this directly by uploading the PDF (2026-08-04, session 5), which is now the Level-A
 source for everything in the THREAT 1 section below.
