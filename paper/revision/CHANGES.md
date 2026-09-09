@@ -192,85 +192,64 @@ The provenance gap is stated in Limitations rather than left in the change log.
 
 ## Still needs a decision
 
-**Two numeric issues in the retained analyses**, both flagged earlier and still
-unpatched because both change published numbers: `estimate` in
-`hierarchical_auroc_ci.csv` is a bootstrap mean carrying about 2.4e-4 of Monte
-Carlo noise, 9.9% of the cosine C-A value; and the within-class scatter is
-numerically rank 1023, inflating the alpha=0 spectral slope by 2.2% against a
-0.1% effect size under discussion.
-
-**Three smaller discrepancies**: cosine C-A .0018 is a difference of rounded
-values and rounds to .0019 from the full ones; the Delta-LID range "+2.7 to
-+5.8" omits gamma=.75, which falls to +0.26; and the configuration-C figures
-are seed 42's, where the five-seed means are 6.731e-3, 6.744e-3 and 0.26.
-
 **Venue.** The README notes the manuscript can be reformatted once a target is
 selected.
 
-## Closing the last two plan items
+**Repository path cleanup.** 23,576 rows across two metadata files carry
+absolute paths under a local home directory. Harmless in a private repository,
+worth removing before the repository is opened. Not done yet because scripts
+read the `path` column and a blind rewrite risks breaking them.
 
-Both were still open against the advisor's Section 8-9. Both produced findings.
+## Resolved since the earlier draft of this file
 
-**Common support** (Stage 2, first item). The matched analysis reported the
-pairs it found, which is overlap after the fact; the plan asks for the check
-before it. Per identity, the fraction of configurations with a cross-identity
-neighbour inside the caliper is, at .15: Adaptation .00, Conventional .40,
-Intervention .30. At the preregistered .25 it is .20/.65/.55.
+**The two numeric issues are patched.** An earlier version of this document
+listed them as outstanding "because both change published numbers", and an
+advisor reviewing the repository at that point would have read them as still
+open. They are not.
 
-Adaptation is the binding constraint and it is thin. At caliper .15 it has no
-overlap at all, and at .25 only a fifth of its configurations have any
-counterpart. The conclusion that intervention identity does not matter
-therefore rests mainly on the Intervention/Conventional contrast. That is now
-stated in the results rather than left for a reader to infer from the pair
-counts.
+`hierarchical_auroc_ci.py` now reports the point estimate in `estimate` and the
+bootstrap mean alongside it in `boot_mean`, so the roughly 2.4e-4 of Monte
+Carlo noise is visible rather than silently occupying the estimate column.
+`lid_spectral_decay.py` applies a relative numerical rank cutoff (`RANK_RTOL`)
+that drops the near-degenerate eigenvalue and reports how many were dropped,
+removing the 2.2% inflation of the alpha=0 spectral slope. Effect on reported
+numbers: fourth decimal at most, no verdict changes.
 
-**FPR@95%TPR** (classified "recommended, cheap once raw scores exist"). It was
-cheap, and it disagrees with the AUROC reading for two scorers.
+**Table 4's configuration-C column is now traceable.** It was computed from a
+cached per-example store with no intermediate file recording the per-seed
+AUROCs, so the KDE entry in particular could not be checked against anything.
+`PhaseB/outputs/rq3/abc_per_seed_auroc.csv` now holds all fifteen
+configuration-seed values, and averaging it reproduces Table 4 including the
+KDE column at .9968.
 
-k-NN moves .0051 in AUROC, which is nothing, while its false-alarm rate at the
-operating point goes .0111 -> .0310, a factor of 2.8, rising in all five seeds.
-KDE shows the same weaker: .0057 -> .0143, rising in four of five, with seed 42
-flat. Mahalanobis is flat on both, 1.01x.
+**The dropped research line is disclosed in the manuscript.** See below.
 
-So a scorer can be near-invariant in rank order and substantially worse where
-it is actually used. This is the same failure of aggregate summaries the
-manuscript already documents for near-ceiling AUROC, one level down, and it
-strengthens rather than complicates the argument.
+## The registered hypothesis is not the one the paper answers
 
-Reported per scorer rather than pooled, because k-NN's evidence is 5/5 seeds
-and KDE's is 4/5, and lumping them would overstate the weaker one.
+This is the largest gap an outside reader of the repository would find, and it
+was not addressed in the manuscript until now.
 
-## Final pass — the fine grid, and what it changed
+`24_PreRegistration.md` locks a primary hypothesis about mediation: that the
+dissociation between probe-decodability and distance-based estimator
+performance is a general property of representation-reshaping interventions,
+mediated by representation geometry. That hypothesis was tested. Ten
+configurations, probe AUROC .99999 to 1.00000 against Mahalanobis .9983 to
+.9984, paired difference significant in nine of ten at p between 2.5e-5 and
+8.4e-8, retained in `stage5_c5_raw.json`. An earlier draft, `results.tex` dated
+2026-08-17, reported it in full.
 
-**Common support and the gamma extension.** The plan's conditional item fired.
-The registered positive-only ladder cannot satisfy it — Adaptation sits at high
-slope, positive gamma lowers slope, and the nearest reachable configuration is
-at distance .95 against a caliper of .25. Small negative gamma reaches the
-region and raises Adaptation's support from .00 to .80 at caliper .15. Logged as
-a protocol deviation, chosen on geometry before scoring, with scripts that have
-no code path to a scorer.
+The submitted manuscript contains no occurrence of "probe", "GRL", or
+"dissociation". The reason is in `19_Reviewer3_Logic_Attack.md`, an internal
+adversarial review of the argument's logic: for Mahalanobis, the covariance
+structure and the class-mean separation are not separable inputs whose
+contributions can be apportioned, since both are parameters of
+(z-mu)^T Sigma^-1 (z-mu). Asking which one explains the estimator's behaviour
+presupposes a decomposition the estimator does not make.
 
-**Table 8 changed the RQ3 reading, twice.** Read on the augmented set alone the
-original effect vanishes; read on the 21 pairs that touch a registered
-configuration — the best-balanced set at |SMD| .015 — it is larger than
-originally reported and all four scorers exclude zero. The middle row is
-pooling two populations, since 30 of its 51 pairs sit entirely inside the
-extended gamma regime. Thin support was suppressing the effect, not creating it.
-
-That reversal is worth stating plainly because the intermediate reading was
-wrong and briefly believed: an augmented analysis that looks better balanced can
-be worse targeted, and the pair composition has to be checked before the
-contrast is read.
-
-**The alignment argument replaces the leakage speculation.** The nuisance
-direction is the normalised ISIC-PAD mean difference, so measuring the
-Intervention arm against ISIC-versus-PAD detection measures the operator against
-its own construction target. External projections are .289, .111 and .002
-against 1.000. This is visible in the definition, needs no sample size, and is
-what the earlier "consistent with calibration leakage" sentence should have been
-all along.
-
-**PH2 is recorded as not fitting.** Projection .002 predicts no response; the
-intervention nonetheless makes PH2 easier to detect in 5/5 seeds for k-NN and
-KDE. No mechanism offered. Constructing one from a single domain without a
-mechanism test is the reading error the manuscript argues against.
+That is a defensible reason to change direction, and the invariance
+formalization is a direct answer to it. But a reader holding only the PDF could
+not know that a different hypothesis had been registered, tested, and set
+aside, or why. The Protocol Registration section now says so, states that the
+dissociation measurement is not withdrawn — only its causal-mediation reading
+is — and notes that the supporting columns remain in the released run matrix so
+the branch is recoverable rather than deleted.

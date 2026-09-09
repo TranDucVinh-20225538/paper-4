@@ -639,6 +639,37 @@ a filing with a registry, and it has no platform-based standing; the claim it
 supports is that the hypotheses, outcomes and analysis plan were fixed before
 the experiments, not that a third party attested to the date.
 
+\textbf{The registered primary hypothesis is not the one this manuscript
+answers, and the change is not visible from the paper alone.} The frozen
+protocol states a hypothesis about mediation: that the dissociation between
+probe-decodability and distance-based estimator performance is a general
+property of representation-reshaping interventions, mediated by representation
+geometry rather than by the intervention family or the architecture. That
+hypothesis was tested and the experiment is retained. Across ten
+configurations a linear probe recovered acquisition-domain identity with AUROC
+between $.99999$ and $1.00000$ while Mahalanobis AUROC on the same
+representations ran $.9983$ to $.9984$, and the paired difference was
+significant in nine of ten with $p$ between $2.5\times10^{-5}$ and
+$8.4\times10^{-8}$.
+
+It was replaced for a reason internal to the argument rather than to the
+result. For Mahalanobis, the covariance structure $\Sigma$ and the class-mean
+separation are not two inputs to distinct processes whose relative contribution
+can be apportioned; they are both parameters of the single expression
+$(z-\mu)^\top\Sigma^{-1}(z-\mu)$. Asking whether geometry or information content
+accounts for the estimator's behaviour presupposes a separation the estimator's
+own definition does not make. The invariance formalization here answers what
+that question was reaching for --- what a scorer can register, and at what
+quantitative cost --- without requiring the decomposition.
+
+Two things follow that a reader should have. The dissociation measurement is
+not withdrawn or contradicted; what was withdrawn is the causal-mediation
+reading of it. And the columns supporting it remain in the released run matrix,
+so the branch is recoverable rather than deleted. We state this here because
+the difference between a registered protocol and a submitted paper is exactly
+what a registration section exists to disclose, and a reader comparing the two
+would otherwise have to infer the reason.
+
 The external-validation phase was registered differently and more strongly. Its
 protocol --- the label mapping and exclusions for both external sources, the
 overlap screen and its calibrated threshold, the frozen scorer and intervention
