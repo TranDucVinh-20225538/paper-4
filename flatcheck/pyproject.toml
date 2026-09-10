@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flatcheck"
+version = "0.1.0"
+description = "Three checks on whether a flat evaluation result carries information"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name = "Duc-Vinh Tran"}]
+keywords = ["out-of-distribution", "evaluation", "reliability", "permutation-test"]
+dependencies = ["numpy>=1.20"]
+
+[project.optional-dependencies]
+cli = ["pandas>=1.3"]
+test = ["pytest>=7"]
+
+[project.scripts]
+flatcheck = "flatcheck.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["flatcheck*"]
