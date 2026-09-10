@@ -76,7 +76,13 @@ def whole_seed_permutation(df, g, s):
     null = np.array([kendalltau(gv, np.concatenate(
         [by_seed[p][s].to_numpy() for p in perm])).statistic
         for perm in arrangements])
-    return obs, null, float((np.abs(null) >= abs(obs) - 1e-12).mean()), n_used, exhaustive
+    b = int((np.abs(null) >= abs(obs) - 1e-12).sum())
+    # Enumeration already contains the observed arrangement, so b/k! is the
+    # p-value. Sampling does not, and the naive b/n can return exactly zero;
+    # the plus-one estimator (b+1)/(n+1) is the valid one and puts the floor at
+    # 1/(n+1). Reporting b/n would overstate significance at the extreme.
+    p = b / n_used if exhaustive else (b + 1) / (n_used + 1)
+    return obs, null, float(p), n_used, exhaustive
 
 
 def main():
@@ -108,12 +114,14 @@ def main():
     for _, r in tau.iterrows():
         print(f"{r.geometry:<26}{r.scorer:<14}{r.tau:+8.3f}{r.perm_p:9.4f}"
               f"{r.perm_p_holm:8.4f}{r.null_p95_abs:16.3f}")
-    floor = 1.0 / tau.n_perm.iloc[0]
+    floor = (1.0 / tau.n_perm.iloc[0] if tau.exhaustive.iloc[0]
+             else 1.0 / (tau.n_perm.iloc[0] + 1))
     kind = "exhaustive" if tau.exhaustive.iloc[0] else "sampled"
     holm_first = 0.05 / len(tau)
     print(f"\n{len(tau)} associations, {kind} permutation over {tau.n_perm.iloc[0]:,} "
           f"arrangements at {lad.seed.nunique()} seeds")
-    print(f"floor 1/{tau.n_perm.iloc[0]:,} = {floor:.2e}; Holm's first threshold "
+    denom = tau.n_perm.iloc[0] + (0 if tau.exhaustive.iloc[0] else 1)
+    print(f"floor 1/{denom:,} = {floor:.2e}; Holm's first threshold "
           f"{holm_first:.5f} -> {'reachable' if floor < holm_first else 'UNREACHABLE'}")
     print(f"{(tau.perm_p <= floor + 1e-12).sum()} of {len(tau)} attain the floor; "
           f"{(tau.perm_p_holm < .05).sum()} survive Holm\n")
