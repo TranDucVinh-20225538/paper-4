@@ -19,7 +19,7 @@ from sklearn.metrics import roc_auc_score
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "analysis"))
 from rq3_geometry_matching import (  # noqa: E402
-    G_COLS, SCORERS, standardize, greedy_match, cluster_bootstrap,
+    G_COLS, SCORERS, standardize, greedy_match, multiway_cluster_bootstrap,
 )
 
 OUT = ROOT / "outputs" / "phase3"
@@ -63,7 +63,8 @@ def main():
         A, B = dz.iloc[i], dz.iloc[j]
         for sc in SCORERS:
             dd = A[sc].to_numpy() - B[sc].to_numpy()
-            boot = cluster_bootstrap(dd, A.seed.to_numpy(), N_BOOT, rng)
+            boot = multiway_cluster_bootstrap(dd, A.seed.to_numpy(), B.seed.to_numpy(),
+                                              N_BOOT, rng)
             lo, hi = np.percentile(boot, [2.5, 97.5])
             out.append(dict(draw=di, scorer=sc, n_pairs=len(pairs), delta=dd.mean(),
                             lo=lo, hi=hi, excludes_zero=bool(lo > 0 or hi < 0)))

@@ -604,16 +604,16 @@ scripts that selected it compute geometry and have no code path to a scorer.
 
 \begin{table}[t]
 \centering
-\caption{Matched contrast at caliper $.25$ on three configuration sets. The augmented set pools two populations --- 30 of its 51 pairs lie entirely inside the extended $\gamma$ regime --- so the third row, which requires each pair to touch an originally registered configuration, is the like-for-like comparison.}
+\caption{Matched contrast at caliper $.25$ on three configuration sets. The first two rows are the with-and-without comparison the deviation log committed to before the grid was scored. The augmented set pools two populations --- 30 of its 51 pairs lie entirely inside the extended $\gamma$ regime --- so the third row, which requires each pair to touch an originally registered configuration, isolates the like-for-like subset; that row was defined after the grid was run and is post hoc. Matching is blind to seed, so a pair may span two of them; intervals are the multiway cluster bootstrap, which admits a pair only when both of its seeds are drawn.}
 \label{tab:support}
 \small
 \begin{tabular}{lrrrrr}
 \toprule
 Configuration set & Pairs & $|$SMD$|$ & Cosine & $k$-NN & Mahalanobis\\
 \midrule
-Registered only & 10 & .136 & $-.00853^\ast$ & $-.00072^\ast$ & $+.00000$\\
-Augmented, all & 51 & .043 & $+.00260$ & $-.00016$ & $-.00003^\ast$\\
-Augmented, touching registered & 21 & .015 & $-.01095^\ast$ & $-.00148^\ast$ & $-.00006^\ast$\\
+Registered only & 10 & .136 & $-.00853^\ast$ & $-.00072$ & $+.00000$\\
+Augmented, all & 51 & .043 & $+.00260$ & $-.00016$ & $-.00003$\\
+Augmented, touching registered & 21 & .015 & $-.01095^\ast$ & $-.00148$ & $-.00006$\\
 \bottomrule
 \end{tabular}
 \\[2pt]
@@ -622,13 +622,15 @@ Augmented, touching registered & 21 & .015 & $-.01095^\ast$ & $-.00148^\ast$ & $
 
 Table~\ref{tab:support} is the reason the grid was worth running, and it points
 the opposite way from the middle row read alone. On the best-balanced set ---
-$|$SMD$|$ $.015$ against the registered set's $.136$ --- the contrast is larger
-than originally reported, not smaller, and all four scorers exclude zero rather
-than two. Thin common support was suppressing the effect on this pair, not
-manufacturing it. Mahalanobis's interval excludes zero at $-6\times10^{-5}$,
-which is detectable at this precision and negligible at any other reading; it is
-the same point Table~\ref{tab:susceptibility} makes about the difference between
-a resolvable effect and a meaningful one.
+$|$SMD$|$ $.015$ against the registered set's $.136$ --- the cosine contrast is
+larger than originally reported, not smaller, $-.01095$ against $-.00853$, and
+it is the only one of the four whose interval excludes zero. Thin common support
+was suppressing the cosine effect on this pair rather than manufacturing it. The
+other three move in the same direction without resolving: $k$-NN at $-.00148$
+and Mahalanobis at $-6\times10^{-5}$ have intervals that cover zero once a pair
+spanning two seeds is charged to both of them rather than to one. That gap
+between an estimate and a resolvable effect is the same point
+Table~\ref{tab:susceptibility} makes at the margin distribution.
 
 \textbf{Operating-point behaviour.} AUROC integrates over every threshold,
 while a deployed reliability estimator runs at one. Table~\ref{tab:fpr} reports
@@ -669,7 +671,7 @@ The same-modality pair supplies the headroom the calibration pair lacks: baselin
 
 The direct contrast replicates. $C-A$, which holds adapter dose fixed and varies only the tempering exponent, is positive and excludes zero for cosine on all three external pairs, with the clinical pair landing within $2\times10^{-4}$ of the calibration estimate. $k$-NN holds on both Derm7pt arms. Mahalanobis remains flat everywhere, as Theorem~2 and Table~\ref{tab:susceptibility} jointly predict. Changing representation geometry changes distance-based OOD ranking, reproducibly and across domains that differ in site, modality and difficulty.
 
-The geometry-matched contrast does not. Holding $G$ fixed and varying intervention identity yields no interval excluding zero in any of the twelve external pair--scorer combinations, with every negative-control permutation above $p=.2$ against $p=.006$ on the calibration pair. Balance is better on the external pairs, not worse (worst $|\mathrm{SMD}|$ .043 and .054 against .136), and the calibration estimate for cosine falls outside both Derm7pt intervals, so this is a contradiction rather than a failure to resolve. Three controls exclude a pipeline explanation: recomputed geometry matches the stored values to $5\times10^{-5}$ relative and the AUROCs exactly; the same code reproduces the calibration result to $0.000\times10^{0}$ on the estimate, both interval bounds and the pair count; and subsampling PAD-UFES to the external sample size over forty stratified draws leaves the cosine contrast at $-.00850$ excluding zero in 100\% of draws, so sample size is not the explanation.
+The geometry-matched contrast does not. Holding $G$ fixed and varying intervention identity yields one interval excluding zero across the twelve external pair--scorer combinations --- $k$-NN on PH2 at $+.00163$, opposite in sign to the calibration effect --- with every negative-control permutation above $p=.2$ against $p=.006$ on the calibration pair; PH2's own control sits at $p=.66$, so the exception is not corroborated by the control that would have to support it. Balance is better on the external pairs, not worse (worst $|\mathrm{SMD}|$ .043 and .054 against .136), and the calibration estimate for cosine falls outside both Derm7pt intervals, so this is a contradiction rather than a failure to resolve. Three controls exclude a pipeline explanation: recomputed geometry matches the stored values to $5\times10^{-5}$ relative and the AUROCs exactly; the same code reproduces the calibration result to $0.000\times10^{0}$ on the estimate, both interval bounds and the pair count; and subsampling PAD-UFES to the external sample size over forty stratified draws leaves the cosine contrast at $-.00850$ excluding zero in 100\% of draws, so sample size is not the explanation.
 
 Read together the two results are the two halves of one statement. Geometry change moves ranking, reliably. Intervention identity, once geometry is held fixed, adds nothing. Within the evaluated operator family the intervention acts \emph{through} the measured geometry rather than beyond it, and RQ3 is answered rather than left unresolved. The scope qualifier is that this holds for the two-coordinate $G$ evaluated here; a richer geometry vector could in principle leave residual identity structure that $(\mathrm{LID},\text{slope})$ does not capture.
 
@@ -754,7 +756,7 @@ Associations surviving Holm & 0/16 & \textbf{0/16}\\
 Matched pairs at caliper $.25$ & 10 & 27\\
 Worst $|$SMD$|$ & .137 & .021\\
 Cosine contrast & $-.00853^\ast$ & $-.01015^\ast$\\
-$k$-NN contrast & $-.00072^\ast$ & $-.00121^\ast$\\
+$k$-NN contrast & $-.00072$ & $-.00121^\ast$\\
 KDE contrast & $-.00025$ & $-.00044^\ast$\\
 Mahalanobis contrast & $+.00000$ & $-.00001$\\
 \midrule
@@ -779,7 +781,7 @@ finding.
 
 The matched contrast strengthens rather than dilutes. Ten seeds yield 27 pairs
 against 10 and reduce the worst standardised mean difference from $.137$ to
-$.021$; every contrast grows and KDE's interval now excludes zero as well. This
+$.021$; every contrast grows, and where five seeds resolved cosine alone, ten resolve $k$-NN and KDE as well. This
 is the same direction as the fine-grid result of Section~5: on this pair, better
 balance makes the effect larger, so thin support was suppressing it rather than
 manufacturing it.

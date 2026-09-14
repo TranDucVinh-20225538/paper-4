@@ -2,7 +2,7 @@
 Phase 3 -- RQ3 geometry matching on each external pair.
 
 Same design as the primary analysis, same code: standardize, greedy_match, smd
-and cluster_bootstrap are imported from rq3_geometry_matching rather than
+and multiway_cluster_bootstrap are imported from rq3_geometry_matching rather than
 copied, so a difference between pairs is a difference in the data and not in my
 transcription.
 
@@ -22,7 +22,8 @@ import numpy as np, pandas as pd
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "analysis"))
 from rq3_geometry_matching import (  # noqa: E402
-    G_COLS, SCORERS, CALIPERS, standardize, greedy_match, smd, cluster_bootstrap,
+    G_COLS, SCORERS, CALIPERS, standardize, greedy_match, smd,
+    multiway_cluster_bootstrap,
 )
 
 OUT = ROOT / "outputs" / "phase3"
@@ -55,10 +56,10 @@ def main():
                        "acceptable" if worst < 0.20 else "FAILS -- inconclusive")
             print(f"  caliper {cal}: {len(pairs)} pairs, |SMD| max {worst:.3f} ({verdict})"
                   f"   " + "  ".join(f"{c.split('_')[0]} {v:+.3f}" for c, v in bal.items()))
-            seeds = A.seed.to_numpy()
+            sa, sb = A.seed.to_numpy(), B.seed.to_numpy()
             for sc in SCORERS:
                 dd = A[sc].to_numpy() - B[sc].to_numpy()
-                boot = cluster_bootstrap(dd, seeds, N_BOOT, rng)
+                boot = multiway_cluster_bootstrap(dd, sa, sb, N_BOOT, rng)
                 lo, hi = np.percentile(boot, [2.5, 97.5])
                 rows.append(dict(pair=pair, caliper=cal, n_pairs=len(pairs), scorer=sc,
                                  worst_smd=worst, delta=dd.mean(), lo=lo, hi=hi,

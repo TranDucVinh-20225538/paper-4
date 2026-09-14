@@ -253,3 +253,70 @@ aside, or why. The Protocol Registration section now says so, states that the
 dissociation measurement is not withdrawn — only its causal-mediation reading
 is — and notes that the supporting columns remain in the released run matrix so
 the branch is recoverable rather than deleted.
+
+## The matched contrast: the seed clustering was wrong, and is now right
+
+The advisor asked where the data file for Table 8's third row was. There was
+none. Tracing it turned up something larger and then something larger again.
+
+**No script produced two of the three rows.** Only "Registered only" was
+reproducible, through `rq3_geometry_matching.py`. The augmented rows were
+matched by hand and the results typed in, so 51, 30 and 21 existed nowhere but
+in the prose. Table 10's five-versus-ten comparison was in the same state.
+`PhaseB/analysis/rq3_augmented_matching.py` now produces all of them from
+committed inputs and writes `PhaseB/outputs/rq3/rq3_table8.csv`. Run in the
+mode the manuscript was built on, it reproduces every published number exactly,
+which is what made the next finding legible.
+
+**Matching is blind to seed, and 15 of the 21 pairs spanned two of them.** The
+locked protocol asks for uncertainty "clustered on seed". A pair joining a
+configuration from seed 42 to one from seed 62 sits in two clusters, and the
+one-way bootstrap had to charge it to the first member's seed alone. That is
+not clustering on seed; it is picking one of two and discarding the dependence
+on the other. So this is a correction bringing the implementation into line
+with the registered protocol, not a deviation from it, and it is logged here
+rather than in the deviation log for that reason.
+
+`multiway_cluster_bootstrap` admits a pair only when both of its seeds are
+drawn, weighted by the smaller of the two draw counts -- the conservative
+member of the pigeonhole family. For a within-seed pair it reduces to the old
+behaviour.
+
+**What changed.** No point estimate moves, because no matched set changes. Only
+the intervals widen, which is what accounting for a second source of dependence
+must do. Cosine survives everywhere it was claimed. k-NN and Mahalanobis do not:
+
+| | before | after |
+|---|---|---|
+| Table 8, registered | cosine*, k-NN* | cosine* |
+| Table 8, augmented all | Mahalanobis* | none |
+| Table 8, touching registered | all four * | cosine* |
+| Table 10, five seeds | cosine*, k-NN* | cosine* |
+| Table 10, ten seeds | cosine*, k-NN*, KDE* | unchanged |
+| Phase 3, external | 0 of 12 | 1 of 12 |
+
+The external exception is k-NN on PH2, `+.00163`, opposite in sign to the
+calibration effect and with its own negative control at `p=.66`. Balance is
+untouched (`.043` and `.054` against `.136`), the subsample control still holds
+cosine at `-.00850` in 100% of draws, and the calibration negative control is
+still `p=.006`.
+
+Table 10 reads better after the correction than before it: at five seeds only
+cosine resolves, at ten seeds k-NN and KDE resolve as well, so the seed
+extension visibly buys something instead of merely agreeing with itself.
+
+**The third row of Table 8 is post hoc, and now says so.** D-1 committed to
+reporting the matched analysis "both with and without" the augmented
+configurations -- rows one and two. "Touching registered" is a subset defined
+after the grid was run. The caption previously called it "the like-for-like
+comparison" and the surrounding text leaned on it harder than any other row.
+It is still reported, now labelled as post hoc, and the weight has moved back
+to the two preregistered rows.
+
+**A sensitivity that is not adopted, and why.** Restricting matching to within
+a seed fixes the clustering by construction. It also strips the pool: each seed
+holds nine configurations, so balance on the external domains degrades from
+`.043` and `.054` to `.174` and `.190`, past the point where the matched
+comparison carries meaning, and Phase 3 would read 5 of 12. That is a worse
+design, not a stricter one. `rq3_table8.csv` carries both matching modes
+crossed with both bootstraps so the choice is checkable rather than asserted.

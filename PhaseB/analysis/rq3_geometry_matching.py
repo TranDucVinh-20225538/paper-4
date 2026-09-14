@@ -25,7 +25,9 @@ Following Section 6 of the plan:
   acceptable to 0.20. If balance fails the answer is inconclusive, not a
   loosened caliper.
 
-Uncertainty clusters on seed throughout. A negative control permutes intervention
+Uncertainty clusters on seed throughout, through the multiway bootstrap:
+matching is blind to seed, so a pair can span two of them, and a pair that
+sits in two clusters cannot be charged to one of them alone. A negative control permutes intervention
 identity within matched sets, keeping G and Y, to confirm the pipeline does not
 manufacture a residual identity effect.
 
@@ -84,6 +86,28 @@ def cluster_bootstrap(diffs, seeds, n, rng):
                      for _ in range(n)])
 
 
+def multiway_cluster_bootstrap(diffs, seeds_a, seeds_b, n, rng):
+    """Resample seed clusters when a matched pair can belong to two of them.
+
+    Matching is blind to seed, so a pair may join a configuration from seed 42
+    to one from seed 62. Such a pair sits in two clusters at once, and the
+    one-way bootstrap above has to pick one of them, which understates the
+    dependence. Here a pair enters a resample only when both of its seeds are
+    drawn, weighted by the smaller of the two draw counts -- the conservative
+    member of the pigeonhole / multiway-cluster family. For a within-seed pair
+    both counts coincide and this reduces to the one-way case.
+    """
+    uniq = np.unique(np.concatenate([seeds_a, seeds_b]))
+    out = []
+    for _ in range(n):
+        draw = rng.choice(uniq, len(uniq))
+        cnt = {k: int((draw == k).sum()) for k in uniq}
+        w = np.array([min(cnt[a], cnt[b]) for a, b in zip(seeds_a, seeds_b)], float)
+        if w.sum() > 0:
+            out.append(float(np.average(diffs, weights=w)))
+    return np.array(out)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", type=Path, default=Path("PhaseB/outputs/matched_input.csv"))
@@ -117,12 +141,14 @@ def main():
               ", ".join(f"{a}-{b}: {n}" for (a, b), n in
                         pd.Series(list(zip(A.arm, B.arm))).value_counts().items()))
 
-        seeds = A.seed.to_numpy()
+        sa, sb = A.seed.to_numpy(), B.seed.to_numpy()
+        n_cross = int((sa != sb).sum())
         for sc in SCORERS:
             d = A[sc].to_numpy() - B[sc].to_numpy()
-            boot = cluster_bootstrap(d, seeds, args.n_boot, rng)
+            boot = multiway_cluster_bootstrap(d, sa, sb, args.n_boot, rng)
             lo, hi = np.percentile(boot, [2.5, 97.5])
-            rows.append({"caliper": cal, "n_pairs": len(pairs), "scorer": sc,
+            rows.append({"caliper": cal, "n_pairs": len(pairs),
+                         "n_cross_seed_pairs": n_cross, "scorer": sc,
                          "worst_smd": worst, "delta": d.mean(), "lo": lo, "hi": hi,
                          "excludes_zero": bool(lo > 0 or hi < 0)})
         print()
