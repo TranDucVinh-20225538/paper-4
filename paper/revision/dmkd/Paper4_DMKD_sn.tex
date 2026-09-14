@@ -1,0 +1,967 @@
+\documentclass[pdflatex,sn-basic]{sn-jnl}
+
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{booktabs}%
+\usepackage{array}%
+\usepackage{multirow}%
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}
+\newtheorem{corollary}{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}
+\newtheorem{assumption}{Assumption}
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+
+\raggedbottom
+
+\begin{document}
+
+\title[Representation Geometry and Distance-Based OOD Ranking]{%
+When Does Representation Geometry Predict Distance-Based OOD Ranking? An Invariance-Aware Intervention Study}
+
+\author[1]{\fnm{Duc-Vinh} \sur{Tran}}\email{vinh.td225538@sis.hust.edu.vn}
+
+\author*[1]{\fnm{Quyet-Thang} \sur{Huynh}}\email{thang.huynhquyet@hust.edu.vn}
+
+\affil*[1]{\orgdiv{School of Information and Communication Technology},
+\orgname{Hanoi University of Science and Technology},
+\orgaddress{\city{Hanoi}, \postcode{100000}, \country{Vietnam}}}
+
+\abstract{Detection methods are compared, and interventions on them are judged, through a
+single aggregate score. That practice carries an unstated assumption: that a
+score which does not move reports something about the detector. It need not. A
+representation intervention that leaves a distance-based out-of-distribution
+scorer's AUROC flat admits at least three readings, and an aggregate summary
+cannot tell them apart. The scorer may be invariant to the change. It may be
+unable to respond to any change, because almost no in-distribution/out-of-distribution
+pair sits within reach of the perturbation. Or the design may be incapable of
+producing evidence, because its correction threshold lies below the smallest
+$p$-value its resampling scheme can attain. A fourth reading applies to the
+non-flat case and is easier to miss: an apparent response can be an artifact of
+evaluating an operator on the domain from which that operator was constructed.
+
+We give a computable test for each. Local ranking susceptibility, the margin
+mass within reach of the observed score perturbation, separates invariance from
+insensitivity: on the worked example below it separates two scorers by a factor
+of 735 while the less responsive one is the one whose scores move further.
+Threshold arithmetic settles the third before any data are collected: a
+whole-seed permutation over $k$ seeds has a smallest attainable $p$ of $1/k!$,
+so a Holm family of more than six tests at five seeds cannot be cleared
+whatever the data show. And the projection of a domain's separation direction
+onto the direction an operator suppresses settles the fourth by inspection of
+the operator's definition, with no sample size involved.
+
+The example is a frozen dermatology foundation model, four distance-based
+scorers, and four evaluation domains, three of them locked under a protocol
+committed before any of their images was encoded. It reproduces all three
+failures and their diagnoses: two correction families in the original analysis
+turn out to be unreachable; the one domain that responds to the intervention
+is the one from whose mean difference the intervention's target direction was
+defined, at a projection of 1.000 against .289, .111 and .002 for the others;
+and a scorer whose AUROC moves by .005 has its false-alarm rate at the
+operating point nearly triple. The diagnostics are properties of the design and
+transfer; the particular values are properties of this representation and are
+not claimed to.}
+
+\keywords{Out-of-distribution detection, Representation geometry, Scorer
+invariance, Evaluation methodology, Intervention study, Foundation models}
+
+\maketitle
+
+\section{Introduction}
+Out-of-distribution detection is a safeguard for machine-learning systems deployed beyond their development population. For feature-space detectors, operational behavior depends on an interface between the representation produced by the encoder and the scoring functional that reads it. A representation can therefore appear geometrically favorable under a global summary while remaining poorly aligned with the ranking rule used for detection.
+
+Distance-based scorers make this interface explicit. Mahalanobis scoring reads displacement through an estimated precision matrix \citep{lee2018simple}; cosine-to-centroid scoring retains angles while discarding magnitude; nearest-neighbor scoring depends on local order statistics \citep{sun2022ood}; and kernel-density estimation, whose use as a novelty score for validating a trained model's inputs goes back to density-based novelty detection \citep{bishop1994novelty}, additionally depends on bandwidth and local mass. These scorers do not respond to transformations in the same way. A shared invertible affine map can substantially change Euclidean spectra while leaving an unregularized, consistently refitted Mahalanobis distance unchanged. Conversely, anisotropic scaling can alter angular or neighborhood orderings without a commensurate change in a coarse global statistic.
+
+This creates an identifiability problem. A geometry descriptor may move while a scorer's ordering is invariant, or a scorer may begin so close to perfect separation that little response remains observable. Before interpreting a geometry--ranking relationship, an intervention study should establish four conditions: preservation of task utility, successful manipulation of the named property, visibility of that manipulation to the scorer, and sufficient ranking headroom. Geometry-matched comparisons must additionally distinguish the matched property from the intervention history that produced it.
+
+We study these conditions within one frozen dermatology foundation-model backbone. The study does not ask whether geometry is universally useful. It asks when a named geometric property is empirically admissible as a predictor of a named scorer's OOD ranking, and separates the question of whether a scorer can register a geometric change from the question of whether that change was successfully induced and empirically observed. AUROC is treated as a directed ranking measure \citep{fawcett2006introduction} under a fixed higher-score-is-more-OOD convention; orientation is not reversed after inspecting domain labels.
+
+The three research questions are:
+\begin{itemize}
+\item \textbf{RQ1 (scorer admissibility):} Which of the four evaluated distance-based scorers are, under the accepted geometry-manipulation operator, structurally capable of registering the targeted geometric change, and to what quantitative extent?
+\item \textbf{RQ2 (manipulability and preservation):} Can targeted geometric properties be systematically manipulated within a fixed frozen backbone while preserving in-distribution task utility?
+\item \textbf{RQ3 (empirical response conditional on admissibility and manipulation):} Conditional on scorer admissibility and successful geometry manipulation, do observed changes in distance-based OOD ranking support a scorer-visible geometry effect rather than intervention history or limited ranking susceptibility?
+\end{itemize}
+
+RQ1 is answered analytically in Section~3, prior to and independent of any dose-response data; RQ2 and RQ3 are answered empirically in Section~4, with RQ3 read conditional on both preceding answers.
+
+The contributions are three, and they are stated in the order of how far they
+travel.
+
+\textbf{A test that separates invariance from insensitivity.} A scorer whose
+ranking does not move may be protected by a transformation group, or may simply
+be unable to move. The two produce the same flat curve and the same conclusion
+in most published readings. We formalize scorer-relative transformation groups,
+give the resulting guarantees a quantitative complement --- bounded violation
+under ridge regularization and under anisotropic mapping --- and connect those
+bounds to attainable AUROC change through the local ranking-margin
+distribution. The margin mass within reach of the observed perturbation is
+computable from image-level scores and is the quantity that distinguishes the
+two cases. It is a property of a scorer and a population, not of an
+architecture.
+
+\textbf{Two conditions that determine whether a null is informative, both
+checkable before the data are seen.} The first is arithmetic: a whole-seed
+permutation over $k$ seeds attains no $p$ below $1/k!$, so a Holm family larger
+than six tests at five seeds cannot be cleared regardless of what is observed,
+and reporting its null describes the design rather than the phenomenon. The
+second is structural: when an intervention is defined from a contrast involving
+the evaluation domain --- as nuisance-removal operators routinely are --- then
+evaluating it against that domain measures the operator against its own
+construction target. Both conditions are settled by inspection, one of the
+analysis plan and one of the operator's definition.
+
+\textbf{A worked example that exhibits all three failures and their
+diagnoses.} We hold backbone, extraction pipeline, feature layer, splits,
+evaluation protocol and scorer definitions fixed, and intervene on the
+representation output alone behind an integrity gate and a manipulation check.
+Cross-backbone studies vary architecture, pretraining corpus, objective,
+dimension and feature layer together, so geometry--performance covariation
+observed there may reflect provenance rather than geometry; holding provenance
+fixed removes that confound at the cost of generality, which we do not claim.
+The example is not offered as evidence about distance-based OOD detection in
+general. It is offered because the three failures above are easier to recognize
+once seen operating together on real data, and because two of them were present
+in our own earlier analysis of it and went unnoticed until the corresponding
+test was applied.
+
+\section{Related Work}
+\subsection{Distance-Based OOD Ranking}
+Mahalanobis OOD detection fits class means and a tied covariance matrix \citep{lee2018simple}. Deep nearest-neighbor detection replaces the shared-Gaussian assumption with non-parametric proximity \citep{sun2022ood}. Locally adapted likelihood ratios further show that ordinary neighborhood scores may ignore locally relevant dimensions in pretrained spaces \citep{ahmadian2024unsupervised}. These works establish that geometry matters through the scorer that reads it. Our question is complementary: when the scorer is fixed, does a controlled change in a scorer-visible property predict a ranking change?
+
+\subsection{Representation Geometry and Intervention}
+The closest motivation is the reported cross-backbone association of intrinsic dimensionality, within-class spectral properties, normalization, and Mahalanobis OOD performance \citep{janiak2025dissecting}. LID is estimated from local neighbor-distance ratios \citep{levina2004maximum}. Spectrum modulation and local-dimensionality regularization show that these properties can be manipulated during representation learning \citep{weng2024modulate,huang2024ldreg}. Whitening is not unique: transforms can share a covariance target while differing in rotational or cross-correlation structure \citep{kessy2018optimal}. Spectral tempering provides a dose-controlled eigenvalue transformation \citep{li2026spectral}. Residual adapters modify frozen representations efficiently \citep{rebuffi2017learning}; we optimize them with AdamW \citep{loshchilov2019decoupled}.
+
+\subsection{Dermatology Foundation Models and Domain Shift}
+PanDerm is a multimodal dermatology foundation model pretrained on more than two million images across clinical sources and modalities \citep{yan2025multimodal}. ISIC~2019 contains dermoscopic images assembled from constituent sources including HAM10000, ISIC challenge data, and BCN20000 \citep{tschandl2018ham10000,codella2018skin,hernandez2024bcn20000}. PAD-UFES-20 instead contains clinical smartphone images \citep{pacheco2020pad}. The ISIC--PAD comparison is therefore cross-source and cross-modality: dermoscopic archives assembled from multiple clinics already carry measurable technical and biological domain shift among themselves \citep{fogelberg2023domain}, and models trained on dermoscopic images are separately reported to generalize poorly to clinical (non-dermoscopic) photographs, including on Derm7pt and PAD-UFES-20 \citep{sultana2025selective}, which motivates treating the dermoscopic-clinical arms of Derm7pt as a distinct external check from the ISIC--PAD pair in Section~4.2. PAD-UFES-20 participated in development and operator calibration and is not described as an unseen OOD domain.
+
+\section{Formalization and Methods: Answering RQ1}
+\subsection{Problem Setup}
+Let $f:\mathcal{X}\rightarrow\mathbb{R}^{d}$ be a frozen encoder, $z=f(x)$, $D_{\mathrm{ID}}$ the reference set, and $T_\theta$ an intervention. For scorer $j$, $s_j(T_\theta z;T_\theta D_{\mathrm{ID}})$ is oriented so that larger values indicate greater OOD likelihood. Directed ranking performance is
+\begin{equation}
+A_j(\theta,D)=\Pr\!\left[s_j(T_\theta z_u)>s_j(T_\theta z_{id})\right].
+\end{equation}
+A geometry descriptor $g_k(T_\theta D_{\mathrm{ID}})$ summarizes a named property. The empirical target is whether paired $\Delta g_k$ predicts paired $\Delta A_j$, conditional on preservation, successful manipulation, scorer visibility, and headroom.
+
+\subsection{Scorer-Relative Invariance and Violation}
+\textbf{Definition 1 (rank invariance).} A scorer $s$ is rank-invariant to $T$ on $D$ if, for every evaluation pair $z_a,z_b$,
+\begin{equation}
+s(Tz_a;TD)<s(Tz_b;TD)\iff s(z_a;D)<s(z_b;D).
+\end{equation}
+Rank invariance implies directed AUROC invariance because AUROC is the fraction of correctly ordered ID--OOD pairs.
+
+\textbf{Theorem 1 (affine Mahalanobis invariance).} Let $T(z)=Az+b$ with invertible $A$. If class means and the shared covariance are consistently refitted after transformation and no fixed ridge is added, then for every class $c$,
+\begin{equation}
+(Tz-\mu'_c)^\top(\Sigma')^{-1}(Tz-\mu'_c)
+=(z-\mu_c)^\top\Sigma^{-1}(z-\mu_c).
+\end{equation}
+\emph{Proof.} Refitting gives $\mu'_c=A\mu_c+b$ and $\Sigma'=A\Sigma A^\top$. Therefore $Tz-\mu'_c=A(z-\mu_c)$ and $(\Sigma')^{-1}=A^{-\top}\Sigma^{-1}A^{-1}$. Substitution cancels $A^\top A^{-\top}$ and $A^{-1}A$, yielding the stated equality. Taking the minimum over classes preserves the complete score and hence its ranking. \hfill$\square$
+
+The exact result follows affine covariance equivariance. Its use here is scorer-specific: it identifies representation changes that a refitted OOD functional cannot observe. A fixed isotropic ridge breaks this equivariance in a quantifiable way.
+
+\textbf{Theorem 2 (ridge-induced Mahalanobis violation).} Let $y=A(z-\mu_c)$, $C=A\Sigma A^\top$, $B=C+\varepsilon I$, and $D=C+\varepsilon AA^\top$, where $A$ is invertible, $\Sigma\succ0$, and $\varepsilon>0$. Define $q_B=y^\top B^{-1}y$ and $q_D=y^\top D^{-1}y$. Then
+\begin{equation}
+|q_B-q_D|\le
+\frac{\varepsilon\|y\|^2\|I-AA^\top\|_2}
+{[\lambda_{\min}(C)+\varepsilon]
+ [\lambda_{\min}(C)+\varepsilon\sigma_{\min}^2(A)]}.
+\label{eq:mahal-bound}
+\end{equation}
+Moreover, $q_D=(z-\mu_c)^\top(\Sigma+\varepsilon I)^{-1}(z-\mu_c)$.
+
+\emph{Proof.} The resolvent identity gives $B^{-1}-D^{-1}=B^{-1}(D-B)D^{-1}$, where $D-B=\varepsilon(AA^\top-I)$. Submultiplicativity gives the numerator in~\eqref{eq:mahal-bound}. The denominator follows from lower bounds on $\lambda_{\min}(B)$ and $\lambda_{\min}(D)$. Finally, $D=A(\Sigma+\varepsilon I)A^\top$, so affine cancellation gives the last equality. \hfill$\square$
+
+The bound vanishes when $\varepsilon=0$ or $AA^\top=I$, and increases with departure from orthogonality and poor conditioning. It bounds score deviation, not AUROC change by itself.
+
+\textbf{Lemma 1 (cosine distortion).} Let $A$ be invertible and
+\begin{equation}
+\eta_A=\frac{\kappa_2(A)^2-1}{\kappa_2(A)^2+1}<1.
+\end{equation}
+For nonzero $x,y$,
+\begin{equation}
+|\cos(Ax,Ay)-\cos(x,y)|
+\le \min\!\left\{2,\frac{2\eta_A}{1-\eta_A}\right\}.
+\label{eq:cos-bound}
+\end{equation}
+\emph{Proof.} Let $\kappa=\kappa_2(A)=\sigma_{\max}(A)/\sigma_{\min}(A)$ and
+$m=(\sigma_{\max}^2+\sigma_{\min}^2)/2$, the midpoint of the extreme
+eigenvalues of $A^\top A$. Write $A^\top A = m(I+E)$. The eigenvalues of $E$
+are $\sigma_i^2/m-1$ for the singular values $\sigma_i$ of $A$, each lying in
+\[
+\left[\frac{\sigma_{\min}^2}{m}-1,\ \frac{\sigma_{\max}^2}{m}-1\right]
+=\left[-\frac{\sigma_{\max}^2-\sigma_{\min}^2}{\sigma_{\max}^2+\sigma_{\min}^2},\
+\frac{\sigma_{\max}^2-\sigma_{\min}^2}{\sigma_{\max}^2+\sigma_{\min}^2}\right]
+=[-\eta_A,\eta_A],
+\]
+using $\sigma_{\max}^2=\kappa^2\sigma_{\min}^2$. Hence $E$ is symmetric with
+$\|E\|_2\le\eta_A$.
+
+For nonzero $x,y$, write $\hat x=x/\|x\|$, $\hat y=y/\|y\|$,
+$c_0=\hat x^\top\hat y=\cos(x,y)$, and set
+\begin{equation}
+a=\hat x^\top E\hat x,\qquad b=\hat y^\top E\hat y,\qquad g=\hat x^\top E\hat y.
+\end{equation}
+Since $E$ is symmetric with $\|E\|_2\le\eta_A$, the Rayleigh quotient bounds
+give $a,b\in[-\eta_A,\eta_A]$; by Cauchy--Schwarz,
+$|g|=|\hat x^\top E\hat y|\le\|E\|_2\|\hat x\|\|\hat y\|\le\eta_A$.
+
+From $x^\top A^\top Ay=m\,x^\top(I+E)y$ and $x=\|x\|\hat x$, $y=\|y\|\hat y$,
+\[
+x^\top A^\top A y = m\|x\|\|y\|\,(c_0+g),\quad
+\|Ax\|^2=m\|x\|^2(1+a),\quad
+\|Ay\|^2=m\|y\|^2(1+b).
+\]
+The common factor $m\|x\|\|y\|$ cancels between numerator and denominator of
+$\cos(Ax,Ay)=x^\top A^\top Ay/(\|Ax\|\|Ay\|)$, giving the exact identity
+\begin{equation}
+\cos(Ax,Ay)=\frac{c_0+g}{\sqrt{(1+a)(1+b)}}.
+\label{eq:cos-exact}
+\end{equation}
+Because $a,b\in[-\eta_A,\eta_A]$, the product $(1+a)(1+b)$ lies in
+$[(1-\eta_A)^2,(1+\eta_A)^2]$, so for $\eta_A<1$,
+\[
+\sqrt{(1+a)(1+b)}\in[1-\eta_A,\,1+\eta_A],
+\qquad
+\big|1-\sqrt{(1+a)(1+b)}\big|\le\eta_A.
+\]
+Rearranging \eqref{eq:cos-exact},
+\[
+\cos(Ax,Ay)-c_0
+=\frac{c_0\big(1-\sqrt{(1+a)(1+b)}\big)+g}{\sqrt{(1+a)(1+b)}}.
+\]
+Using $|c_0|\le1$, $|g|\le\eta_A$, the bound above on
+$|1-\sqrt{(1+a)(1+b)}|$, and the denominator lower bound
+$\sqrt{(1+a)(1+b)}\ge1-\eta_A$,
+\[
+\big|\cos(Ax,Ay)-\cos(x,y)\big|
+\le\frac{\eta_A+\eta_A}{1-\eta_A}
+=\frac{2\eta_A}{1-\eta_A}.
+\]
+Since $\cos(Ax,Ay),\cos(x,y)\in[-1,1]$, their difference is also trivially
+at most $2$, giving the stated bound
+$\min\{2,\,2\eta_A/(1-\eta_A)\}$. \hfill$\square$
+
+For spectral tempering,
+\begin{equation}
+\kappa_2(A_\gamma)=\kappa_2(\Sigma)^{|\gamma|/2}.
+\end{equation}
+Thus small $|\gamma|$ yields a near-identity angular perturbation when the reference spectrum is not extreme. This conservative bound does not constitute a KDE bound; KDE also depends on kernel, bandwidth, and local reference mass.
+
+\subsection{Score Distortion, Ranking, and Spectral Attenuation}
+Let $M=s(z_u)-s(z_{id})$ be a baseline ID--OOD margin, and suppose $|\widetilde{s}(z)-s(z)|\le\delta$ on both evaluated populations.
+
+\textbf{Proposition 1 (score perturbation--ranking reversal).} Let $\widetilde{M}=\widetilde{s}(z_u)-\widetilde{s}(z_{id})$. Then $|\widetilde{M}-M|\le2\delta$. Consequently, a pair can change its directed ordering only if $|M|\le2\delta$.
+
+\emph{Proof.} By the triangle inequality,
+\begin{equation}
+|\widetilde{M}-M|
+\le |\widetilde{s}(z_u)-s(z_u)|
+ +|\widetilde{s}(z_{id})-s(z_{id})|
+\le2\delta.
+\end{equation}
+A margin outside $[-2\delta,2\delta]$ therefore cannot cross zero. \hfill$\square$
+
+\textbf{Corollary 1 (AUROC perturbation through local margin mass).} Under the conditions of Proposition~1,
+\begin{equation}
+|\operatorname{AUROC}(\widetilde{s})-\operatorname{AUROC}(s)|
+\le \Pr(|M|\le2\delta).
+\label{eq:auroc-bound}
+\end{equation}
+\emph{Proof.} Directed AUROC is the probability of a positive ID--OOD margin. Proposition~1 shows that only pairs in the stated margin band can change their contribution to this probability. \hfill$\square$
+
+We call $S_s(\delta)=\Pr(|M|\le2\delta)$ the \emph{local ranking susceptibility}. Unlike global headroom $H_s=1-\operatorname{AUROC}(s)$, it measures the mass that a perturbation of a specified size can reorder. Near-ceiling AUROC alone does not imply small $S_s(\delta)$: correctly ordered pairs may still lie close to zero. Equation~\eqref{eq:auroc-bound} is the bridge from an invariance-violation bound to an AUROC bound; evaluating it requires retained image-level scores.
+
+\textbf{Proposition 2 (Mahalanobis spectral attenuation).} Let $\Sigma=U\operatorname{diag}(\lambda_1,\ldots,\lambda_d)U^\top\succ0$, let $h=\sum_i c_i u_i$ be a displacement, and use ridge $\varepsilon\ge0$. Its squared Mahalanobis contribution is
+\begin{equation}
+q_\varepsilon(h)=h^\top(\Sigma+\varepsilon I)^{-1}h
+=\sum_{i=1}^{d}\frac{c_i^2}{\lambda_i+\varepsilon}.
+\label{eq:spectral-attenuation}
+\end{equation}
+If $h$ lies in an eigenspace with $\lambda_i\ge L$, then
+$q_\varepsilon(h)\le\|h\|^2/(L+\varepsilon)$. If it lies in an eigenspace with $\lambda_i\le \ell$, then $q_\varepsilon(h)\ge\|h\|^2/(\ell+\varepsilon)$.
+
+\emph{Proof.} Substitution of the orthonormal eigendecomposition gives~\eqref{eq:spectral-attenuation}; bounding each reciprocal eigenvalue on the stated spectral subspace gives the two inequalities. \hfill$\square$
+
+Thus equal-Euclidean-norm perturbations aligned with high-variance directions are attenuated relative to perturbations aligned with low-variance directions. This is a scorer-specific spectral mechanism and does not imply recoverability by another learned readout.
+
+Cosine and Mahalanobis now have quantitative violation bounds; $k$-nearest-neighbour scoring, the remaining scorer with an exact invariance class under similarities (Section~3.4), has so far only that qualitative statement. Because the $k$-NN score is an order statistic over the reference set rather than a fixed point's distance, boundedness of the underlying linear map does not immediately imply boundedness of the score: the reference point realizing the $k$-th smallest distance can itself change after transformation. The next result shows the same singular-value bracket nonetheless holds for the order statistic, and yields a ranking-preservation guarantee directly comparable to Proposition~1.
+
+\textbf{Proposition 3 ($k$-NN score bracketing and ratio-margin ranking preservation).} Let $A$ be invertible with singular values $\sigma_{\min}(A)\le\sigma_{\max}(A)$ and $\kappa=\kappa_2(A)=\sigma_{\max}(A)/\sigma_{\min}(A)$. Let $D=\{p_1,\ldots,p_n\}\subset\mathbb{R}^d$ be a fixed reference set, $z$ a query point, and $s(z)=d_{(k)}$ the distance from $z$ to its $k$-th nearest neighbour in $D$, where $d_{(1)}\le\cdots\le d_{(n)}$ are the sorted distances $\{\|z-p_i\|\}$. Let $\widetilde s(z)$ denote the same score computed on the transformed sets $\{Az_i\}$, $Az$. Then:
+
+\textbf{(a) Score bracketing.}
+\begin{equation}
+\sigma_{\min}(A)\,s(z)\ \le\ \widetilde s(z)\ \le\ \sigma_{\max}(A)\,s(z).
+\label{eq:knn-bracket}
+\end{equation}
+
+\textbf{(b) Ratio-margin ranking preservation.} For query points $z_u,z_{id}$ with $s(z_{id})>0$, if $s(z_u)/s(z_{id})>\kappa_2(A)$, then $\widetilde s(z_u)>\widetilde s(z_{id})$: the pair's directed order cannot flip under $A$.
+
+\emph{Proof.} (a) Every point-to-point distance obeys $\sigma_{\min}(A)\|x\|\le\|Ax\|\le\sigma_{\max}(A)\|x\|$, applied here to $x=z-p_i$ for each $i$; this pointwise bound holds regardless of $i$'s rank, so it does not by itself bracket an order statistic. Let $p_{(1)},\ldots,p_{(n)}$ be $D$ relabelled by increasing original distance to $z$, so $d_{(i)}=\|z-p_{(i)}\|$.
+
+For the upper bound, the $k$ points $p_{(1)},\ldots,p_{(k)}$ all satisfy $d_{(i)}\le d_{(k)}$ for $i\le k$, so their transformed distances satisfy $\|A(z-p_{(i)})\|\le\sigma_{\max}(A)\,d_{(i)}\le\sigma_{\max}(A)\,d_{(k)}$ for all $i\le k$. At least $k$ transformed distances are therefore no larger than $\sigma_{\max}(A)\,d_{(k)}$, so the $k$-th smallest transformed distance satisfies $\widetilde s(z)\le\sigma_{\max}(A)\,d_{(k)}=\sigma_{\max}(A)\,s(z)$.
+
+For the lower bound, the $n-k+1$ points $p_{(k)},\ldots,p_{(n)}$ all satisfy $d_{(i)}\ge d_{(k)}$, so their transformed distances satisfy $\|A(z-p_{(i)})\|\ge\sigma_{\min}(A)\,d_{(i)}\ge\sigma_{\min}(A)\,d_{(k)}$. Hence at most $k-1$ transformed distances can fall below $\sigma_{\min}(A)\,d_{(k)}$, so the $k$-th smallest transformed distance satisfies $\widetilde s(z)\ge\sigma_{\min}(A)\,d_{(k)}=\sigma_{\min}(A)\,s(z)$. This proves \eqref{eq:knn-bracket}.
+
+(b) By \eqref{eq:knn-bracket} applied to both queries, $\widetilde s(z_u)\ge\sigma_{\min}(A)\,s(z_u)$ and $\widetilde s(z_{id})\le\sigma_{\max}(A)\,s(z_{id})$. If $s(z_u)/s(z_{id})>\kappa_2(A)=\sigma_{\max}(A)/\sigma_{\min}(A)$, then
+\[
+\widetilde s(z_u)\ \ge\ \sigma_{\min}(A)\,s(z_u)\ >\ \sigma_{\min}(A)\cdot\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}\,s(z_{id})\ =\ \sigma_{\max}(A)\,s(z_{id})\ \ge\ \widetilde s(z_{id}),
+\]
+so the order is preserved. \hfill$\square$
+
+\textbf{Corollary 2 ($k$-NN ranking susceptibility).} Define the \emph{ratio-margin susceptibility}
+\begin{equation}
+S_{\mathrm{kNN}}(\kappa)=\Pr\!\left(
+\max\left\{\frac{s(z_u)}{s(z_{id})},\frac{s(z_{id})}{s(z_u)}\right\}
+\le\kappa\right).
+\end{equation}
+Under Proposition~3(b),
+\begin{equation}
+\big|\operatorname{AUROC}(\widetilde s)-\operatorname{AUROC}(s)\big|\ \le\ S_{\mathrm{kNN}}\big(\kappa_2(A)\big).
+\label{eq:knn-auroc-bound}
+\end{equation}
+\emph{Proof.} Only pairs failing the ratio condition in Proposition~3(b) in both directions --- equivalently, pairs with $\max\{s(z_u)/s(z_{id}),\,s(z_{id})/s(z_u)\}\le\kappa_2(A)$ --- can have their directed order changed by $A$; the argument is otherwise identical to Corollary~1's, with the additive margin band replaced by a multiplicative ratio band appropriate to a nonnegative, scale-covariant score. \hfill$\square$
+
+Equation~\eqref{eq:knn-auroc-bound} is the $k$-NN analogue of Corollary~1 and requires only $\kappa_2(A)$, not image-level scores, to state; evaluating $S_{\mathrm{kNN}}$ itself still requires the paired distance ratios on the evaluated population. For the tempering operator, $\kappa_2(A_\gamma)=\kappa_2(\Sigma)^{|\gamma|/2}$ as in~(9), so Proposition~3 and Corollary~2 apply directly to $A_\gamma$ once a baseline value of $\kappa_2(\Sigma)$ is reported; unlike Theorem~2's bound, they do not additionally require per-point residuals $y$.
+
+\subsection{Transformation-Group Interpretation}
+Classical group-invariance theory studies inferential quantities that remain constant on transformation orbits \citep{eaton1989group}. Here the consistently refitted unregularized Mahalanobis scorer admits $GL(d)\ltimes\mathbb{R}^d$. Cosine admits orthogonal maps and positive common scaling, but not general translation or anisotropic maps; at the pair level it is also unchanged by independent positive radial rescaling. Euclidean $k$-NN ordering admits similarities---translation, orthogonal maps, and uniform positive scaling---whereas KDE invariance additionally depends on bandwidth and density transformation. These groups are different and may be nested for particular subgroups; their sensitivity profiles are not identical. Scorer-visible and scorer-invisible geometry are therefore structural consequences of different transformation orbits. Together, Definition~1, Theorems~1--2, Lemma~1, Proposition~1, Corollary~1, Proposition~2, Proposition~3, and Corollary~2 replace a binary invariance label by a hierarchy of exact, bounded, ranking-level, and spectral statements, covering three of the four evaluated scorers quantitatively and the fourth (KDE) through its qualitative transformation group alone.
+
+\textbf{Answering RQ1.} This section constitutes the answer to RQ1, established analytically rather than by dose-response data, and holding for the accepted operator $T_\gamma$ (an exact instance of the affine class of Theorem~1 for any fixed $\gamma$, since $U$, $\{\lambda_i\}$, and $\mu$ are fixed once from the training covariance). Mahalanobis is exactly invisible to $T_\gamma$ at zero ridge (Theorem~1) and boundedly visible under the ridge actually used in the fitted scorer (Theorem~2, vanishing as $\gamma\to0$). Cosine and $k$-NN are both boundedly visible, with violation governed by the same quantity, $\kappa_2(A_\gamma)=\kappa_2(\Sigma)^{|\gamma|/2}$ (Lemma~1; Proposition~3 and Corollary~2). KDE's admissibility is not established by this formalization and is treated as undetermined rather than assumed either visible or invisible. Table~\ref{tab:rq1-admissibility} summarizes this classification; Section~4 reports the manipulation and empirical evidence that RQ2 and RQ3 condition on it.
+
+\begin{table}[t]
+\centering
+\caption{RQ1 answer: scorer admissibility under the accepted operator $T_\gamma$. Bound requirement contrasts data-free quantities against per-point residuals.}
+\label{tab:rq1-admissibility}
+\small
+\begin{tabular}{p{2.0cm}p{3.2cm}p{3.4cm}p{3.4cm}}
+\toprule
+Scorer & Admissibility & Governing result & Bound requires\\
+\midrule
+Mahalanobis & Exact ($\varepsilon=0$) / bounded ($\varepsilon>0$) & Theorem~1 / Theorem~2 & per-point $y$ (Thm.~2)\\
+Cosine & Bounded & Lemma~1 & only $\kappa_2(\Sigma)$\\
+$k$-NN & Bounded & Proposition~3, Corollary~2 & only $\kappa_2(\Sigma)$\\
+KDE & Undetermined & Qualitative group only (Sec.~3.4) & Kernel and bandwidth model\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Backbone, Populations, and Intervention}
+The frozen PanDerm ViT-L/16 encoder produces 1024-dimensional embeddings. ISIC~2019 contributes 25,331 images split with a fixed seed into training ($n=16{,}211$), validation ($n=4{,}053$), and held-out evaluation ($n=5{,}067$). PAD-UFES-20 contributes 2,298 stress-test images mapped into the same eight-class label space. Embeddings are extracted once under fixed preprocessing and stored with checksums.
+
+For seed $r\in\{42,52,62,72,82\}$, a zero-initialized residual bottleneck produces displacement $\Delta z_r=W_2\operatorname{GELU}(W_1z)$. Post-training interpolation defines
+\begin{equation}
+T_{r,\alpha}(z)=z+\alpha\Delta z_r,\quad
+\alpha\in\{0,.25,.50,.75,1\}.
+\end{equation}
+All doses from a seed share one fitted adapter, preserving pairing. A Conventional arm uses the same architecture, schedule, budget, and seeds without the geometry-targeting term.
+
+Gate~0 requires in-distribution eight-class balanced accuracy above chance by a fixed margin ($>0.125+0.10=0.225$). Gate~1 requires at least one prespecified target---LID or within-class spectral-decay slope---to show reproducible dose dependence across seeds. Gate~0 is a threshold-based utility-admissibility check rather than a non-inferiority or equivalence test.
+
+\subsection{Geometry Operators and Scorers}
+The initial radial normalization operator changed condition number strongly but left LID and spectral slope nearly unchanged, and therefore serves as a negative manipulation check. The accepted operator uses the eigendecomposition $\Sigma=U\operatorname{diag}(\lambda_i)U^\top$ of the ID training covariance:
+\begin{equation}
+T_\gamma(z)=\mu+U\operatorname{diag}(\lambda_i^{-\gamma/2})U^\top(z-\mu),
+\quad \gamma\in[0,1].
+\end{equation}
+Its transformed covariance is $U\operatorname{diag}(\lambda_i^{1-\gamma})U^\top$, so in exact arithmetic
+\begin{equation}
+\kappa(\Sigma')=\kappa(\Sigma)^{1-\gamma}.
+\end{equation}
+
+LID provides a complementary scale check. Under one common multiplier $c>0$, every neighbor distance satisfies $r_j(cz)=cr_j(z)$, so every ratio $r_j/r_k$ and the usual maximum-likelihood LID estimate are unchanged. A pointwise radial operator need not preserve these ratios, so the small LID movement under normalization is an empirical negative manipulation check rather than an exact invariance result.
+
+Four scorers are refit on each transformed ID training population: class-conditional Mahalanobis distance with ridge $10^{-5}$, cosine-to-centroid, $k$-NN with $k=10$, and class-conditional KDE. Higher scores are fixed to mean more OOD. Baseline headroom is $H_j=1-A_{j,\mathrm{ref}}$. When image-level scores are available, the stronger diagnostic is $S_j(\delta)$ from Corollary~1, with $\delta$ supplied by a scorer-specific analytical or empirical score-distortion bound.
+
+\subsection{RQ3 Estimands}
+The paired configuration-level estimands are
+\begin{equation}
+\Delta g_{r,\alpha}=g_{r,\alpha}-g_{r,0},\qquad
+\Delta A_{j,r,\alpha}=A_{j,r,\alpha}-A_{j,r,0}.
+\end{equation}
+The available Kendall coefficients across 30 configurations are retained only as exploratory summaries because configurations sharing a seed are dependent. Mixed-effects interactions group by seed \citep{bates2015fitting}. Holm correction \citep{holm1979simple} is reported for the metric--scorer family, with a constraint that has to be stated where the procedure is defined rather than discovered in the results: for a randomization test built from all attainable seed permutations, the achievable $p$-value grid is fixed by the number of permutations rather than by the data \citep{edgington2007randomization}, so a whole-seed permutation over five seeds has a smallest attainable $p$ of $1/5!=.0083$, while Holm's first threshold is $\alpha/m$. For $m>6$ the floor lies above the threshold, so no permutation $p$-value can clear the first step regardless of the data. With $m=16$ the threshold is $.0031$ and with $m=8$ it is $.0063$; both families are unreachable by construction. Corrected permutation inference is therefore not available at this seed count, and the permutation results below are read as descriptive summaries with their null distributions reported. This is a property of the design, not a finding about geometry, and treating an uncorrectable null as evidence of absence would be the error the rest of this manuscript is about. Hierarchical intervals require image-level score vectors \citep{saravanan2020application}; aggregate AUROC means are not treated as image-level observations. Those vectors were not retained during the original runs but are regenerable from the frozen embedding artifact and the retained adapters, and the regeneration reproduces every stored aggregate AUROC to six decimals, so the intervals reported here are computed at the image level rather than approximated from means.
+
+RQ3 uses three paired configurations: $A=(\alpha=1,\gamma=0)$; $B=(\alpha=.25,\gamma=0)$; and $C=(\alpha=1,\gamma=.01)$. Configuration $C$ matches $B$ on spectral slope and $A$ on adapter dose/intervention history. It does not match $B$ on LID. Paired $C-B$ and $C-A$ contrasts are tested for four scorers with Holm correction across eight comparisons. For Mahalanobis, $A-C$ is a near-invariance consistency check; it is not treated as a powered geometry-effect test.
+
+\section{Three Readings of a Flat Response}
+\label{sec:three}
+Before the empirical section, we state the three conditions in the form a
+reader can apply to their own study, since none of them depends on what
+follows.
+
+\textbf{Is the scorer able to respond?} Corollary~1 bounds the AUROC change a
+score perturbation of size $\delta$ can produce by $S(\delta)=\Pr(|M|\le
+2\delta)$, the fraction of ID--OOD pairs whose score gap the perturbation can
+close. The bound is valid at $\delta_{\max}$ and is usually vacuous there; its
+use is comparative. Two scorers evaluated at their own observed perturbation
+magnitudes have commensurable $S$, and an order-of-magnitude gap between them
+is the difference between a scorer that declined to move and one that could not.
+Computing it needs image-level scores. It does not need them to have been
+retained: they regenerate from a frozen embedding artifact and the trained
+adapters, and the regeneration can be checked against whatever aggregates were
+stored.
+
+\textbf{Can the design reject at all?} A whole-seed permutation over $k$ seeds
+has $k!$ arrangements and a smallest attainable $p$ of $1/k!$. Holm's first
+threshold over a family of $m$ tests is $\alpha/m$. Where $1/k! > \alpha/m$ ---
+at five seeds and $\alpha=.05$, wherever $m>6$ --- no permutation $p$-value can
+clear the first step, and the family's null is a statement about the design.
+This is one division. It costs nothing to check when the analysis plan is
+written and is uncomfortable to discover afterwards, as we did: two families in
+our own earlier analysis were in that regime. Section~\ref{sec:seeds} reports
+what happened when the constraint was removed, which is the check the condition
+implies and not an optional extra --- a null reported from an unreachable
+family says nothing until someone makes the family reachable.
+
+\textbf{Was the operator built from the domain it is evaluated on?} Nuisance
+removal, domain-adversarial training and shortcut suppression commonly define
+their target from a contrast between the in-distribution population and a
+reference shifted population. Where that reference is also the evaluation
+domain, the intervention is trained to suppress the direction along which the
+evaluation domain separates, and the resulting effect is not evidence about
+mechanism. The check is a single inner product: project each evaluation
+domain's mean displacement from the in-distribution population onto the
+suppressed direction. A projection near one identifies the construction target;
+projections near zero identify domains the operator does not point at. No
+sample size enters, and the answer does not change with more seeds.
+
+The first condition asks whether the instrument can register the phenomenon,
+the second whether the analysis can express the answer, and the third whether
+the measurement is independent of the thing measured. A flat curve that has not
+been checked against all three carries less information than it appears to, and
+a non-flat one that fails the third carries less than that.
+
+\section{Worked Example: RQ2 and RQ3 on One Backbone}
+This section is a worked example of Section~\ref{sec:three}'s three checks
+rather than a generalization claim: the values below are properties of this
+backbone and these four evaluation domains, and each of the three checks
+changed a reading here that had previously gone unquestioned.
+RQ1 was answered analytically in Section~3 and does not depend on the data reported below: Table~\ref{tab:rq1-admissibility} classifies each scorer's admissibility under the accepted operator $T_\gamma$ prior to, and independent of, any dose-response evidence. This section reports the empirical evidence for RQ2 (manipulation and preservation) and RQ3 (empirical response, read conditional on RQ1's admissibility classification and RQ2's manipulation evidence).
+\subsection{RQ2: Manipulation and Preservation}
+\label{sec:rq2-manipulation}
+All Intervention and Conventional checkpoints satisfied the threshold-based Gate~0 at every dose, and the Intervention arm passed Gate~1 across all five seeds. Gate~0 is a weak instrument on its own: it asks only for balanced accuracy above .225 against a chance rate of .125, so a model degrading from .75 to .30 would pass it, and observed utility runs .5351 to .5868.
+
+Because the two arms are run at matched doses and matched seeds, the question admits a paired answer. Following the one-sided-interval logic standard in non-inferiority testing \citep{walker2011understanding}, across the twenty matched pairs, the mean utility difference is $-0.0000$ with a seed-clustered bootstrap interval of $[-.0025,+.0029]$ and a one-sided 95\% lower bound of $-.0022$; per-dose means range from $-.0010$ to $+.0007$. Non-inferiority therefore holds for any margin $\delta_U>.0022$, roughly a fifth of a percentage point of balanced accuracy. We do not select $\delta_U$ here: which degradation is clinically tolerable is a prior decision fixed by a margin external to the data \citep{walker2011understanding}, and the data cannot supply it. What the paired analysis establishes is that the intervention has no measurable utility cost at the resolution this design affords, which is a stronger statement than clearing Gate~0 and the one the word ``preservation'' requires. The normalization operator changed condition number by approximately $-2.7\times10^{5}$ but left LID effectively unchanged (mean $-4\times10^{-4}$, SD $1.8\times10^{-3}$) and changed spectral slope by less than $10^{-6}$ (SD $10^{-6}$). It was excluded from geometry-matched interpretation.
+
+\begin{table}[t]
+\centering
+\caption{Manipulation and threshold-based utility-admissibility evidence.}
+\label{tab:rq2-manipulation}
+\small
+\begin{tabular}{p{2.2cm}p{6.0cm}p{3.0cm}p{2.2cm}}
+\toprule
+Operator & Geometry outcome & ID task & RQ2 use\\
+\midrule
+Adapter $\alpha$ & At least one target dose-dependent & Gate~0 pass & Positive\\
+Norm. & $\Delta$LID $\approx0$; slope $<10^{-6}$ & Not decisive & Negative\\
+Tempering & Slope and LID change across $\gamma$ & Gate~0 pass & Positive\\
+$\gamma=.01$ & Slope matched; LID differs by .26 (5-seed mean) & Gate~0 pass & Slope only\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Spectral slope changed reproducibly and near-monotonically by $-1.5,-2.7,-3.6,$ and $-3.5\times10^{-3}$ at $\gamma=.25,.50,.75,$ and $1.00$. LID changed reproducibly but non-monotonically, increasing by approximately $+2.7$ to $+5.8$ at intermediate exponents --- with one exception, $\gamma=.75$, where the change was smaller ($+0.26$) rather than falling within that range --- before decreasing by approximately $-1.5$ to $-4.4$ at full whitening. At $\gamma=.01$, slope was $6.731\times10^{-3}$ against a target of $6.744\times10^{-3}$ (five-seed means; seed 42 alone gives $6.746\times10^{-3}$ against $6.751\times10^{-3}$), while LID remained on average $0.26$ below the target checkpoint over five seeds (seed 42 alone: $0.60$). The manipulation component of RQ2 is supported within the observed trajectories, all configurations meet the threshold-based utility gate, and the paired analysis above establishes non-inferiority for any margin above .0022. Arbitrary or joint geometric control is not established.
+
+\subsection{RQ3: Empirical Response Conditional on Admissibility and Manipulation}
+This section answers RQ3 using both the pooled configuration-level analysis and the geometry-matched paired contrast, conditional on RQ1's admissibility classification (Table~\ref{tab:rq1-admissibility}) and RQ2's manipulation evidence.
+
+\textbf{Pooled configuration-level associations.} Neither target metric had a Holm-corrected association with any scorer in the exploratory pooled analysis (Table~\ref{tab:rq2}). The largest LID and slope associations were both with Mahalanobis ($\tau=-.24$, uncorrected $p=.065$; $\tau=.22$, $p=.088$). Condition number was associated with all scorers in the pooled table, but no association survived whole-seed permutation sensitivity after correction. The permutation was applied symmetrically to all four geometry metrics rather than to condition number alone. Across the resulting sixteen associations the smallest observed $p$ is $.050$, but the more important number is that the smallest \emph{attainable} one is $1/120=.0083$ while Holm's first threshold at $m=16$ is $.0031$: the family cannot produce a corrected rejection whatever the data show, so its null is uninformative by construction rather than by outcome. The more informative summary is the permutation null itself, whose 95th percentile of $|\tau|$ runs from $.14$ to $.66$ depending on metric and scorer. A design in which a $|\tau|$ of $.66$ arises by chance in one draw in twenty cannot adjudicate the observed coefficients, and the pooled table is reported as a descriptive summary on that basis rather than as weak evidence.
+
+\begin{table}[t]
+\centering
+\caption{Exploratory configuration-level Kendall $\tau$. Configurations sharing a seed are dependent.}
+\label{tab:rq2}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Metric & Mahal. & Cosine & $k$-NN & KDE\\
+\midrule
+LID & $-.24$ & $.01$ & $.19$ & $.10$\\
+Spectral slope & $.22$ & $.16$ & $.12$ & $.05$\\
+Condition number & $.56$ & $.58$ & $.42$ & $.55$\\
+Nuisance variance & $.32$ & $.34$ & $.33$ & $.15$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Condition number's pooled association, uniform across all four scorers regardless of each scorer's admissibility class in Table~\ref{tab:rq1-admissibility}, should not be read as support for a geometry-mediated ranking effect. RQ1 establishes that a consistently refitted Mahalanobis score is exactly insensitive to the isotropic component of a transformation (Theorem~1) and only boundedly sensitive under the ridge actually used (Theorem~2); the manipulation check in RQ2 independently shows that the normalization operator moves condition number by approximately $-2.7\times10^{5}$ while leaving both prespecified shape metrics (LID, slope) essentially unchanged. Condition number therefore behaves as a scale-sensitive descriptor rather than a measure of the spectral shape the prespecified metrics target, and an association uniform across scorers with different admissibility classes is more consistent with a shared scale confound than with a scorer-visible geometric mechanism.
+
+Three of 16 intervention-type-by-geometry interactions cleared a Holm-corrected threshold on the 55-configuration run matrix, all 16 models converging --- these are parametric mixed-effects $p$-values, which are not subject to the permutation floor above, though they inherit the same five-seed variance estimate: spectral slope with $k$-NN ($\hat\beta=-5.2\times10^{-3}$, $p_{\mathrm{Holm}}=2.2\times10^{-4}$), spectral slope with cosine ($-2.7\times10^{-2}$, $5.9\times10^{-3}$), and LID with Mahalanobis ($-8.9\times10^{-5}$, $8.1\times10^{-3}$). The significant coefficients are small in absolute AUROC and differ by scorer, which is inconsistent with treating geometry as a mechanism-independent predictor. LID remains unresolved at this level because it is not independently matched while holding slope and intervention history apart. The pooled coefficients do not by themselves answer the paired RQ3 estimand, and Section~\ref{sec:external} does.
+
+Which three interactions reach significance depends on which configuration set is analysed: the 30-configuration subset returns three slope interactions with one model failing to converge, and the 45-row matched-input table returns one. We report the 55-configuration matrix because it is the widest retained set and the only one on which all sixteen models converge, and we treat the instability across subsets as the substantive result at this level --- an association that changes identity with the analysis population is not evidence about a mechanism. This is the reason the pooled table is described as exploratory throughout and is not carried into any conclusion.
+
+\textbf{Geometry-matched paired contrast.} Table~\ref{tab:rq3} reports the A/B/C comparison. Mahalanobis shows no separation. For cosine, $C$ sits closer to history-matched $A$ than to slope-matched $B$: $C-A$ is $+.0024$ against $C-B$ of $-.0224$; $k$-NN and KDE show the same sign pattern at a tenth and a twentieth of the magnitude ($+.0002$ against $-.0043$, and $+.0001$ against $-.0018$). Hierarchical intervals over seeds then examples exclude zero for all three on $C-B$ and for cosine, $k$-NN and KDE on $C-A$.
+
+The eight-comparison Holm family this was originally corrected within is one of the unreachable ones described in Section~2: at $m=8$ the first threshold is $.0063$ against a permutation floor of $.0083$. Reporting ``no comparison reaches corrected significance'' for that family would describe the design and not the data. The intervals above are reported instead, and the question they cannot settle --- whether the alignment reflects intervention history or the geometry that history produced --- is what the external pairs in Section~\ref{sec:external} are for.
+
+\begin{table}[t]
+\centering
+\caption{Mean directed AUROC over five paired seeds.}
+\label{tab:rq3}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Scorer & $A:\alpha=1$ & $B:\alpha=.25$ & $C:\alpha=1,\gamma=.01$\\
+\midrule
+Mahalanobis & .9984 & .9984 & .9984\\
+Cosine & .9498 & .9750 & .9523\\
+$k$-NN & .9928 & .9973 & .9930\\
+KDE & .9967 & .9986 & .9968\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Global headroom and A/B/C response range on the calibration pair. Local susceptibility is reported separately in Table~\ref{tab:susceptibility}.}
+\label{tab:headroom}
+\small
+\begin{tabular}{lrrrl}
+\toprule
+Scorer & Ref. & $H_j$ & Range & Class\\
+\midrule
+Mahalanobis & .9984 & .0016 & .0000 & Near ceiling\\
+$k$-NN & .9973 & .0027 & .0046 & Near ceiling\\
+Cosine & .9750 & .0250 & .0251 & Limited\\
+KDE & .9986 & .0014 & .0019 & Near ceiling\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{Local ranking susceptibility from reconstructed image-level scores. $S(\delta)=\Pr(|M|\le2\delta)$ at the observed $\alpha\!:\!0\!\to\!1$ score distortion. Only the $\delta_{\max}$ column is a valid bound; the median column is descriptive and its value is the ordering across scorers, not whether it exceeds the observation.}
+\label{tab:susceptibility}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Scorer & $\delta_{\mathrm{med}}$ & $S(\delta_{\mathrm{med}})$ & $|\Delta A|$ & $\delta_{\max}$ & $S(\delta_{\max})$\\
+\midrule
+Mahalanobis & 7.44 & .000065 & .000160 & $1.08{\times}10^{4}$ & .690\\
+Cosine & .0098 & .0478 & .0337 & .301 & 1.000\\
+$k$-NN & 1.09 & .0073 & .0051 & 2.90 & .832\\
+KDE & 101.3 & .0186 & .0021 & $7.72{\times}10^{3}$ & 1.000\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[t]
+\centering
+\caption{External validation. $C-A$ holds $\alpha=1$ and adds tempering, so the two configurations differ in geometry; the matched contrast holds geometry fixed and varies intervention identity. Intervals are hierarchical bootstrap over seeds then examples.}
+\label{tab:external}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+& PAD-UFES & Derm7pt & Derm7pt & PH2\\
+& (calib.) & dermoscopic & clinical & \\
+\midrule
+Baseline AUROC (cosine) & .9805 & .7805 & .9340 & .6322\\
+\midrule
+$C-A$ cosine & $+$.00241 & $+$.00361 & $+$.00229 & $+$.00423\\
+\quad excludes zero & yes & yes & yes & yes\\
+$C-A$ $k$-NN & $+$.00022 & $+$.00111 & $+$.00091 & $+$.00022\\
+$C-A$ Mahalanobis & $+$.00000 & $+$.00001 & $+$.00000 & $-$.00001\\
+\midrule
+Matched contrasts excluding zero & 2/4 & 0/4 & 0/4 & 0/4\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Image-level scores were regenerated from the frozen embedding artifact and the retained adapters, reproducing every stored aggregate AUROC to six decimals, so the local susceptibility that aggregate means cannot express is available directly (Table~\ref{tab:susceptibility}). Two readings follow. First, the bound of Corollary~1 is valid only at $\delta_{\max}$, and there it is uninformative: $S=1.000$ for cosine and KDE, $.832$ for $k$-NN, $.690$ for Mahalanobis. Second, at a common descriptive $\delta$ the scorers separate by three orders of magnitude, with Mahalanobis at $6.5\times10^{-5}$ against cosine's $4.8\times10^{-2}$ --- a factor of 735 --- even though Mahalanobis's score displacement is the larger of the two (median 7.44, 95th percentile $2.5\times10^{3}$). Mahalanobis's flat profile is therefore ranking insensitivity, not a ceiling artifact. This distinction is what the pooled aggregates could not make.
+
+\textbf{Common support.} The matched contrast in Table~\ref{tab:rq3} borrows its
+diagnostic apparatus --- caliper matching, standardized mean difference, and a
+common-support check on the matching variable before the contrast is read ---
+from the propensity-score matching literature \citep{austin2011introduction}, applied here to a
+two-coordinate geometry descriptor $G=(\mathrm{LID},\mathrm{slope})$ rather than
+a propensity score. The matched analysis reports the pairs it found; the
+prior question is whether the intervention identities occupy a shared region of
+$G$ at all. Per identity, the fraction of configurations with a cross-identity
+neighbour inside the caliper is: at $.15$, Adaptation $.00$, Conventional $.40$,
+Intervention $.30$; at $.25$, $.20/.65/.55$. Adaptation is the binding
+constraint and it is thin --- at the preregistered caliper only a fifth of its
+configurations have any counterpart. On the external pairs, which carry the full
+Adaptation ladder rather than the single rung that survived the primary merge,
+the same figure is $.40$, $.25$ and $.15$.
+
+Thin support is the trigger for the conditional fine-grid item in the analysis
+plan, so the grid was run. The registered tempering ladder cannot satisfy it:
+Adaptation sits at high standardised slope and positive $\gamma$ lowers slope,
+so the nearest configuration reachable within the registered range is at
+distance $.95$ against a caliper of $.25$, and adding tempering moves further
+away rather than closer. Extending to small negative $\gamma$, which sharpens
+the spectrum instead of whitening it and stays inside the theory's
+$\kappa_2(A_\gamma)=\kappa_2(\Sigma)^{|\gamma|/2}$, does reach the region: 120
+configurations at $\gamma\in\{-.006,\dots,-.003\}$ raise Adaptation's support
+from $.00$ to $.80$ at caliper $.15$ and from $.20$ to $.80$ at $.25$. The
+extension is a departure from the registered ladder, was chosen on geometry
+before any of these configurations was scored, and is logged as such; the
+scripts that selected it compute geometry and have no code path to a scorer.
+
+\begin{table}[t]
+\centering
+\caption{Matched contrast at caliper $.25$ on three configuration sets. The first two rows are the with-and-without comparison the deviation log committed to before the grid was scored. The augmented set pools two populations --- 30 of its 51 pairs lie entirely inside the extended $\gamma$ regime --- so the third row, which requires each pair to touch an originally registered configuration, isolates the like-for-like subset; that row was defined after the grid was run and is post hoc. Matching is blind to seed, so a pair may span two of them; intervals are the multiway cluster bootstrap, which admits a pair only when both of its seeds are drawn.}
+\label{tab:support}
+\small
+\begin{tabular}{lrrrrr}
+\toprule
+Configuration set & Pairs & $|$SMD$|$ & Cosine & $k$-NN & Mahalanobis\\
+\midrule
+Registered only & 10 & .136 & $-.00853^\ast$ & $-.00072$ & $+.00000$\\
+Augmented, all & 51 & .043 & $+.00260$ & $-.00016$ & $-.00003$\\
+Augmented, touching registered & 21 & .015 & $-.01095^\ast$ & $-.00148$ & $-.00006$\\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\footnotesize $^\ast$ hierarchical interval excludes zero.
+\end{table}
+
+Table~\ref{tab:support} is the reason the grid was worth running, and it points
+the opposite way from the middle row read alone. On the best-balanced set ---
+$|$SMD$|$ $.015$ against the registered set's $.136$ --- the cosine contrast is
+larger than originally reported, not smaller, $-.01095$ against $-.00853$, and
+it is the only one of the four whose interval excludes zero. Thin common support
+was suppressing the cosine effect on this pair rather than manufacturing it. The
+other three move in the same direction without resolving: $k$-NN at $-.00148$
+and Mahalanobis at $-6\times10^{-5}$ have intervals that cover zero once a pair
+spanning two seeds is charged to both of them rather than to one. That gap
+between an estimate and a resolvable effect is the same point
+Table~\ref{tab:susceptibility} makes at the margin distribution.
+
+\textbf{Operating-point behaviour.} AUROC integrates over every threshold,
+while a deployed reliability estimator runs at one. Table~\ref{tab:fpr} reports
+FPR at 95\% TPR on the calibration pair, and it does not agree with the AUROC
+reading for two scorers. $k$-NN moves $.0051$ in AUROC, which is nothing, while
+its false-alarm rate at the operating point goes from $.0111$ to $.0310$ --- a
+factor of $2.8$, rising in all five seeds. KDE shows the same pattern more
+weakly, $.0057$ to $.0143$, rising in four of five. Mahalanobis is flat on both
+measures, $1.01\times$, which is the one place the two agree.
+
+A scorer can therefore be near-invariant in rank order and substantially worse
+where it is actually used. That is the same failure of aggregate summaries this
+manuscript documents for near-ceiling AUROC, one level further down, and it is
+the reason the susceptibility analysis is reported at the margin distribution
+rather than at the summary.
+
+\begin{table}[t]
+\centering
+\caption{FPR at 95\% TPR on the calibration pair, Intervention arm, mean over five seeds, against the AUROC change over the same dose interval.}
+\label{tab:fpr}
+\small
+\begin{tabular}{lrrrr}
+\toprule
+Scorer & $|\Delta$AUROC$|$ & FPR $\alpha{=}0$ & FPR $\alpha{=}1$ & Ratio\\
+\midrule
+Mahalanobis & .000160 & .0081 & .0082 & $1.01\times$\\
+$k$-NN & .005075 & .0111 & .0310 & $2.80\times$\\
+KDE & .002125 & .0057 & .0143 & $2.50\times$\\
+Cosine & .033715 & .0801 & .1580 & $1.97\times$\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\label{sec:external}
+\textbf{External validation.} Three additional evaluation pairs were added under a protocol fixed before any external image was embedded: Derm7pt (Interactive Atlas of Dermoscopy) in both its dermoscopic and clinical arms, and PH2. Neither source contributes to ISIC~2019, and a near-duplicate screen in encoder space flagged no image in any set against the 21{,}278 frozen ISIC embeddings, at a threshold calibrated as the 99.9th percentile of within-ISIC nearest-neighbour similarity. The Derm7pt arms photograph the same 983 lesions under two modalities, which separates the modality gap from the site gap in a way the calibration pair cannot.
+
+The same-modality pair supplies the headroom the calibration pair lacks: baseline cosine AUROC falls from .9805 to .7805, and to .6322 on PH2 (Table~\ref{tab:external}). Two results follow, and they answer different questions.
+
+The direct contrast replicates. $C-A$, which holds adapter dose fixed and varies only the tempering exponent, is positive and excludes zero for cosine on all three external pairs, with the clinical pair landing within $2\times10^{-4}$ of the calibration estimate. $k$-NN holds on both Derm7pt arms. Mahalanobis remains flat everywhere, as Theorem~2 and Table~\ref{tab:susceptibility} jointly predict. Changing representation geometry changes distance-based OOD ranking, reproducibly and across domains that differ in site, modality and difficulty.
+
+The geometry-matched contrast does not. Holding $G$ fixed and varying intervention identity yields one interval excluding zero across the twelve external pair--scorer combinations --- $k$-NN on PH2 at $+.00163$, opposite in sign to the calibration effect --- with every negative-control permutation above $p=.2$ against $p=.006$ on the calibration pair; PH2's own control sits at $p=.66$, so the exception is not corroborated by the control that would have to support it. Balance is better on the external pairs, not worse (worst $|\mathrm{SMD}|$ .043 and .054 against .136), and the calibration estimate for cosine falls outside both Derm7pt intervals, so this is a contradiction rather than a failure to resolve. Three controls exclude a pipeline explanation: recomputed geometry matches the stored values to $5\times10^{-5}$ relative and the AUROCs exactly; the same code reproduces the calibration result to $0.000\times10^{0}$ on the estimate, both interval bounds and the pair count; and subsampling PAD-UFES to the external sample size over forty stratified draws leaves the cosine contrast at $-.00850$ excluding zero in 100\% of draws, so sample size is not the explanation.
+
+Read together the two results are the two halves of one statement. Geometry change moves ranking, reliably. Intervention identity, once geometry is held fixed, adds nothing. Within the evaluated operator family the intervention acts \emph{through} the measured geometry rather than beyond it, and RQ3 is answered rather than left unresolved. The scope qualifier is that this holds for the two-coordinate $G$ evaluated here; a richer geometry vector could in principle leave residual identity structure that $(\mathrm{LID},\text{slope})$ does not capture.
+
+Why the calibration pair is the only one that responds does not require a
+statistical argument, and is stronger for not needing one. The nuisance
+direction is defined in closed form as the normalised ISIC--PAD mean
+difference, so the Intervention arm is trained to suppress precisely the
+direction along which PAD-UFES-20 separates from the in-distribution
+population. Measuring that arm's effect on ISIC-versus-PAD detection therefore
+measures the operator against its own construction target. This is visible in
+the definition rather than inferred from the results, and no sample size makes
+it more or less true.
+
+The locked external domains project onto that direction at $.289$ (Derm7pt
+clinical), $.111$ (Derm7pt dermoscopic) and $.002$ (PH2), against $1.000$ for
+the pair the direction was built from. Suppressing a direction that carries a
+tenth of a domain's separation, or a five-hundredth of it, should do little to
+that domain's detectability, and none of the three shows a matched-contrast
+effect. Among the three domains with appreciable projection the response
+magnitude also orders with it --- cosine moves $-.030$, $-.017$ and $-.010$ at
+projections of $1.000$, $.289$ and $.111$ --- though that ordering rests on
+seed-level differences that are individually noisy and is offered as
+consistent, not as a dose-response result.
+
+PH2 does not fit and is reported as not fitting. At a projection of $.002$ the
+alignment account predicts no response, yet the intervention makes PH2 easier
+to detect in all five seeds for $k$-NN and for KDE, by about $+.022$ and
+$+.029$. Cosine on the same pair is unstable across seeds and carries no weight
+either way. We have no account of the two stable positive effects; offering one
+from a single domain without a mechanism test is the kind of reading this
+manuscript argues against, so the observation is recorded and left open.
+
+The practical statement is narrower than a claim about geometry in general and
+more useful for it: an intervention evaluated on the domain from which its
+operator was constructed is being evaluated against its own target, and the
+apparent effect need not survive contact with a domain the operator does not
+point at.
+
+The equal rounded Mahalanobis AUROC for $A$ and $C$ is consistent with the small ridge-induced deviation allowed by Theorem~2, not evidence of exact numerical identity. The theorem does not constrain $A-B$, which differs in nonlinear adapter dose, and makes no exact prediction for the other scorers under anisotropic tempering. $k$-NN's near-flat profile across $A$, $B$, and $C$ is likewise consistent with the bracket of Proposition~3 and the ratio-margin susceptibility of Corollary~2: both bounds are governed by the same $\kappa_2(A_\gamma)=\kappa_2(\Sigma)^{|\gamma|/2}$ that bounds cosine's deviation under Lemma~1, so a small violation is expected for $k$-NN whenever it is expected for cosine, but Table~\ref{tab:headroom}'s near-zero headroom for $k$-NN means this bound cannot by itself be distinguished from a ceiling effect with the retained aggregates. Lemma~1 predicts that angular deviation contracts as $\kappa(A_\gamma)\rightarrow1$, but the retained aggregates do not permit a numerical bound-to-observation comparison for cosine either. Minimal global headroom likewise does not establish irrelevance: Corollary~1 and Corollary~2 both require local margin or ratio-margin mass, which cannot be recovered from Table~\ref{tab:headroom}. With image-level scores available, Table~\ref{tab:susceptibility} distinguishes what the aggregates could not: Mahalanobis's and $k$-NN's flatness is governed by their low ranking susceptibility rather than by a ceiling, and the external pairs supply the headroom needed to test the matched property where no ceiling applies.
+
+\section{Discussion and Limitations}
+The three RQs delineate a methodological boundary rather than a general verdict on geometry. RQ1 establishes, analytically and prior to any dose-response data, which scorers are structurally capable of registering the accepted operator's geometric change and at what quantitative cost. The three conditions of Section~\ref{sec:three} are what that framework buys a reader who is not working on this backbone: an instrument check, an analysis check, and an independence check, each answerable before the result is known. RQ2 establishes controlled movement of target metrics while in-distribution task utility remains above a prespecified admissibility threshold. RQ3, read conditional on both, shows why pooled associations require scorer-visibility screening before interpretation, and separates two questions that a single flat curve conflates: whether changing geometry changes ranking, and whether intervention identity matters once geometry is fixed. On external domains with headroom the first is answered affirmatively and reproducibly, the second negatively, and together they place the intervention's effect inside the measured geometry rather than beyond it.
+
+The central lesson is an admissibility rule: a geometry--OOD claim requires successful manipulation, preservation, scorer visibility, and sufficient local ranking susceptibility. Failure of any condition changes the meaning of a null response. Exact group invariance supplies a theoretical zero; Theorem~2 and Lemma~1 replace the remaining binary judgment by scorer-specific quantitative bounds; Proposition~1 and Corollary~1 connect those bounds to ranking and AUROC; and Proposition~2 identifies a concrete spectral attenuation mechanism for Mahalanobis scoring. Global headroom remains a useful warning but is not a substitute for the pairwise margin distribution. None of these conditions supports a universal conclusion that geometry is irrelevant.
+
+The evaluation covers one backbone, one layer, one diagnostic task, five optimization seeds, and four evaluation domain pairs, of which three are locked and same-modality or lesion-matched. Generalization beyond a single encoder is the principal remaining limitation
+and no claim here should be read past it: every statement is, strictly, a
+statement about PanDerm ViT-L/16 and these four evaluation domains. Whether the
+susceptibility ordering across scorers is a property of distance-based OOD
+detection or of this representation cannot be settled with one backbone, and is
+not claimed either way. The three checks of Section~\ref{sec:three} are stated
+at the level of a design rather than a representation precisely because they do
+not depend on that question being settled.
+
+\subsection{Seed extension}
+\label{sec:seeds}
+The second condition of Section~\ref{sec:three} applies to this study's own
+analysis, and identifying a design defect while remaining inside it is a weaker
+position than removing it. The registered seed set of five was therefore
+extended to ten, by continuing the registered arithmetic rule rather than by
+selecting seeds, with every analysis rerun on all ten and both sets reported.
+The extension is logged as a protocol deviation. Before any new adapter was
+written, seed 42 was retrained and asserted bit-identical to the stored one on
+all four tensors, so the added seeds come from the registered training path
+rather than a re-implementation of it.
+
+\begin{table}[t]
+\centering
+\caption{Every conclusion at five and at ten seeds. The permutation floor is $1/k!$ exhaustively and $1/n$ when sampled; at ten seeds $10!$ is not enumerable and 20{,}000 arrangements are drawn, which lowers the floor to $5\times10^{-5}$ and leaves it below Holm's threshold.}
+\label{tab:seeds}
+\small
+\begin{tabular}{lrr}
+\toprule
+& Five seeds & Ten seeds\\
+\midrule
+Permutation floor & $8.3\times10^{-3}$ & $5.0\times10^{-5}$\\
+Holm's first threshold, $m{=}16$ & \multicolumn{2}{c}{$3.1\times10^{-3}$}\\
+Family reachable & no & \textbf{yes}\\
+Associations attaining the floor & 0/16 & \textbf{0/16}\\
+Associations surviving Holm & 0/16 & \textbf{0/16}\\
+\midrule
+Matched pairs at caliper $.25$ & 10 & 27\\
+Worst $|$SMD$|$ & .137 & .021\\
+Cosine contrast & $-.00853^\ast$ & $-.01015^\ast$\\
+$k$-NN contrast & $-.00072$ & $-.00121^\ast$\\
+KDE contrast & $-.00025$ & $-.00044^\ast$\\
+Mahalanobis contrast & $+.00000$ & $-.00001$\\
+\midrule
+$S(\delta_{\mathrm{med}})$, Mahalanobis & .000065 & .000066\\
+$S(\delta_{\mathrm{med}})$, cosine & .0478 & .0472\\
+Mixed-effects interactions surviving Holm & 1/16 & 7/16\\
+Largest $|$coefficient$|$ & .0240 & .0276\\
+\bottomrule
+\end{tabular}
+\par\vspace{2pt}
+\footnotesize $^\ast$ hierarchical interval excludes zero.
+\end{table}
+
+Table~\ref{tab:seeds} reports all four. The first is the one the extension was
+run for and it is the one that matters most. At five seeds the permutation
+family could not reject whatever the data showed, so its null carried no
+information about the phenomenon. At ten seeds it can reject, and the result is
+still zero of sixteen. The null was not an artifact of the unreachable
+threshold; removing the constraint leaves the conclusion where it was, which is
+what a design defect should do when the defect was not the reason for the
+finding.
+
+The matched contrast strengthens rather than dilutes. Ten seeds yield 27 pairs
+against 10 and reduce the worst standardised mean difference from $.137$ to
+$.021$; every contrast grows, and where five seeds resolved cosine alone, ten resolve $k$-NN and KDE as well. This
+is the same direction as the fine-grid result of Section~5: on this pair, better
+balance makes the effect larger, so thin support was suppressing it rather than
+manufacturing it.
+
+Susceptibility is unchanged to the fourth decimal and the ordering across the
+four scorers is identical, which says the five-seed estimate was already stable
+rather than fortunate. The mixed-effects family moves from one surviving
+interaction to seven, as more seeds should do to a parametric test that was
+never subject to the permutation floor; the largest coefficient is $.0276$
+AUROC per standard deviation, about three percent of the AUROC scale, and the
+seven span all four scorers. Both halves of the reading that section already
+gave --- small, and dependent on which scorer is asked --- hold on seven points
+more firmly than they did on one.
+
+Five seeds estimate the seed-level variance component coarsely, so hierarchical intervals are narrower than a seed-only analysis and should not be read as though more seeds were available. The observed between-seed spread of the paired contrast exceeds the Hanley--McNeil sampling standard error by up to a factor of two for cosine, and minimum detectable effects here are computed from the observed spread rather than the formula for that reason. PH2 contributes 200 OOD images, which yields a minimum detectable effect of .059 for cosine; it is retained as a second point on the difficulty ladder and does not stand alone.
+
+LID and spectral slope are correlated at $-.836$ on the calibration pair, so ``after geometry is accounted for'' is ambiguous there in a way it is less so on the external pairs ($-.53$ to $-.64$); matching on a two-coordinate $G$ whose coordinates are nearly redundant is closer to matching on one. RQ3 matches slope alone at $\gamma=.01$; as reported in Section~\ref{sec:rq2-manipulation}, LID remains 0.26 below target on the calibration pair, averaged over five seeds.
+
+Two numerical properties of the retained analyses were found late and are
+recorded because each changes how a table should be read. The hierarchical
+bootstrap originally reported the mean of its replicates as the estimate; the
+point estimate is reported now, and the two differ by about $2.4\times10^{-4}$,
+which is a tenth of the cosine $C-A$ contrast and larger than the $k$-NN one.
+Any bootstrap mean quoted at three or more decimals in a study of this size is
+quoting its own Monte Carlo error. Separately, the raw embeddings' within-class
+scatter is numerically rank $d-1$ --- the class-centred data's smallest singular
+value is $3.95\times10^{-7}$ against $5.47\times10^{-3}$ for the next --- and a
+full-range log-eigenvalue fit that keeps that eigenvalue inflates the
+$\alpha=0$ spectral slope by 2.2\%, against slope differences of about 0.1\%
+under discussion elsewhere. A relative numerical rank cutoff now removes it.
+
+One provenance gap is reported rather than papered over. An earlier draft of this analysis recorded a different significant triple, with $p$-values three orders of magnitude smaller than any retained configuration set reproduces, and the script that produced it is not among the retained artifacts. The coefficients in that record agree with the reconstruction in sign and order of magnitude, so the analysis was evidently run; what cannot be recovered is the population or model specification it was run on. The values reported above are the reconstruction, on a named and retained configuration set. This affects the exploratory table only, and no conclusion in this manuscript rests on it.
+
+The near-duplicate screen operates in encoder space because the ISIC source images were not retained. It is a weaker instrument than a perceptual hash for exact or cropped duplicates, though a stronger one for the same lesion rephotographed, and it can only fail to find evidence of overlap rather than establish its absence.
+
+\section{Conclusion}
+A flat AUROC curve under a representation intervention is not self-interpreting.
+It is consistent with a scorer protected by an invariance, with a scorer unable
+to respond to anything, and with an analysis unable to reject whatever it
+observes; and a curve that is \emph{not} flat is consistent with an operator
+being measured against the domain it was built from. The three tests that
+separate these are cheap and none of them requires more data. Local ranking
+susceptibility needs image-level scores, which regenerate if they were not
+kept. The correction-family check is one division, available when the analysis
+plan is written; where it fails, the repair is more seeds, and we report what
+the repair changed rather than only that it was made. The construction-target check is one inner product, available
+from the operator's definition.
+
+We apply them to a frozen dermatology foundation model and four evaluation
+domains. Within that example, targeted geometry moves while in-distribution
+task utility is non-inferior to baseline for any margin above $.0022$; local
+susceptibility separates the four scorers by three orders of magnitude and
+identifies one whose flat response is insensitivity rather than invariance;
+changing geometry changes ranking reproducibly across three locked external
+domains; and holding geometry fixed, the intervention that produced a
+configuration adds nothing on any domain its operator was not constructed from.
+On the domain it \emph{was} constructed from, it adds a great deal, and more as
+the matching improves.
+
+Those values belong to this representation. The three tests do not, and they
+are the part we would ask a reader to take away. The most consequential
+sentence in a distance-based reliability study is often the one reporting that
+nothing happened, and it is the sentence most rarely accompanied by evidence
+that something could have.
+
+\section*{Data and Code Availability}
+\label{sec:availability}
+All analysis code, the frozen embedding artifact manifest, per-configuration
+scores and every table in this manuscript are in a version-controlled
+repository whose history is the audit trail for the ordering described below.
+The pretrained backbone is not vendored; it is pinned by SHA-256 against the
+release published by its authors. Image-level score vectors are regenerable
+from the frozen artifact and the retained adapters by a single script, and the
+regeneration is checked against the stored aggregates before any downstream
+analysis runs.
+
+\section*{Protocol Registration}
+This study followed an internal pre-registration frozen on 2026-08-04, before
+any experiment in the dose ladder was run. It is an internal dated record, not
+a filing with a registry, and it has no platform-based standing; the claim it
+supports is that the hypotheses, outcomes and analysis plan were fixed before
+the experiments, not that a third party attested to the date.
+
+\textbf{The registered primary hypothesis is not the one this manuscript
+answers, and the change is not visible from the paper alone.} The frozen
+protocol states a hypothesis about mediation: that the dissociation between
+probe-decodability and distance-based estimator performance is a general
+property of representation-reshaping interventions, mediated by representation
+geometry rather than by the intervention family or the architecture. That
+hypothesis was tested and the experiment is retained. Across ten
+configurations a linear probe recovered acquisition-domain identity with AUROC
+between $.99999$ and $1.00000$ while Mahalanobis AUROC on the same
+representations ran $.9983$ to $.9984$, and the paired difference was
+significant in nine of ten with $p$ between $2.5\times10^{-5}$ and
+$8.4\times10^{-8}$.
+
+It was replaced for a reason internal to the argument rather than to the
+result. For Mahalanobis, the covariance structure $\Sigma$ and the class-mean
+separation are not two inputs to distinct processes whose relative contribution
+can be apportioned; they are both parameters of the single expression
+$(z-\mu)^\top\Sigma^{-1}(z-\mu)$. Asking whether geometry or information content
+accounts for the estimator's behaviour presupposes a separation the estimator's
+own definition does not make. The invariance formalization here answers what
+that question was reaching for --- what a scorer can register, and at what
+quantitative cost --- without requiring the decomposition.
+
+Two things follow that a reader should have. The dissociation measurement is
+not withdrawn or contradicted; what was withdrawn is the causal-mediation
+reading of it. And the columns supporting it remain in the released run matrix,
+so the branch is recoverable rather than deleted. We state this here because
+the difference between a registered protocol and a submitted paper is exactly
+what a registration section exists to disclose, and a reader comparing the two
+would otherwise have to infer the reason.
+
+The external-validation phase was registered differently and more strongly. Its
+protocol --- the label mapping and exclusions for both external sources, the
+overlap screen and its calibrated threshold, the frozen scorer and intervention
+settings, the per-pair reporting rule, and three predictions --- was committed
+to the repository before any external image was encoded, and the ordering of
+those commits is verifiable in the repository history rather than asserted.
+
+\begin{table}[t]
+\centering
+\caption{Registered predictions for the external phase, recorded before any external image was encoded, and their outcomes.}
+\label{tab:prereg}
+\small
+\begin{tabular}{p{5.4cm}p{7.4cm}}
+\toprule
+Prediction & Outcome\\
+\midrule
+Mahalanobis remains flat on every pair; $S/\mathrm{MDE}<1$ throughout, so headroom does not rescue it &
+Held. $S/\mathrm{MDE}$ reaches at most $.355$, on every pair, including where baseline AUROC falls to $.836$\\
+\addlinespace
+The same-modality pair yields lower AUROC than the cross-modality calibration pair; if it is also near-ceiling the phase has failed to deliver headroom and that is reported as a null &
+Held. Baseline cosine AUROC $.9805\rightarrow.7805$, and $.6322$ on PH2\\
+\addlinespace
+The clinical arm of the same lesions is easier to separate from dermoscopic ID than the dermoscopic arm &
+Held. $+.154$ AUROC for cosine, $+.075$ $k$-NN, $+.061$ Mahalanobis, $+.038$ KDE, on identical lesions\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Recording the first prediction mattered for how the result is read. It was
+derived from the calibration pair's own scores before any external data
+existed, so its confirmation is a successful prediction rather than a
+post-hoc explanation of Mahalanobis's flatness. The stopping rule was also
+fixed in advance: had the overlap screen demoted both external sources, the
+phase would report the screen and stop, since searching for a source that
+passes is selection on the outcome.
+
+\backmatter
+
+\section*{Declarations}
+
+\bmhead{Funding} No external funding was received for this work.
+
+\bmhead{Competing interests} The authors declare no competing interests.
+
+\bmhead{Ethics approval and consent to participate} Not applicable. The study
+uses only previously published, de-identified image corpora.
+
+\bmhead{Consent for publication} Not applicable.
+
+\bmhead{Data availability} The evaluation corpora are public: ISIC~2019,
+PAD-UFES-20, Derm7pt and PH2, each cited in the text and used under the licence
+its distributor sets. Derived data supporting the findings --- the frozen
+embedding manifest, per-configuration geometry and scores, per-example score
+vectors, and the outputs that generate every table --- are in the
+version-controlled repository described above. The pretrained backbone is not
+redistributed; it is pinned by SHA-256 against the release published by its
+authors.
+
+\bmhead{Materials availability} Not applicable.
+
+\bmhead{Code availability} All analysis code is in the same repository,
+including the scripts that regenerate every table in this manuscript.
+
+\bmhead{Author contribution} D.-V.T. designed and implemented the experiments,
+performed the analysis, and drafted the manuscript. Q.-T.H. supervised the
+work, audited the analysis, and revised the manuscript. Both authors read and
+approved the final version.
+
+\bibliography{Paper4_DMKD}
+
+\end{document}

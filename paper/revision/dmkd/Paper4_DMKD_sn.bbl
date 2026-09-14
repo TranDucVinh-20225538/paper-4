@@ -1,0 +1,133 @@
+\begin{thebibliography}{27}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{\url{https://doi.org/#1}}
+\providecommand{\eprint}[2][]{\url{#2}}
+ \bibcommenthead
+
+\bibitem[{Ahmadian et~al.(2024)Ahmadian, Ding, Eilertsen, and
+  Lindsten}]{ahmadian2024unsupervised}
+Ahmadian A, Ding Y, Eilertsen G, et~al (2024) Unsupervised novelty detection in
+  pretrained representation space with locally adapted likelihood ratio. In:
+  Proceedings of the 27th International Conference on Artificial Intelligence
+  and Statistics, pp 874--882
+
+\bibitem[{Austin(2011)}]{austin2011introduction}
+Austin PC (2011) An introduction to propensity score methods for reducing the
+  effects of confounding in observational studies. Multivariate Behavioral
+  Research 46(3):399--424
+
+\bibitem[{Bates et~al.(2015)Bates, M{\"a}chler, Bolker, and
+  Walker}]{bates2015fitting}
+Bates D, M{\"a}chler M, Bolker B, et~al (2015) Fitting linear mixed-effects
+  models using {lme4}. Journal of Statistical Software 67(1):1--48
+
+\bibitem[{Bishop(1994)}]{bishop1994novelty}
+Bishop CM (1994) Novelty detection and neural network validation. IEE
+  Proceedings -- Vision, Image and Signal Processing 141(4):217--222
+
+\bibitem[{Codella et~al.(2018)}]{codella2018skin}
+Codella NCF, et~al (2018) Skin lesion analysis toward melanoma detection. In:
+  IEEE International Symposium on Biomedical Imaging, pp 168--172
+
+\bibitem[{Eaton(1989)}]{eaton1989group}
+Eaton ML (1989) Group Invariance Applications in Statistics. Institute of
+  Mathematical Statistics, Hayward, CA
+
+\bibitem[{Edgington and Onghena(2007)}]{edgington2007randomization}
+Edgington ES, Onghena P (2007) Randomization Tests, 4th edn. Chapman \&
+  Hall/CRC, Boca Raton, FL
+
+\bibitem[{Fawcett(2006)}]{fawcett2006introduction}
+Fawcett T (2006) An introduction to {ROC} analysis. Pattern Recognition Letters
+  27(8):861--874
+
+\bibitem[{Fogelberg et~al.(2023)Fogelberg, Maron, Chamarthi, Niebling, and
+  Brinker}]{fogelberg2023domain}
+Fogelberg K, Maron RC, Chamarthi S, et~al (2023) Domain shifts in dermoscopic
+  skin cancer datasets: evaluation of essential limitations for clinical
+  translation. arXiv preprint arXiv:230406968
+
+\bibitem[{Hern{\'a}ndez-P{\'e}rez et~al.(2024)}]{hernandez2024bcn20000}
+Hern{\'a}ndez-P{\'e}rez C, et~al (2024) {BCN20000}: dermoscopic lesions in the
+  wild. Scientific Data 11:641
+
+\bibitem[{Holm(1979)}]{holm1979simple}
+Holm S (1979) A simple sequentially rejective multiple test procedure.
+  Scandinavian Journal of Statistics 6(2):65--70
+
+\bibitem[{Huang et~al.(2024)}]{huang2024ldreg}
+Huang H, et~al (2024) {LDReg}: local dimensionality regularized self-supervised
+  learning. In: International Conference on Learning Representations
+
+\bibitem[{Janiak et~al.(2025)Janiak, Binkowski, and
+  Kajdanowicz}]{janiak2025dissecting}
+Janiak D, Binkowski J, Kajdanowicz T (2025) Dissecting {M}ahalanobis: how
+  feature geometry and normalization shape {OOD} detection. arXiv preprint
+  arXiv:251015202
+
+\bibitem[{Kessy et~al.(2018)Kessy, Lewin, and Strimmer}]{kessy2018optimal}
+Kessy A, Lewin A, Strimmer K (2018) Optimal whitening and decorrelation. The
+  American Statistician 72(4):309--314
+
+\bibitem[{Lee et~al.(2018)Lee, Lee, Lee, and Shin}]{lee2018simple}
+Lee K, Lee K, Lee H, et~al (2018) A simple unified framework for detecting
+  out-of-distribution samples and adversarial attacks. In: Advances in Neural
+  Information Processing Systems
+
+\bibitem[{Levina and Bickel(2004)}]{levina2004maximum}
+Levina E, Bickel PJ (2004) Maximum likelihood estimation of intrinsic
+  dimension. In: Advances in Neural Information Processing Systems
+
+\bibitem[{Li et~al.(2026)Li, Eustratiadis, and Kanoulas}]{li2026spectral}
+Li Y, Eustratiadis P, Kanoulas E (2026) Spectral tempering for embedding
+  compression in dense passage retrieval. arXiv preprint arXiv:260319339
+
+\bibitem[{Loshchilov and Hutter(2019)}]{loshchilov2019decoupled}
+Loshchilov I, Hutter F (2019) Decoupled weight decay regularization. In:
+  International Conference on Learning Representations
+
+\bibitem[{Pacheco et~al.(2020)}]{pacheco2020pad}
+Pacheco AGC, et~al (2020) {PAD-UFES-20}: a skin lesion dataset composed of
+  patient data and clinical images collected from smartphones. Data in Brief
+  32:106221
+
+\bibitem[{Rebuffi et~al.(2017)Rebuffi, Bilen, and
+  Vedaldi}]{rebuffi2017learning}
+Rebuffi SA, Bilen H, Vedaldi A (2017) Learning multiple visual domains with
+  residual adapters. In: Advances in Neural Information Processing Systems
+
+\bibitem[{Saravanan et~al.(2020)Saravanan, Berman, and
+  Sober}]{saravanan2020application}
+Saravanan V, Berman GJ, Sober SJ (2020) Application of the hierarchical
+  bootstrap to multi-level data in neuroscience. Neuron 107(5):819--828.e6
+
+\bibitem[{Sultana et~al.(2025)Sultana, Lu, Fan, and Yap}]{sultana2025selective}
+Sultana N, Lu W, Fan X, et~al (2025) Selective alignment transfer for domain
+  adaptation in skin lesion analysis. In: Medical Image Computing and Computer
+  Assisted Intervention, pp 596--606
+
+\bibitem[{Sun et~al.(2022)Sun, Ming, Zhu, and Li}]{sun2022ood}
+Sun Y, Ming Y, Zhu X, et~al (2022) Out-of-distribution detection with deep
+  nearest neighbors. In: Proceedings of the 39th International Conference on
+  Machine Learning, pp 20827--20840
+
+\bibitem[{Tschandl et~al.(2018)Tschandl, Rosendahl, and
+  Kittler}]{tschandl2018ham10000}
+Tschandl P, Rosendahl C, Kittler H (2018) The {HAM10000} dataset. Scientific
+  Data 5:180161
+
+\bibitem[{Walker and Nowacki(2011)}]{walker2011understanding}
+Walker E, Nowacki AS (2011) Understanding equivalence and noninferiority
+  testing. Journal of General Internal Medicine 26(2):192--196
+
+\bibitem[{Weng et~al.(2024)}]{weng2024modulate}
+Weng X, et~al (2024) Modulate your spectrum in self-supervised learning. In:
+  International Conference on Learning Representations
+
+\bibitem[{Yan et~al.(2025)}]{yan2025multimodal}
+Yan S, et~al (2025) A multimodal vision foundation model for clinical
+  dermatology. Nature Medicine 31:2691--2702
+
+\end{thebibliography}
