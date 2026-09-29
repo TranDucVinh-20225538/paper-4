@@ -21,7 +21,13 @@ from sklearn.metrics import roc_auc_score
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "analysis"))
-from rq1_susceptibility import margin_mass, ratio_mass, SEEDS, SCORERS  # noqa: E402
+from rq1_susceptibility import margin_mass, ratio_mass, SEEDS_5, SCORERS  # noqa: E402
+
+# The external domains were scored once, at the five registered seeds. D-2
+# extended the seed set for the primary domain's permutation families and did
+# not touch Phase 3, so importing the extended list here asks for scores that
+# were never computed and were never claimed.
+SEEDS = SEEDS_5
 
 OUT = ROOT / "outputs" / "phase3"
 PE = OUT / "per_example"
