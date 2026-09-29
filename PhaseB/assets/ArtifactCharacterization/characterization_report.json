@@ -2,7 +2,7 @@
   "protocol_step": "Stage 3.1 -- Artifact Characterization",
   "date": "2026-08-05",
   "timestamp": "2026-08-04T21:19:37.326060+00:00",
-  "artifact_dir": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+  "artifact_dir": "{repo}/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
   "basic": {
     "shape": [
       7365,
@@ -81,7 +81,7 @@
     "known_issues_note": "17 groups of pixel-identical images (34 rows) found in the preregistered ISIC 2019 / PAD-UFES-20 datasets, detected via bitwise-identical embedding vectors and independently confirmed via pixel-array comparison. 13/17 of these groups carry conflicting diagnostic labels for the same pixel-identical image. (Issue #1, logged, no action taken). 34/7365 rows (~0.46%) are pixel-identical duplicate pairs, included as-is per Stage 3.0's 'no action taken' decision. Their contribution to the descriptive statistics below is a small, symmetric double-count (each pair counted twice), not expected to shift any pooled statistic meaningfully at this sample size -- noted for completeness, not asserted as negligible without this note."
   },
   "figures": {
-    "norm_histogram": "/Users/cubo/Research/Paper4/PhaseB/assets/ArtifactCharacterization/norm_histogram.png"
+    "norm_histogram": "{repo}/PhaseB/assets/ArtifactCharacterization/norm_histogram.png"
   },
   "not_computed_here": "No Mahalanobis, no probe accuracy, no LID, no spectral-decay slope, no Energy, no ViM, no KDE, no AUROC, no hypothesis-testing statistic of any kind. Per-domain breakdowns above are descriptive counts/means/percentiles only -- not a separability, distance, or significance claim; no comparison test was run."
 }

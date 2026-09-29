@@ -4,7 +4,7 @@
   "status": "COMPLETE (Group A: domain-leakage probe, geometry metrics, ID task performance, Gate 0). Per-direction variance not computed -- no resolved definition, see not_yet_computed.json. Group B (Mahalanobis-family) lives in the separate, sibling GroupBExecution/ artifact, not inside this one -- see 03d_stage3_5_baseline_synthesis.md for the combined Reference Arm baseline both feed into.",
   "created_at": "2026-08-04T21:52:22.804393+00:00",
   "derived_from": {
-    "reference_embedding_artifact": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+    "reference_embedding_artifact": "{repo}/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
     "issues_register_consulted": "Issue #1 -- not expected to materially affect these baseline measurements at n=7365 (34/7365 rows, ~0.46%)"
   },
   "files": {

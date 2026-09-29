@@ -1,17 +1,17 @@
 {
   "artifact": "Nuisance Direction",
   "protocol_step": "Stage 4 Execution Plan v2, Step 2",
-  "execution_contract": "/Users/cubo/Research/Paper4/PhaseB/NuisanceDirection/execution_contract.md",
-  "produced_by_script": "/Users/cubo/Research/Paper4/PhaseB/analysis/compute_nuisance_direction.py",
+  "execution_contract": "{repo}/PhaseB/NuisanceDirection/execution_contract.md",
+  "produced_by_script": "{repo}/PhaseB/analysis/compute_nuisance_direction.py",
   "method": "closed-form, deterministic -- no optimization, no gradient, no training",
   "formula": "w = unit(mean(ReferenceTrainEmbedding) - mean(ReferenceEmbedding[domain=='pad_ufes']))",
   "fit_artifact_isic": {
-    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding",
+    "path": "{repo}/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding",
     "manifest_status": "FROZEN",
     "n": 16211
   },
   "fit_artifact_pad_ufes": {
-    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+    "path": "{repo}/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
     "manifest_status": "FROZEN",
     "n": 2298
   },

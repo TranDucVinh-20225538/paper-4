@@ -39,3 +39,17 @@ this file is the note that says why.
 The paths in them name one author's home directory. That is a disclosure to
 weigh before the repository is made public, not a correctness problem: nothing
 reads them, because the corpora they point at are gone.
+
+## On the public branch
+
+`public` carries the same history with every recorded path rewritten to the
+`{root}` form and every hash record that covered a rewritten file updated to
+match: 25 files, 54 records, propagated until the registry stopped changing.
+Artifact entries verify clean afterwards.
+
+The analysis scripts are a separate matter. `PROVENANCE.tsv` is a snapshot taken
+on 2026-08-28, and the analysis code has been edited continuously since, so its
+entries for `PhaseB/analysis/*.py` were already stale on `main` before this
+branch existed -- 18 of 79 -- for the ordinary reason that code changed and a
+dated snapshot did not. It pins artifacts, which are frozen, and it does not
+pin code, which is not. Read it that way.

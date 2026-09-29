@@ -5,7 +5,7 @@
   "not_for": ["held-out evaluation", "cross-arm comparison", "claim testing"],
   "execution_amendment": "EA-01",
   "produced_by_protocol_step": "EA-01 implementation (Stage 2.1-equivalent scope, ISIC-train population)",
-  "produced_by_script": "/Users/cubo/Research/Paper4/PhaseB/analysis/ea01_extract_reference_train_embeddings.py",
+  "produced_by_script": "{repo}/PhaseB/analysis/ea01_extract_reference_train_embeddings.py",
   "extraction_started_utc": "2026-08-05T04:08:14.831344+00:00",
   "extraction_finished_utc": "2026-08-05T05:58:47.229908+00:00",
   "n_total": 16211,
@@ -18,12 +18,12 @@
     "note": "isic_train = complement of isic_test within isic_train_val; same split already validated by Stage 1.3a's Dataset Validation gate."
   },
   "instrument": {
-    "checkpoint_metadata": "/Users/cubo/Research/Paper4/PhaseB/assets/panderm_vitl16_checkpoint_metadata.json",
-    "preprocessing_snapshot": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_preprocessing.json",
+    "checkpoint_metadata": "{repo}/PhaseB/assets/panderm_vitl16_checkpoint_metadata.json",
+    "preprocessing_snapshot": "{repo}/PhaseB/assets/reference_preprocessing.json",
     "panderm_repo_commit": "fd7a80748ba7fc3e203fed88f909f4689d0d6f24"
   },
   "csg_skin_commit": "12338983d87a35b3ad040687ad09f04908fb0c55",
-  "metadata_csv": "/Users/cubo/Research/CSG-SKin/data/master_metadata.csv",
+  "metadata_csv": "{csg}/data/master_metadata.csv",
   "files": {
     "embeddings.npy": {
       "sha256": "419ba2c73e95f3b97063f3d6c7fac5fd2faa0393b1a1cc267096b69d730a62df",
@@ -38,7 +38,7 @@
       "rows": 16211
     },
     "metadata.csv": {
-      "sha256": "c6b960a1f991c48ee16208be6469ddfb059c324fc8658a1aef007d62710dcbb3",
+      "sha256": "cb8152668b10649eae331b80d4423e4950cbad1fa39c5ec8f0cc5f2f7670a249",
       "rows": 16211
     }
   },

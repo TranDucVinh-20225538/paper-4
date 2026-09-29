@@ -15,15 +15,15 @@
   },
   "adapter_architecture": "z' = z + W2.GELU(W1.z), bottleneck r=16, zero-init up-projection",
   "orthogonality_target": {
-    "artifact": "/Users/cubo/Research/Paper4/PhaseB/NuisanceDirection/manifest.json",
+    "artifact": "{repo}/PhaseB/NuisanceDirection/manifest.json",
     "formula": "cos(z',w)^2"
   },
   "training_population": {
-    "isic_train_artifact": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding/manifest.json",
-    "pad_ufes_from_artifact": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding/manifest.json",
+    "isic_train_artifact": "{repo}/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding/manifest.json",
+    "pad_ufes_from_artifact": "{repo}/PhaseB/assets/reference_embeddings/ReferenceEmbedding/manifest.json",
     "n_total": 18509
   },
-  "eval_population_artifact": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding/manifest.json",
+  "eval_population_artifact": "{repo}/PhaseB/assets/reference_embeddings/ReferenceEmbedding/manifest.json",
   "per_seed": [
     {
       "seed": 42,

@@ -258,7 +258,7 @@
         "spectral_decay_slope": 0.00680667228713005,
         "condition_number": null,
         "per_direction_variance_w": null,
-        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+        "reused_from": "{repo}/PhaseB/ConventionalArm_Canonical/manifest.json"
       },
       {
         "seed": 52,
@@ -274,7 +274,7 @@
         "spectral_decay_slope": 0.006773683532122842,
         "condition_number": null,
         "per_direction_variance_w": null,
-        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+        "reused_from": "{repo}/PhaseB/ConventionalArm_Canonical/manifest.json"
       },
       {
         "seed": 62,
@@ -290,7 +290,7 @@
         "spectral_decay_slope": 0.006791070330546099,
         "condition_number": null,
         "per_direction_variance_w": null,
-        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+        "reused_from": "{repo}/PhaseB/ConventionalArm_Canonical/manifest.json"
       },
       {
         "seed": 72,
@@ -306,7 +306,7 @@
         "spectral_decay_slope": 0.006784990813169225,
         "condition_number": null,
         "per_direction_variance_w": null,
-        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+        "reused_from": "{repo}/PhaseB/ConventionalArm_Canonical/manifest.json"
       },
       {
         "seed": 82,
@@ -322,7 +322,7 @@
         "spectral_decay_slope": 0.0067800891853162255,
         "condition_number": null,
         "per_direction_variance_w": null,
-        "reused_from": "/Users/cubo/Research/Paper4/PhaseB/ConventionalArm_Canonical/manifest.json"
+        "reused_from": "{repo}/PhaseB/ConventionalArm_Canonical/manifest.json"
       }
     ]
   },

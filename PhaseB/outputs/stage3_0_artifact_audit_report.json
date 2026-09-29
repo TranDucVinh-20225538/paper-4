@@ -2,7 +2,7 @@
   "protocol_step": "Stage 3.0 -- Artifact Audit",
   "date": "2026-08-05",
   "timestamp": "2026-08-04T21:08:32.189527+00:00",
-  "artifact_dir": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+  "artifact_dir": "{repo}/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
   "check_1_file_integrity": {
     "pass": true,
     "per_file": {
@@ -17,8 +17,8 @@
         "match": true
       },
       "metadata.csv": {
-        "expected": "26ad35e05e4a6820ac25f3bb21541653c09936c0b4433f1715ec23196fae72e5",
-        "recomputed": "26ad35e05e4a6820ac25f3bb21541653c09936c0b4433f1715ec23196fae72e5",
+        "expected": "2e8221a06f65f721a4cad7c45991dca1147c980fc06be69083f9b2ce59d8cffe",
+        "recomputed": "2e8221a06f65f721a4cad7c45991dca1147c980fc06be69083f9b2ce59d8cffe",
         "match": true
       }
     },
@@ -42,8 +42,8 @@
             1550
           ],
           "paths": [
-            "/Users/cubo/Research/Paper4/archive/BKL/ISIC_0060857.jpg",
-            "/Users/cubo/Research/Paper4/archive/BKL/ISIC_0059011.jpg"
+            "{archive}/BKL/ISIC_0060857.jpg",
+            "{archive}/BKL/ISIC_0059011.jpg"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -58,8 +58,8 @@
             6205
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_380_1540_959.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_380_773_362.png"
+            "{csg}/data/pad_ufes20/images/PAT_380_1540_959.png",
+            "{csg}/data/pad_ufes20/images/PAT_380_773_362.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -74,8 +74,8 @@
             5955
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_759_1538_566.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_759_1433_914.png"
+            "{csg}/data/pad_ufes20/images/PAT_759_1538_566.png",
+            "{csg}/data/pad_ufes20/images/PAT_759_1433_914.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -90,8 +90,8 @@
             6820
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_302_651_529.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_302_650_477.png"
+            "{csg}/data/pad_ufes20/images/PAT_302_651_529.png",
+            "{csg}/data/pad_ufes20/images/PAT_302_650_477.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -106,8 +106,8 @@
             6424
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_701_4056_457.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_701_1321_156.png"
+            "{csg}/data/pad_ufes20/images/PAT_701_4056_457.png",
+            "{csg}/data/pad_ufes20/images/PAT_701_1321_156.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -122,8 +122,8 @@
             6986
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_56_86_479.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_56_88_274.png"
+            "{csg}/data/pad_ufes20/images/PAT_56_86_479.png",
+            "{csg}/data/pad_ufes20/images/PAT_56_88_274.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -138,8 +138,8 @@
             5925
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_691_3994_671.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_691_1311_2.png"
+            "{csg}/data/pad_ufes20/images/PAT_691_3994_671.png",
+            "{csg}/data/pad_ufes20/images/PAT_691_1311_2.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -154,8 +154,8 @@
             5604
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_38_1002_34.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_38_1003_68.png"
+            "{csg}/data/pad_ufes20/images/PAT_38_1002_34.png",
+            "{csg}/data/pad_ufes20/images/PAT_38_1003_68.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -170,8 +170,8 @@
             7278
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_202_307_424.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_202_308_721.png"
+            "{csg}/data/pad_ufes20/images/PAT_202_307_424.png",
+            "{csg}/data/pad_ufes20/images/PAT_202_308_721.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -186,8 +186,8 @@
             6565
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_570_1085_429.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_570_1084_939.png"
+            "{csg}/data/pad_ufes20/images/PAT_570_1085_429.png",
+            "{csg}/data/pad_ufes20/images/PAT_570_1084_939.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -202,8 +202,8 @@
             6699
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_311_666_191.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_311_667_416.png"
+            "{csg}/data/pad_ufes20/images/PAT_311_666_191.png",
+            "{csg}/data/pad_ufes20/images/PAT_311_667_416.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -218,8 +218,8 @@
             6059
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_528_3072_615.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_528_993_589.png"
+            "{csg}/data/pad_ufes20/images/PAT_528_3072_615.png",
+            "{csg}/data/pad_ufes20/images/PAT_528_993_589.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -234,8 +234,8 @@
             6917
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_38_1003_226.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_38_1002_668.png"
+            "{csg}/data/pad_ufes20/images/PAT_38_1003_226.png",
+            "{csg}/data/pad_ufes20/images/PAT_38_1002_668.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -250,8 +250,8 @@
             6991
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_419_2767_323.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_419_833_148.png"
+            "{csg}/data/pad_ufes20/images/PAT_419_2767_323.png",
+            "{csg}/data/pad_ufes20/images/PAT_419_833_148.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -266,8 +266,8 @@
             7049
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_834_1574_276.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_834_1572_430.png"
+            "{csg}/data/pad_ufes20/images/PAT_834_1574_276.png",
+            "{csg}/data/pad_ufes20/images/PAT_834_1572_430.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -282,8 +282,8 @@
             6406
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_691_3994_791.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_691_1311_890.png"
+            "{csg}/data/pad_ufes20/images/PAT_691_3994_791.png",
+            "{csg}/data/pad_ufes20/images/PAT_691_1311_890.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -298,8 +298,8 @@
             7065
           ],
           "paths": [
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_570_1084_637.png",
-            "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_570_1085_344.png"
+            "{csg}/data/pad_ufes20/images/PAT_570_1084_637.png",
+            "{csg}/data/pad_ufes20/images/PAT_570_1085_344.png"
           ],
           "pixel_identical_confirmed": true,
           "label_names": [
@@ -334,76 +334,76 @@
         "row_index": 632,
         "domain": "isic",
         "label_name": "BKL",
-        "path": "/Users/cubo/Research/Paper4/archive/BKL/ISIC_0033322.jpg"
+        "path": "{archive}/BKL/ISIC_0033322.jpg"
       },
       {
         "row_index": 656,
         "domain": "isic",
         "label_name": "NV",
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0072088.jpg"
+        "path": "{archive}/NV/ISIC_0072088.jpg"
       },
       {
         "row_index": 693,
         "domain": "isic",
         "label_name": "DF",
-        "path": "/Users/cubo/Research/Paper4/archive/DF/ISIC_0061232.jpg"
+        "path": "{archive}/DF/ISIC_0061232.jpg"
       },
       {
         "row_index": 1483,
         "domain": "isic",
         "label_name": "NV",
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0033724.jpg"
+        "path": "{archive}/NV/ISIC_0033724.jpg"
       },
       {
         "row_index": 3186,
         "domain": "isic",
         "label_name": "NV",
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0058012.jpg"
+        "path": "{archive}/NV/ISIC_0058012.jpg"
       },
       {
         "row_index": 3228,
         "domain": "isic",
         "label_name": "NV",
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0063914.jpg"
+        "path": "{archive}/NV/ISIC_0063914.jpg"
       },
       {
         "row_index": 3876,
         "domain": "isic",
         "label_name": "MEL",
-        "path": "/Users/cubo/Research/Paper4/archive/MEL/ISIC_0033725.jpg"
+        "path": "{archive}/MEL/ISIC_0033725.jpg"
       },
       {
         "row_index": 4815,
         "domain": "isic",
         "label_name": "NV",
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0029537.jpg"
+        "path": "{archive}/NV/ISIC_0029537.jpg"
       },
       {
         "row_index": 5133,
         "domain": "pad_ufes",
         "label_name": "AK",
-        "path": "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_2025_4229_541.png"
+        "path": "{csg}/data/pad_ufes20/images/PAT_2025_4229_541.png"
       },
       {
         "row_index": 5692,
         "domain": "pad_ufes",
         "label_name": "AK",
-        "path": "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_1170_608_367.png"
+        "path": "{csg}/data/pad_ufes20/images/PAT_1170_608_367.png"
       },
       {
         "row_index": 6318,
         "domain": "pad_ufes",
         "label_name": "BCC",
-        "path": "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_67_104_695.png"
+        "path": "{csg}/data/pad_ufes20/images/PAT_67_104_695.png"
       },
       {
         "row_index": 7185,
         "domain": "pad_ufes",
         "label_name": "AK",
-        "path": "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_878_1663_7.png"
+        "path": "{csg}/data/pad_ufes20/images/PAT_878_1663_7.png"
       }
     ],
-    "montage_path": "/Users/cubo/Research/Paper4/PhaseB/outputs/stage3_0_sample_montage.png"
+    "montage_path": "{repo}/PhaseB/outputs/stage3_0_sample_montage.png"
   },
   "check_5_reproducibility_spotcheck": {
     "pass": true,
@@ -411,84 +411,84 @@
     "per_row": [
       {
         "row_index": 632,
-        "path": "/Users/cubo/Research/Paper4/archive/BKL/ISIC_0033322.jpg",
+        "path": "{archive}/BKL/ISIC_0033322.jpg",
         "max_abs_diff": 2.771615982055664e-06,
         "cosine_similarity": 1.0,
         "pass": true
       },
       {
         "row_index": 656,
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0072088.jpg",
+        "path": "{archive}/NV/ISIC_0072088.jpg",
         "max_abs_diff": 7.62939453125e-06,
         "cosine_similarity": 1.0,
         "pass": true
       },
       {
         "row_index": 693,
-        "path": "/Users/cubo/Research/Paper4/archive/DF/ISIC_0061232.jpg",
+        "path": "{archive}/DF/ISIC_0061232.jpg",
         "max_abs_diff": 3.814697265625e-06,
         "cosine_similarity": 0.9999999403953552,
         "pass": true
       },
       {
         "row_index": 1483,
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0033724.jpg",
+        "path": "{archive}/NV/ISIC_0033724.jpg",
         "max_abs_diff": 2.86102294921875e-06,
         "cosine_similarity": 1.0000001192092896,
         "pass": true
       },
       {
         "row_index": 3186,
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0058012.jpg",
+        "path": "{archive}/NV/ISIC_0058012.jpg",
         "max_abs_diff": 2.6226043701171875e-06,
         "cosine_similarity": 1.0,
         "pass": true
       },
       {
         "row_index": 3228,
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0063914.jpg",
+        "path": "{archive}/NV/ISIC_0063914.jpg",
         "max_abs_diff": 6.67572021484375e-06,
         "cosine_similarity": 1.0000001192092896,
         "pass": true
       },
       {
         "row_index": 3876,
-        "path": "/Users/cubo/Research/Paper4/archive/MEL/ISIC_0033725.jpg",
+        "path": "{archive}/MEL/ISIC_0033725.jpg",
         "max_abs_diff": 6.67572021484375e-06,
         "cosine_similarity": 1.0000001192092896,
         "pass": true
       },
       {
         "row_index": 4815,
-        "path": "/Users/cubo/Research/Paper4/archive/NV/ISIC_0029537.jpg",
+        "path": "{archive}/NV/ISIC_0029537.jpg",
         "max_abs_diff": 2.384185791015625e-06,
         "cosine_similarity": 0.9999999403953552,
         "pass": true
       },
       {
         "row_index": 5133,
-        "path": "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_2025_4229_541.png",
+        "path": "{csg}/data/pad_ufes20/images/PAT_2025_4229_541.png",
         "max_abs_diff": 3.814697265625e-06,
         "cosine_similarity": 0.9999998807907104,
         "pass": true
       },
       {
         "row_index": 5692,
-        "path": "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_1170_608_367.png",
+        "path": "{csg}/data/pad_ufes20/images/PAT_1170_608_367.png",
         "max_abs_diff": 7.62939453125e-06,
         "cosine_similarity": 0.9999998807907104,
         "pass": true
       },
       {
         "row_index": 6318,
-        "path": "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_67_104_695.png",
+        "path": "{csg}/data/pad_ufes20/images/PAT_67_104_695.png",
         "max_abs_diff": 4.76837158203125e-06,
         "cosine_similarity": 0.9999998807907104,
         "pass": true
       },
       {
         "row_index": 7185,
-        "path": "/Users/cubo/Research/CSG-SKin/data/pad_ufes20/images/PAT_878_1663_7.png",
+        "path": "{csg}/data/pad_ufes20/images/PAT_878_1663_7.png",
         "max_abs_diff": 9.5367431640625e-06,
         "cosine_similarity": 0.9999998807907104,
         "pass": true

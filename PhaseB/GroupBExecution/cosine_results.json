@@ -1,15 +1,15 @@
 {
   "scorer": "cosine_to_centroid",
   "protocol_step": "Stage 3.2 Group B (Mahalanobis-family)",
-  "execution_contract": "/Users/cubo/Research/Paper4/PhaseB/GroupBExecution/execution_contract.md",
-  "produced_by_script": "/Users/cubo/Research/Paper4/PhaseB/analysis/groupB_mahalanobis_family.py",
+  "execution_contract": "{repo}/PhaseB/GroupBExecution/execution_contract.md",
+  "produced_by_script": "{repo}/PhaseB/analysis/groupB_mahalanobis_family.py",
   "fit_artifact": {
-    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding",
+    "path": "{repo}/PhaseB/assets/reference_embeddings/ReferenceTrainEmbedding",
     "manifest_status": "FROZEN",
     "n": 16211
   },
   "eval_artifact": {
-    "path": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
+    "path": "{repo}/PhaseB/assets/reference_embeddings/ReferenceEmbedding",
     "manifest_status": "FROZEN",
     "n_id": 5067,
     "n_ood": 2298

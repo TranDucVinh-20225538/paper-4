@@ -1,7 +1,7 @@
 {
   "stage": "1.3 -- Batch Inference Validation",
   "date": "2026-08-05",
-  "image_source": "/Users/cubo/Research/DST-Skin/reader_images_96",
+  "image_source": "{dst_skin_images}",
   "n_images_total": 96,
   "n_images_attempted": 96,
   "n_images_succeeded": 96,

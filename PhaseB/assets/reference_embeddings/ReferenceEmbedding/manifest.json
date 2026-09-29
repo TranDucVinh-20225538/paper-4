@@ -5,11 +5,11 @@
   "dim": 1024,
   "n_id_isic": 5067,
   "n_ood_pad_ufes": 2298,
-  "checkpoint": "/Users/cubo/Research/Paper4/PhaseB/assets/panderm_vitl16_checkpoint_metadata.json",
-  "preprocessing": "/Users/cubo/Research/Paper4/PhaseB/assets/reference_preprocessing.json",
+  "checkpoint": "{repo}/PhaseB/assets/panderm_vitl16_checkpoint_metadata.json",
+  "preprocessing": "{repo}/PhaseB/assets/reference_preprocessing.json",
   "dataset": {
-    "metadata_csv": "/Users/cubo/Research/CSG-SKin/data/master_metadata.csv",
-    "dataset_validation_report": "/Users/cubo/Research/Paper4/PhaseB/outputs/dataset_validation_report.json",
+    "metadata_csv": "{csg}/data/master_metadata.csv",
+    "dataset_validation_report": "{repo}/PhaseB/outputs/dataset_validation_report.json",
     "split_seed": 42,
     "isic_test_fraction": 0.2,
     "val_fraction": 0.2
@@ -32,7 +32,7 @@
       "rows": 7365
     },
     "metadata.csv": {
-      "sha256": "26ad35e05e4a6820ac25f3bb21541653c09936c0b4433f1715ec23196fae72e5",
+      "sha256": "2e8221a06f65f721a4cad7c45991dca1147c980fc06be69083f9b2ce59d8cffe",
       "rows": 7365
     }
   },

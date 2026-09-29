@@ -6,7 +6,7 @@
     "reference_embedding_artifact": "assets/reference_embeddings/ReferenceEmbedding/",
     "reference_embedding_manifest": "assets/reference_embeddings/ReferenceEmbedding/manifest.json",
     "embeddings.npy_sha256": "3a12b0e08440e63f4a6a2821705d1947a3063a4543c80d1ceafa323902eac9ff",
-    "metadata.csv_sha256": "26ad35e05e4a6820ac25f3bb21541653c09936c0b4433f1715ec23196fae72e5"
+    "metadata.csv_sha256": "2e8221a06f65f721a4cad7c45991dca1147c980fc06be69083f9b2ce59d8cffe"
   },
   "known_issues_consulted": {
     "register": "assets/ArtifactIssuesRegister/issues_register.json",

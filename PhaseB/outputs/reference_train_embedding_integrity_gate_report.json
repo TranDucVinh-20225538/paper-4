@@ -15,6 +15,6 @@
   "structural_checks_pass": true,
   "sha256_embeddings_npy": "419ba2c73e95f3b97063f3d6c7fac5fd2faa0393b1a1cc267096b69d730a62df",
   "sha256_labels_csv": "d32f22700f352d15d5d067f89f26863af6eb37c1793649af00cd935756a1287f",
-  "sha256_metadata_csv": "c6b960a1f991c48ee16208be6469ddfb059c324fc8658a1aef007d62710dcbb3",
+  "sha256_metadata_csv": "cb8152668b10649eae331b80d4423e4950cbad1fa39c5ec8f0cc5f2f7670a249",
   "gate_result": "PASS"
 }
