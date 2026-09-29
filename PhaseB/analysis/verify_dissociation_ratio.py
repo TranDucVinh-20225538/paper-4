@@ -18,6 +18,8 @@ from pathlib import Path
 
 import pandas as pd
 
+import data_roots
+
 PROBES = ["probe_lr_auroc", "probe_svm_auroc", "probe_rf_auroc"]
 THIS_STUDY_GAP = 1.6e-3
 
@@ -25,7 +27,7 @@ THIS_STUDY_GAP = 1.6e-3
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--matrix", type=Path,
-                    default=Path("../paper-3/results/checkpoint_results_matrix.csv"))
+                    default=data_roots.root("paper3") / "results" / "checkpoint_results_matrix.csv")
     ap.add_argument("--scorer", default="mahalanobis_auroc")
     args = ap.parse_args()
 

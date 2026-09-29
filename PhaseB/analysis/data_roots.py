@@ -38,6 +38,7 @@ CONFIG = PHASEB / "data_roots.json"
 ENV_VAR = {
     "archive": "PAPER4_ARCHIVE",
     "csg": "PAPER4_CSG_ROOT",
+    "paper3": "PAPER4_PAPER3",
     "paper3_scripts": "PAPER4_PAPER3_SCRIPTS",
     "dst_skin_images": "PAPER4_DST_SKIN_IMAGES",
     "derm7pt": "PAPER4_DERM7PT",
@@ -47,6 +48,7 @@ ENV_VAR = {
 _WHAT = {
     "archive": "working copy of the ISIC crops (deleted; provenance only)",
     "csg": "Paper 1/2 repository, imported for its dataset and model code",
+    "paper3": "Paper 3 repository, read for its checkpoint results matrix",
     "paper3_scripts": "Paper 3 scripts directory, imported for shared helpers",
     "dst_skin_images": "DST-Skin reader images, used by the forward-pass checks",
     "derm7pt": "Derm7pt release_v0, external evaluation domain",

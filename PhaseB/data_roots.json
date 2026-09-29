@@ -3,6 +3,7 @@
   "roots": {
     "archive": "{archive}",
     "csg": "{csg}",
+    "paper3": "/Users/cubo/Research/paper-3",
     "paper3_scripts": "{paper3_scripts}",
     "dst_skin_images": "{dst_skin_images}",
     "derm7pt": "/Users/cubo/Downloads/release_v0",

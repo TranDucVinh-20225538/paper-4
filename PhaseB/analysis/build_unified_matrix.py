@@ -39,6 +39,8 @@ from pathlib import Path
 
 import pandas as pd
 
+import data_roots
+
 SHARED_SCORERS = {"mahalanobis": "ood_mahalanobis", "cosine": "ood_cosine", "knn10": "ood_knn10"}
 
 
@@ -101,7 +103,7 @@ def from_paper4(p: Path) -> pd.DataFrame:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--paper3", type=Path,
-                    default=Path("../paper-3/results/checkpoint_results_matrix.csv"))
+                    default=data_roots.root("paper3") / "results" / "checkpoint_results_matrix.csv")
     ap.add_argument("--paper4", type=Path, default=Path("PhaseB/outputs/raw_run_matrix.csv"))
     ap.add_argument("--out", type=Path, default=Path("PhaseB/outputs/unified_run_matrix.csv"))
     args = ap.parse_args()
