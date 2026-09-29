@@ -21,7 +21,9 @@ The embeddings and per-example scores are extracted output, not source, so
 `.gitignore` excludes them for the same reason it excludes the 1.35 GB backbone.
 Both bundles are release assets:
 
-    unzip embeddings_items1_4.zip      # 97 MB: reference embeddings, external .npz
+    unzip embeddings_items1_4.zip      # 129 MB: reference embeddings, the
+                                       #   reference artifact, the nuisance
+                                       #   direction, and the external .npz
     unzip per_example_scores.zip       # 40 MB: per-example scores, 10-seed outputs
 
 Check them against the hashes the repository already carries:
@@ -46,7 +48,8 @@ These reproduce the manuscript's tables from the two bundles alone:
 | `verify_manuscript_numbers.py` | checks RQ2 figures against the artifacts |
 
 `rq1_susceptibility.py`, `verify_scorer_invariance.py` and
-`phase3_external_rq1.py` also run once the second bundle is unpacked.
+`phase3_external_rq1.py` also run, the first two from the second bundle and the
+third from the first.
 
 ## 4. What needs more than the bundles
 
