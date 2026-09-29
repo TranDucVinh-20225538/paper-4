@@ -35,7 +35,7 @@ import torch
 from scipy import stats
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, "/Users/cubo/Research/CSG-SKin")
+sys.path.insert(0, str(data_roots.root("csg")))
 
 from stage4_adapter import BottleneckAdapter  # noqa: E402
 from stage4_train_intervention import TRAIN_DIR, load_eval_population, compute_gate0, compute_gate1_measurement  # noqa: E402
@@ -44,6 +44,8 @@ from groupB_mahalanobis_family import (  # noqa: E402
     cosine_centroid_scores, compute_knn_scores, density_kde_scores, auroc_fpr95, K_VALUES, PRIMARY_K, NUM_CLASSES, REG_EPS,
 )
 from src.utils import ood_metrics  # noqa: E402
+
+import data_roots
 
 SEEDS = [42, 52, 62, 72, 82]
 R = 16

@@ -38,7 +38,9 @@ from sklearn.metrics import roc_auc_score
 from scipy.special import logsumexp
 from sklearn.neighbors import NearestNeighbors
 
-sys.path.insert(0, "/Users/cubo/Research/CSG-SKin")
+import data_roots  # noqa: E402
+
+sys.path.insert(0, str(data_roots.root("csg")))
 from src.utils.ood_metrics import (  # noqa: E402
     compute_mahalanobis_params_from_arrays,
     mahalanobis_min_squared_distances,

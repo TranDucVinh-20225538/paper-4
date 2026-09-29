@@ -17,13 +17,15 @@ from pathlib import Path
 import numpy as np, pandas as pd, torch
 from PIL import Image
 
+import data_roots
+
 ROOT = Path(__file__).resolve().parents[1]
 PANDERM = ROOT / "external" / "PanDerm" / "classification"
 CKPT = ROOT / "assets" / "checkpoints" / "panderm_vitl16_checkpoint-499.pth"
 PREPROC = ROOT / "assets" / "reference_preprocessing.json"
 OUT = ROOT / "outputs" / "phase3"
-DERM7PT = Path("/Users/cubo/Downloads/release_v0")
-PH2 = Path("/Users/cubo/Downloads/PH2Dataset")
+DERM7PT = data_roots.root("derm7pt")
+PH2 = data_roots.root("ph2")
 
 LABELS = ["MEL", "NV", "BCC", "AK", "BKL", "DF", "VASC", "SCC"]
 L2I = {l: i for i, l in enumerate(LABELS)}

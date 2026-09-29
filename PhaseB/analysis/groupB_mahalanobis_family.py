@@ -46,9 +46,11 @@ import pandas as pd
 from sklearn.metrics import roc_auc_score
 from sklearn.neighbors import KernelDensity, NearestNeighbors
 
-CSG_ROOT = Path("/Users/cubo/Research/CSG-SKin")
+CSG_ROOT = data_roots.root("csg")
 sys.path.insert(0, str(CSG_ROOT))
 from src.utils import ood_metrics  # noqa: E402 -- genuine import, unmodified
+
+import data_roots
 
 ASSETS = Path(__file__).resolve().parents[1] / "assets" / "reference_embeddings"
 TRAIN_DIR = ASSETS / "ReferenceTrainEmbedding"

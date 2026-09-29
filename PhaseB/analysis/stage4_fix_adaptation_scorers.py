@@ -11,11 +11,13 @@ import pandas as pd
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, "/Users/cubo/Research/CSG-SKin")
+sys.path.insert(0, str(data_roots.root("csg")))
 from stage4_adapter import BottleneckAdapter
 from stage4_train_intervention import TRAIN_DIR, load_eval_population
 from groupB_mahalanobis_family import cosine_centroid_scores, compute_knn_scores, density_kde_scores, auroc_fpr95, K_VALUES, PRIMARY_K, NUM_CLASSES, REG_EPS
 from src.utils import ood_metrics
+
+import data_roots
 
 OUTPUT_DIR = Path("AdaptationArm_Canonical")
 SEEDS = [42, 52, 62, 72, 82]

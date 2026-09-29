@@ -39,10 +39,12 @@ from pathlib import Path
 import torch
 from PIL import Image
 
+import data_roots
+
 REPO_ROOT = Path(__file__).resolve().parents[1] / "external" / "PanDerm" / "classification"
 CHECKPOINT = Path(__file__).resolve().parents[1] / "assets" / "checkpoints" / "panderm_vitl16_checkpoint-499.pth"
 PREPROCESSING_SNAPSHOT = Path(__file__).resolve().parents[1] / "assets" / "reference_preprocessing.json"
-IMAGE_DIR = Path("/Users/cubo/Research/DST-Skin/reader_images_96")
+IMAGE_DIR = data_roots.root("dst_skin_images")
 OUTPUT_JSON = Path(__file__).resolve().parents[1] / "outputs" / "stage1_3_batch_inference_validation.json"
 BATCH_SIZE = 16
 EMBED_DIM = 1024

@@ -251,7 +251,7 @@ Deliberately did **not** substitute ISIC 2018, the stray metadata-only CSV, or r
 provenance ambiguity this gate exists to prevent, silently. Flagged to Vinh instead of guessing.
 
 Asked Vinh where the real ISIC 2019 + PAD-UFES-20 data is. First answer,
-`/Users/cubo/projects/Bản sao datn 4/data/`, checked and confirmed byte-identical (MD5 match on
+`an earlier working copy under the author's home directory/data/`, checked and confirmed byte-identical (MD5 match on
 `pad_ufes20/metadata.csv`, matching file counts) to `DST-Skin/data/raw/` — i.e. the same ISIC 2018 +
 PAD-UFES-20 testbed already found, not ISIC 2019. Reported the mismatch back rather than treating a
 real, specific pointer as automatically correct. Vinh's response: "bạn tự tải về đi" (download it

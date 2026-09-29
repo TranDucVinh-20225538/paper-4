@@ -52,7 +52,9 @@ from pathlib import Path
 
 import torch
 
-CSG_ROOT = Path("/Users/cubo/Research/CSG-SKin")
+import data_roots
+
+CSG_ROOT = data_roots.root("csg")
 PANDERM_REPO = Path(__file__).resolve().parents[1] / "external" / "PanDerm" / "classification"
 CHECKPOINT = Path(__file__).resolve().parents[1] / "assets" / "checkpoints" / "panderm_vitl16_checkpoint-499.pth"
 PREPROCESSING_SNAPSHOT = Path(__file__).resolve().parents[1] / "assets" / "reference_preprocessing.json"

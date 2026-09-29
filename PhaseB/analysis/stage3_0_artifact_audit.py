@@ -32,7 +32,9 @@ import pandas as pd
 import torch
 from PIL import Image, ImageDraw
 
-CSG_ROOT = Path("/Users/cubo/Research/CSG-SKin")
+import data_roots
+
+CSG_ROOT = data_roots.root("csg")
 PANDERM_REPO = Path(__file__).resolve().parents[1] / "external" / "PanDerm" / "classification"
 CHECKPOINT = Path(__file__).resolve().parents[1] / "assets" / "checkpoints" / "panderm_vitl16_checkpoint-499.pth"
 ARTIFACT_DIR = Path(__file__).resolve().parents[1] / "assets" / "reference_embeddings" / "ReferenceEmbedding"

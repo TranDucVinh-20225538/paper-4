@@ -47,9 +47,11 @@ from pathlib import Path
 import torch
 from PIL import Image
 
+import data_roots
+
 REPO_ROOT = Path(__file__).resolve().parents[1] / "external" / "PanDerm" / "classification"
 CHECKPOINT = Path(__file__).resolve().parents[1] / "assets" / "checkpoints" / "panderm_vitl16_checkpoint-499.pth"
-TEST_IMAGE = Path("/Users/cubo/Research/DST-Skin/reader_images_96/ISIC_0034336.jpg")
+TEST_IMAGE = data_roots.root("dst_skin_images") / "ISIC_0034336.jpg"
 
 sys.path.insert(0, str(REPO_ROOT))
 

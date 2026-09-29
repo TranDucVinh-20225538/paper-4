@@ -21,11 +21,13 @@ import subprocess
 import sys
 from pathlib import Path
 
-CSG_ROOT = Path("/Users/cubo/Research/CSG-SKin")
+import data_roots
+
+CSG_ROOT = data_roots.root("csg")
 BUILD_SCRIPT = CSG_ROOT / "src" / "datasets" / "preprocess_metadata.py"
 OUTPUT_CSV = CSG_ROOT / "data" / "master_metadata.csv"
 ISIC_INPUT_DIR = CSG_ROOT / "data" / "ISIC_2019_Training_Input"  # symlinks into Paper4/archive/
-ARCHIVE_SOURCE = Path("/Users/cubo/Research/Paper4/archive")
+ARCHIVE_SOURCE = data_roots.root("archive")
 GROUNDTRUTH_CSV = CSG_ROOT / "data" / "ISIC_2019_Training_GroundTruth.csv"
 PROVENANCE_JSON = Path(__file__).resolve().parents[1] / "assets" / "master_metadata_build_provenance.json"
 
@@ -107,7 +109,7 @@ def main() -> None:
                 "verification_groundtruth_csv": str(GROUNDTRUTH_CSV),
                 "verification_groundtruth_csv_source": "https://isic-challenge-data.s3.amazonaws.com/2019/ISIC_2019_Training_GroundTruth.csv",
             },
-            "pad_ufes20_source": "DST-Skin/data/raw/pad_ufes20/ (confirmed byte-identical by MD5 to /Users/cubo/projects/Bản sao datn 4/data/raw/pad_ufes20/ before copying)",
+            "pad_ufes20_source": "DST-Skin/data/raw/pad_ufes20/ (confirmed byte-identical by MD5 to an earlier working copy under the author's home directory before copying)",
         },
         "stdout": result.stdout,
     }

@@ -28,7 +28,9 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-CSG_ROOT = Path("/Users/cubo/Research/CSG-SKin")
+import data_roots
+
+CSG_ROOT = data_roots.root("csg")
 PANDERM_REPO = Path(__file__).resolve().parents[1] / "external" / "PanDerm" / "classification"
 CHECKPOINT_METADATA = Path(__file__).resolve().parents[1] / "assets" / "panderm_vitl16_checkpoint_metadata.json"
 PREPROCESSING_SNAPSHOT = Path(__file__).resolve().parents[1] / "assets" / "reference_preprocessing.json"

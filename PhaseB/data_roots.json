@@ -1,0 +1,11 @@
+{
+  "_comment": "The layout this study was run on. Override any entry with the environment variable named in analysis/data_roots.py, or edit the paths here. 'archive' and the image directories under 'csg' no longer exist on that machine; they are recorded so the provenance in the embedding artifacts stays readable.",
+  "roots": {
+    "archive": "/Users/cubo/Research/Paper4/archive",
+    "csg": "/Users/cubo/Research/CSG-SKin",
+    "paper3_scripts": "/Users/cubo/Research/paper-3/scripts",
+    "dst_skin_images": "/Users/cubo/Research/DST-Skin/reader_images_96",
+    "derm7pt": "/Users/cubo/Downloads/release_v0",
+    "ph2": "/Users/cubo/Downloads/PH2Dataset"
+  }
+}

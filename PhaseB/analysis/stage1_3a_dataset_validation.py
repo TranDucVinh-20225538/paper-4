@@ -35,7 +35,9 @@ import subprocess
 import sys
 from pathlib import Path
 
-CSG_ROOT = Path("/Users/cubo/Research/CSG-SKin")
+import data_roots
+
+CSG_ROOT = data_roots.root("csg")
 PANDERM_REPO = Path(__file__).resolve().parents[1] / "external" / "PanDerm" / "classification"
 PREPROCESSING_SNAPSHOT = Path(__file__).resolve().parents[1] / "assets" / "reference_preprocessing.json"
 OUTPUT_JSON = Path(__file__).resolve().parents[1] / "outputs" / "dataset_validation_report.json"

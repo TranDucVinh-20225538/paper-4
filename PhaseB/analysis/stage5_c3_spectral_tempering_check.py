@@ -43,13 +43,15 @@ import numpy as np
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, "/Users/cubo/Research/paper-3/scripts")
-sys.path.insert(0, "/Users/cubo/Research/CSG-SKin")
+sys.path.insert(0, str(data_roots.root("paper3_scripts")))
+sys.path.insert(0, str(data_roots.root("csg")))
 
 from stage4_adapter import BottleneckAdapter  # noqa: E402
 from stage4_train_intervention import load_eval_population, compute_gate0, compute_gate1_measurement, TRAIN_DIR  # noqa: E402
 from geometry_diagnostics import condition_number  # noqa: E402
 from src.utils import ood_metrics  # noqa: E402
+
+import data_roots
 
 SEEDS = [42, 52, 62, 72, 82]
 ALPHAS = [1.0]  # canonical full-strength checkpoint only -- see module docstring for justification

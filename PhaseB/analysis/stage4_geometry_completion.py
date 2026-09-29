@@ -19,13 +19,15 @@ import numpy as np
 import torch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, "/Users/cubo/Research/paper-3/scripts")
-sys.path.insert(0, "/Users/cubo/Research/CSG-SKin")
+sys.path.insert(0, str(data_roots.root("paper3_scripts")))
+sys.path.insert(0, str(data_roots.root("csg")))
 
 from stage4_adapter import BottleneckAdapter  # noqa: E402
 from stage4_train_intervention import load_eval_population, NUISANCE_PATH  # noqa: E402
 from geometry_diagnostics import condition_number  # noqa: E402  -- paper-3, reused
 from src.utils.ood_metrics import compute_mahalanobis_params_from_arrays  # noqa: E402  -- CSG-Skin, reused
+
+import data_roots
 
 ALPHAS = [0.0, 0.25, 0.5, 0.75, 1.0]
 R = 16

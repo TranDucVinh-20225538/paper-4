@@ -53,8 +53,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-CSG_ROOT = Path("/Users/cubo/Research/CSG-SKin")
-PAPER3_SCRIPTS = Path("/Users/cubo/Research/paper-3/scripts")
+import data_roots
+
+CSG_ROOT = data_roots.root("csg")
+PAPER3_SCRIPTS = data_roots.root("paper3_scripts")
 ARTIFACT_DIR = Path(__file__).resolve().parents[1] / "assets" / "reference_embeddings" / "ReferenceEmbedding"
 ISSUES_REGISTER = Path(__file__).resolve().parents[1] / "assets" / "ArtifactIssuesRegister" / "issues_register.json"
 OUTPUT_DIR = Path(__file__).resolve().parents[1] / "ReferenceArmBaseline" / "BaselineReport"

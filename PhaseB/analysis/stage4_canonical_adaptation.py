@@ -25,8 +25,8 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, TensorDataset
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-sys.path.insert(0, "/Users/cubo/Research/paper-3/scripts")
-sys.path.insert(0, "/Users/cubo/Research/CSG-SKin")
+sys.path.insert(0, str(data_roots.root("paper3_scripts")))
+sys.path.insert(0, str(data_roots.root("csg")))
 
 from stage4_adapter import BottleneckAdapter, TaskHead, task_loss
 from stage4_train_intervention import (
@@ -37,6 +37,8 @@ from geometry_diagnostics import condition_number
 from src.utils import ood_metrics
 from groupB_mahalanobis_family import cosine_centroid_scores, compute_knn_scores, density_kde_scores, auroc_fpr95, K_VALUES, PRIMARY_K, NUM_CLASSES, REG_EPS
 from lid_spectral_decay import compute_lid_spectral_diagnostics
+
+import data_roots
 
 SEEDS = [42, 52, 62, 72, 82]
 OUTPUT_DIR = Path(__file__).resolve().parents[1] / "AdaptationArm_Canonical"
