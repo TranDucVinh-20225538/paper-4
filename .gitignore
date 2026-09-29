@@ -23,3 +23,7 @@ PhaseB/assets/checkpoints/*.pt
 # would store a gitlink that clones cannot resolve. Pinned in
 # PhaseB/external/PanDerm.pin instead; no local modifications to restore.
 PhaseB/external/PanDerm/
+
+# Hand-off bundles of the ignored artifacts above. Built on demand for someone
+# who cannot regenerate them; distributed as a release asset, never committed.
+embeddings_items*.zip
