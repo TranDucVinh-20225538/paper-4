@@ -1,0 +1,41 @@
+{
+  "backbone": "resnet50_imagenet",
+  "description": "torchvision resnet50 IMAGENET1K_V1, fc stripped, post-avgpool 2048-d",
+  "frozen_from": {
+    "repo": "https://github.com/pytorch/vision",
+    "weights": "ResNet50_Weights.IMAGENET1K_V1",
+    "transforms": "Resize(256, bilinear), CenterCrop(224), Normalize ImageNet"
+  },
+  "dataset_level": "PIL image .convert('RGB') before the pipeline",
+  "pipeline": [
+    {
+      "op": "Resize",
+      "size": 256,
+      "interpolation": "bilinear",
+      "antialias": true
+    },
+    {
+      "op": "CenterCrop",
+      "size": [
+        224,
+        224
+      ]
+    },
+    {
+      "op": "ToTensor"
+    },
+    {
+      "op": "Normalize",
+      "mean": [
+        0.485,
+        0.456,
+        0.406
+      ],
+      "std": [
+        0.229,
+        0.224,
+        0.225
+      ]
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "backbone": "clip_vitb16",
+  "description": "OpenAI CLIP ViT-B/16 image tower (timm quickgelu variant), projected 512-d",
+  "frozen_from": {
+    "repo": "https://github.com/openai/CLIP",
+    "transforms": "Resize(224, bicubic), CenterCrop(224), Normalize CLIP",
+    "timm_crop_pct_override": "OpenAI's preprocess has no crop_pct (resize == crop == 224); timm's pretrained_cfg lists 0.9, which is timm's own convention"
+  },
+  "dataset_level": "PIL image .convert('RGB') before the pipeline",
+  "pipeline": [
+    {
+      "op": "Resize",
+      "size": 224,
+      "interpolation": "bicubic",
+      "antialias": true
+    },
+    {
+      "op": "CenterCrop",
+      "size": [
+        224,
+        224
+      ]
+    },
+    {
+      "op": "ToTensor"
+    },
+    {
+      "op": "Normalize",
+      "mean": [
+        0.48145466,
+        0.4578275,
+        0.40821073
+      ],
+      "std": [
+        0.26862954,
+        0.26130258,
+        0.27577711
+      ]
+    }
+  ]
+}

@@ -43,6 +43,19 @@ ENV_VAR = {
     "dst_skin_images": "PAPER4_DST_SKIN_IMAGES",
     "derm7pt": "PAPER4_DERM7PT",
     "ph2": "PAPER4_PH2",
+    # Phase C (flat-response audit generalisation). Optional: not needed for Phase B.
+    "openood": "PAPER4_OPENOOD",
+    "phasec_data": "PAPER4_PHASEC_DATA",
+    "phasec_checkpoints": "PAPER4_PHASEC_CKPT",
+}
+
+#: roots only Phase C reads. They fall back to a repo-relative default, and they
+#: do not make `python3 PhaseB/analysis/data_roots.py` fail when absent, so the
+#: Phase B check keeps its meaning.
+OPTIONAL = {
+    "openood": None,
+    "phasec_data": "PhaseC/data",
+    "phasec_checkpoints": "PhaseC/assets/checkpoints",
 }
 
 _WHAT = {
@@ -53,6 +66,9 @@ _WHAT = {
     "dst_skin_images": "DST-Skin reader images, used by the forward-pass checks",
     "derm7pt": "Derm7pt release_v0, external evaluation domain",
     "ph2": "PH2 dataset, external evaluation domain",
+    "openood": "OpenOOD benchmark data (ImageNet/CIFAR OOD splits), Phase C",
+    "phasec_data": "Phase C dataset root (default PhaseC/data in this repository)",
+    "phasec_checkpoints": "Phase C model checkpoints (default PhaseC/assets/checkpoints)",
 }
 
 
@@ -72,6 +88,9 @@ def root(name: str) -> Path:
     configured = _configured().get(name)
     if configured:
         return Path(configured).expanduser()
+    default = OPTIONAL.get(name)
+    if default:
+        return REPO / default
     raise RuntimeError(
         f"data root {name!r} ({_WHAT[name]}) is not configured. "
         f"Set {ENV_VAR[name]}, or add it under \"roots\" in {CONFIG}."
@@ -107,19 +126,25 @@ def resolve(recorded: str) -> Path:
 def main() -> int:
     configured = _configured()
     missing = 0
+    required = [n for n in sorted(ENV_VAR) if n not in OPTIONAL]
     for name in sorted(ENV_VAR):
+        optional = name in OPTIONAL
         if os.environ.get(ENV_VAR[name]):
             where, src = Path(os.environ[ENV_VAR[name]]).expanduser(), ENV_VAR[name]
         elif name in configured:
             where, src = Path(configured[name]).expanduser(), CONFIG.name
+        elif optional and OPTIONAL[name]:
+            where, src = REPO / OPTIONAL[name], "default"
         else:
-            print(f"  unset    {name:<16} {_WHAT[name]}\n           set {ENV_VAR[name]}")
-            missing += 1
+            tag = "unset*" if optional else "unset"
+            print(f"  {tag:<8} {name:<16} {_WHAT[name]}\n           set {ENV_VAR[name]}")
+            missing += not optional
             continue
-        mark = "ok" if where.exists() else "MISSING"
+        mark = "ok" if where.exists() else ("MISSING*" if optional else "MISSING")
         print(f"  {mark:<8} {name:<16} {where}   [{src}]")
-        missing += not where.exists()
-    print(f"\n{len(ENV_VAR) - missing} of {len(ENV_VAR)} roots resolve.")
+        missing += (not where.exists()) and not optional
+    print(f"\n{len(required) - missing} of {len(required)} roots resolve."
+          "  (* = Phase C only, not counted)")
     return 1 if missing else 0
 
 

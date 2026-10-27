@@ -1,0 +1,21 @@
+{
+ "spearman_rho": 0.8821428571428571,
+ "spearman_p": 1.3558210624788689e-05,
+ "n_configs": 15,
+ "max_sigma_dev": 0.18686094890718447,
+ "max_det_dev": 2.8784233095652735e-05,
+ "kde_max_by_backbone": {
+  "clip_vitb16": 0.005263589999999985,
+  "dinov2_vitb14": 0.00013397000000003878,
+  "resnet18_cifar_openood": 0.005939430000000079,
+  "resnet50_imagenet": 0.009293769999999979,
+  "vitb16_imagenet": 0.0012721600000000777
+ },
+ "kde_det_max_by_backbone": {
+  "clip_vitb16": 1.9999999989472883e-08,
+  "dinov2_vitb14": 7.890000000010389e-06,
+  "resnet18_cifar_openood": 1.1372682795496303e-08,
+  "resnet50_imagenet": 9.999999994736442e-09,
+  "vitb16_imagenet": 1.050000000057949e-06
+ }
+}

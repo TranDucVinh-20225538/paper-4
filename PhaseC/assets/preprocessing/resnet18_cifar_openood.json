@@ -1,0 +1,43 @@
+{
+  "backbone": "resnet18_cifar_openood",
+  "description": "OpenOOD ResNet18_32x32 on CIFAR-10, post-avgpool 512-d. Prefers cifar10_res18_v1.5; accepts cifar10_res18 (v1) when v1.5 is unavailable \u2014 see provenance.openood_checkpoint_version and benchmark_pairing_note.",
+  "frozen_from": {
+    "repo": "https://github.com/Jingkang50/OpenOOD",
+    "network": "resnet18_32x32",
+    "preprocessor": "base (Resize(32, bilinear), CenterCrop(32), ToTensor, Normalize cifar10)",
+    "v1_gdrive_id": "1rPEScK7TFjBn_W_frO-8RSPwIG6_x0fJ",
+    "v15_gdrive_id": "1byGeYxM_PlLjT72wZsMQvP6popJeWBgt"
+  },
+  "dataset_level": "PIL image .convert('RGB') before the pipeline",
+  "pipeline": [
+    {
+      "op": "Resize",
+      "size": 32,
+      "interpolation": "bilinear",
+      "antialias": true
+    },
+    {
+      "op": "CenterCrop",
+      "size": [
+        32,
+        32
+      ]
+    },
+    {
+      "op": "ToTensor"
+    },
+    {
+      "op": "Normalize",
+      "mean": [
+        0.4914,
+        0.4822,
+        0.4465
+      ],
+      "std": [
+        0.247,
+        0.2435,
+        0.2616
+      ]
+    }
+  ]
+}

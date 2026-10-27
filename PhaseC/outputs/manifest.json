@@ -1,0 +1,1827 @@
+{
+ "written": "2026-10-27T08:52:39+00:00",
+ "git": {
+  "commit": "671d907f7ce8102134eb41540085fb3963c1eff8",
+  "dirty_files": [
+   "?? PhaseC/"
+  ]
+ },
+ "packages": {
+  "python": "3.11.5",
+  "platform": "Linux-5.15.0-75-generic-x86_64-with-glibc2.31",
+  "torch": "2.1.1",
+  "torchvision": "0.16.1",
+  "timm": "1.0.29",
+  "numpy": "1.26.4",
+  "sklearn": "1.9.1",
+  "scipy": "1.15.3",
+  "pandas": "2.3.3",
+  "PIL": "9.3.0",
+  "huggingface_hub": "1.31.0",
+  "gdown": "6.4.2",
+  "cuda_runtime": "12.1",
+  "cudnn": "8902"
+ },
+ "gpu": {
+  "nvidia_smi_here": null,
+  "note": "the GPU the embeddings were computed on is in embeddings.<backbone>.<id_set>.<split>.device_name; nvidia-smi here describes the machine that wrote this manifest, which may be a login node"
+ },
+ "backbones": {
+  "resnet18_cifar_openood": {
+   "kind": "cnn_cifar_supervised",
+   "dim": 512,
+   "source_url": "https://drive.google.com/uc?id=1byGeYxM_PlLjT72wZsMQvP6popJeWBgt",
+   "id_sets": [
+    "cifar10"
+   ],
+   "description": "OpenOOD ResNet18_32x32 on CIFAR-10, post-avgpool 512-d. Prefers cifar10_res18_v1.5; accepts cifar10_res18 (v1) when v1.5 is unavailable \u2014 see provenance.openood_checkpoint_version and benchmark_pairing_note.",
+   "frozen_from": {
+    "repo": "https://github.com/Jingkang50/OpenOOD",
+    "network": "resnet18_32x32",
+    "preprocessor": "base (Resize(32, bilinear), CenterCrop(32), ToTensor, Normalize cifar10)",
+    "v1_gdrive_id": "1rPEScK7TFjBn_W_frO-8RSPwIG6_x0fJ",
+    "v15_gdrive_id": "1byGeYxM_PlLjT72wZsMQvP6popJeWBgt"
+   },
+   "preprocess_pipeline": [
+    {
+     "op": "Resize",
+     "size": 32,
+     "interpolation": "bilinear",
+     "antialias": true
+    },
+    {
+     "op": "CenterCrop",
+     "size": [
+      32,
+      32
+     ]
+    },
+    {
+     "op": "ToTensor"
+    },
+    {
+     "op": "Normalize",
+     "mean": [
+      0.4914,
+      0.4822,
+      0.4465
+     ],
+     "std": [
+      0.247,
+      0.2435,
+      0.2616
+     ]
+    }
+   ],
+   "preprocess_pin": {
+    "file": "PhaseC/assets/preprocessing/resnet18_cifar_openood.json",
+    "sha256": "c2f9efee73a262c57e09d34c1eec643dc30e0652276617748ce4e336348f0656"
+   },
+   "checkpoint": {
+    "state_dict_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+    "file": "PhaseC/assets/checkpoints/cifar10_res18.zip",
+    "file_sha256": "05ea017319591f6134ed866d5fefc7ae889f0c42e8472302dc4b598447ab8eec",
+    "openood_checkpoint_version": "v1",
+    "openood_checkpoint_id": "cifar10_res18",
+    "source_url": "https://drive.google.com/uc?id=1rPEScK7TFjBn_W_frO-8RSPwIG6_x0fJ",
+    "openood_far_ood_as_published": [
+     "mnist",
+     "fashionmnist",
+     "texture",
+     "places365"
+    ],
+    "benchmark_pairing_note": "checkpoint is OpenOOD v1 (cifar10_res18); PhaseC far-OOD ladder follows the v1.5 taxonomy (MNIST, SVHN, Textures, Places365) rather than v1's FashionMNIST. Numbers are not drop-in comparable to the published OpenOOD v1 leaderboard row."
+   }
+  },
+  "resnet50_imagenet": {
+   "kind": "cnn_imagenet_supervised",
+   "dim": 2048,
+   "source_url": "https://download.pytorch.org/models/resnet50-0676ba61.pth",
+   "id_sets": [
+    "cifar10",
+    "imagenet200"
+   ],
+   "description": "torchvision resnet50 IMAGENET1K_V1, fc stripped, post-avgpool 2048-d",
+   "frozen_from": {
+    "repo": "https://github.com/pytorch/vision",
+    "weights": "ResNet50_Weights.IMAGENET1K_V1",
+    "transforms": "Resize(256, bilinear), CenterCrop(224), Normalize ImageNet"
+   },
+   "preprocess_pipeline": [
+    {
+     "op": "Resize",
+     "size": 256,
+     "interpolation": "bilinear",
+     "antialias": true
+    },
+    {
+     "op": "CenterCrop",
+     "size": [
+      224,
+      224
+     ]
+    },
+    {
+     "op": "ToTensor"
+    },
+    {
+     "op": "Normalize",
+     "mean": [
+      0.485,
+      0.456,
+      0.406
+     ],
+     "std": [
+      0.229,
+      0.224,
+      0.225
+     ]
+    }
+   ],
+   "preprocess_pin": {
+    "file": "PhaseC/assets/preprocessing/resnet50_imagenet.json",
+    "sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd"
+   },
+   "checkpoint": {
+    "state_dict_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+    "source_url": "https://download.pytorch.org/models/resnet50-0676ba61.pth",
+    "file": "resnet50-0676ba61.pth",
+    "file_sha256": "0676ba61b6795bbe1773cffd859882e5e297624d384b6993f7c9e683e722fb8a"
+   }
+  },
+  "vitb16_imagenet": {
+   "kind": "vit_imagenet_supervised",
+   "dim": 768,
+   "source_url": "https://huggingface.co/timm/vit_base_patch16_224.augreg2_in21k_ft_in1k",
+   "id_sets": [
+    "cifar10",
+    "imagenet200"
+   ],
+   "description": "timm vit_base_patch16_224 (augreg2_in21k_ft_in1k), CLS after final norm, 768-d",
+   "frozen_from": {
+    "repo": "https://github.com/huggingface/pytorch-image-models",
+    "pretrained_cfg": "crop_pct 0.9 (224/0.9 = 248 resize), bicubic, mean=std=0.5"
+   },
+   "preprocess_pipeline": [
+    {
+     "op": "Resize",
+     "size": 248,
+     "interpolation": "bicubic",
+     "antialias": true
+    },
+    {
+     "op": "CenterCrop",
+     "size": [
+      224,
+      224
+     ]
+    },
+    {
+     "op": "ToTensor"
+    },
+    {
+     "op": "Normalize",
+     "mean": [
+      0.5,
+      0.5,
+      0.5
+     ],
+     "std": [
+      0.5,
+      0.5,
+      0.5
+     ]
+    }
+   ],
+   "preprocess_pin": {
+    "file": "PhaseC/assets/preprocessing/vitb16_imagenet.json",
+    "sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c"
+   },
+   "checkpoint": {
+    "state_dict_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+    "source_url": "https://huggingface.co/timm/vit_base_patch16_224.augreg2_in21k_ft_in1k",
+    "timm": "1.0.29",
+    "pretrained_cfg_hf_hub_id": "timm/vit_base_patch16_224.augreg2_in21k_ft_in1k",
+    "pretrained_cfg_mean": [
+     0.5,
+     0.5,
+     0.5
+    ],
+    "pretrained_cfg_std": [
+     0.5,
+     0.5,
+     0.5
+    ],
+    "pretrained_cfg_interpolation": "bicubic",
+    "pretrained_cfg_crop_pct": "0.9",
+    "file": "models--timm--vit_base_patch16_224.augreg2_in21k_ft_in1k@063c6c38a5d8510b2e57df480445e94b231dad2c/model.safetensors",
+    "file_sha256": "32aa17d6e17b43500f531d5f6dc9bc93e56ed8841b8a75682e1bb295d722405b"
+   }
+  },
+  "dinov2_vitb14": {
+   "kind": "vit_selfsupervised",
+   "dim": 768,
+   "source_url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth",
+   "id_sets": [
+    "cifar10",
+    "imagenet200"
+   ],
+   "description": "DINOv2 ViT-B/14 (LVD-142M), CLS token after final norm, 768-d",
+   "frozen_from": {
+    "repo": "https://github.com/facebookresearch/dinov2",
+    "transforms": "Resize(256, bicubic), CenterCrop(224), Normalize ImageNet (dinov2/data/transforms.py make_classification_eval_transform)"
+   },
+   "preprocess_pipeline": [
+    {
+     "op": "Resize",
+     "size": 256,
+     "interpolation": "bicubic",
+     "antialias": true
+    },
+    {
+     "op": "CenterCrop",
+     "size": [
+      224,
+      224
+     ]
+    },
+    {
+     "op": "ToTensor"
+    },
+    {
+     "op": "Normalize",
+     "mean": [
+      0.485,
+      0.456,
+      0.406
+     ],
+     "std": [
+      0.229,
+      0.224,
+      0.225
+     ]
+    }
+   ],
+   "preprocess_pin": {
+    "file": "PhaseC/assets/preprocessing/dinov2_vitb14.json",
+    "sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a"
+   },
+   "checkpoint": {
+    "state_dict_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+    "source_url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth",
+    "hub_repo": "facebookresearch/dinov2 (hubconf dinov2_vitb14)",
+    "file": "dinov2_vitb14_pretrain.pth",
+    "file_sha256": "0b8b82f85de91b424aded121c7e1dcc2b7bc6d0adeea651bf73a13307fad8c73"
+   }
+  },
+  "clip_vitb16": {
+   "kind": "vlm_contrastive",
+   "dim": 512,
+   "source_url": "https://huggingface.co/timm/vit_base_patch16_clip_224.openai",
+   "id_sets": [
+    "cifar10",
+    "imagenet200"
+   ],
+   "description": "OpenAI CLIP ViT-B/16 image tower (timm quickgelu variant), projected 512-d",
+   "frozen_from": {
+    "repo": "https://github.com/openai/CLIP",
+    "transforms": "Resize(224, bicubic), CenterCrop(224), Normalize CLIP",
+    "timm_crop_pct_override": "OpenAI's preprocess has no crop_pct (resize == crop == 224); timm's pretrained_cfg lists 0.9, which is timm's own convention"
+   },
+   "preprocess_pipeline": [
+    {
+     "op": "Resize",
+     "size": 224,
+     "interpolation": "bicubic",
+     "antialias": true
+    },
+    {
+     "op": "CenterCrop",
+     "size": [
+      224,
+      224
+     ]
+    },
+    {
+     "op": "ToTensor"
+    },
+    {
+     "op": "Normalize",
+     "mean": [
+      0.48145466,
+      0.4578275,
+      0.40821073
+     ],
+     "std": [
+      0.26862954,
+      0.26130258,
+      0.27577711
+     ]
+    }
+   ],
+   "preprocess_pin": {
+    "file": "PhaseC/assets/preprocessing/clip_vitb16.json",
+    "sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734"
+   },
+   "checkpoint": {
+    "state_dict_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+    "source_url": "https://huggingface.co/timm/vit_base_patch16_clip_224.openai",
+    "timm": "1.0.29",
+    "pretrained_cfg_hf_hub_id": "timm/vit_base_patch16_clip_224.openai",
+    "pretrained_cfg_mean": [
+     0.48145466,
+     0.4578275,
+     0.40821073
+    ],
+    "pretrained_cfg_std": [
+     0.26862954,
+     0.26130258,
+     0.27577711
+    ],
+    "pretrained_cfg_interpolation": "bicubic",
+    "pretrained_cfg_crop_pct": "0.9",
+    "file": "models--timm--vit_base_patch16_clip_224.openai@977e3dd0ec55ab8da155f2fbeb6b5f54948b6e3d/pytorch_model.bin",
+    "file_sha256": "53b401837e5baa82115d3b6db60c6fff43cfd1a6412e48ed0193d54a69d2f993"
+   }
+  }
+ },
+ "embeddings": {
+  "clip_vitb16": {
+   "cifar10": {
+    "id_train": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/id_train.npz",
+     "n": 50000,
+     "dim": 512,
+     "source": "torchvision.CIFAR10",
+     "n_source": 50000,
+     "subsample_seed": null,
+     "file_sha256": "8d98f3caef160f25517b5ab69a9d35261d5d638ddb64266de40eb67a1880eb2c",
+     "content_sha256": "f4ecac723a237194294153572703bc8c18ebe2c1c4df85fa63fed0126bc39346",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_train.npz",
+      "file_sha256": "8d98f3caef160f25517b5ab69a9d35261d5d638ddb64266de40eb67a1880eb2c",
+      "content_sha256": "f4ecac723a237194294153572703bc8c18ebe2c1c4df85fa63fed0126bc39346",
+      "n": 50000,
+      "dim": 512
+     }
+    },
+    "id_test": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/id_test.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "torchvision.CIFAR10",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "362cd9802c9179c6ed0bd68a96064bf38c2e637489442d3de2966b8f930e4422",
+     "content_sha256": "0bfbcc3da277af31b25cae1b349e90fa15b6c3e39406241d6cfe6d55c35d514e",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_test.npz",
+      "file_sha256": "362cd9802c9179c6ed0bd68a96064bf38c2e637489442d3de2966b8f930e4422",
+      "content_sha256": "0bfbcc3da277af31b25cae1b349e90fa15b6c3e39406241d6cfe6d55c35d514e",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_ref": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/ood_ref.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "torchvision.CIFAR100",
+     "n_source": 50000,
+     "subsample_seed": 4107,
+     "file_sha256": "2bf6aa98a70d91b137db6df696721a75c1f26c3e77289bdc58de8d3708e3218e",
+     "content_sha256": "c96ac13f6de9c35b47091fed7505dd308180e78eab64abb82e7c343f71ae1893",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_ref.npz",
+      "file_sha256": "2bf6aa98a70d91b137db6df696721a75c1f26c3e77289bdc58de8d3708e3218e",
+      "content_sha256": "c96ac13f6de9c35b47091fed7505dd308180e78eab64abb82e7c343f71ae1893",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_cifar100": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/ood_cifar100.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "torchvision.CIFAR100",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "b1dd1fed0615dd6fefb509135def48da9db2d2f74d8288563b4ff30e92871cac",
+     "content_sha256": "cea94983d2ff1c12f68b3ea5018ba36156728842fb827f4f0d1d077f5e047cf9",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_cifar100.npz",
+      "file_sha256": "b1dd1fed0615dd6fefb509135def48da9db2d2f74d8288563b4ff30e92871cac",
+      "content_sha256": "cea94983d2ff1c12f68b3ea5018ba36156728842fb827f4f0d1d077f5e047cf9",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_mnist": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/ood_mnist.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "torchvision.MNIST(train=False)",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "4affca45de923ce2cd2bbfb34395bdfd58c5f412fd0bc22a0079541aaf96c32e",
+     "content_sha256": "8415cb7bfff05772f2c22549b6f9bb0dd7e545cc71ccd8c22d351967c40c4c55",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_mnist.npz",
+      "file_sha256": "4affca45de923ce2cd2bbfb34395bdfd58c5f412fd0bc22a0079541aaf96c32e",
+      "content_sha256": "8415cb7bfff05772f2c22549b6f9bb0dd7e545cc71ccd8c22d351967c40c4c55",
+      "n": 10000,
+      "dim": 512
+     },
+     "openood_group": "far_ood"
+    },
+    "ood_places365": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/ood_places365.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "openood folder images_classic/places365",
+     "n_source": 182532,
+     "subsample_seed": 4104,
+     "file_sha256": "a4febbf294031de7ada45401f92b4fe8d7edfa1c073ff67d446c4fb0a235d498",
+     "content_sha256": "be6c19aea42b6e39955b5506560d2429047c4b663968061fb22086d4fab07234",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_places365.npz",
+      "file_sha256": "a4febbf294031de7ada45401f92b4fe8d7edfa1c073ff67d446c4fb0a235d498",
+      "content_sha256": "be6c19aea42b6e39955b5506560d2429047c4b663968061fb22086d4fab07234",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_svhn": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/ood_svhn.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "openood folder images_classic/svhn",
+     "n_source": 26032,
+     "subsample_seed": 4102,
+     "file_sha256": "e19035af7481a82488d8de181e06119439926088ea886304f73281ea6ed961af",
+     "content_sha256": "266258ad102e0c77b21a417aa1fe766ed89c66279f9863fbfd3b200e3f0e2d21",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_svhn.npz",
+      "file_sha256": "e19035af7481a82488d8de181e06119439926088ea886304f73281ea6ed961af",
+      "content_sha256": "266258ad102e0c77b21a417aa1fe766ed89c66279f9863fbfd3b200e3f0e2d21",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_texture": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/ood_texture.npz",
+     "n": 5640,
+     "dim": 512,
+     "source": "openood folder images_classic/texture",
+     "n_source": 5640,
+     "subsample_seed": null,
+     "file_sha256": "60cbfe4fda696c561dfbd00063ac423a0098f3a007e2c2b5110be54acf9f384f",
+     "content_sha256": "e52e3338cc0c7ba3e6147943948a9cae2cff130dbcb95502fde3b8e521ed49c2",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_texture.npz",
+      "file_sha256": "60cbfe4fda696c561dfbd00063ac423a0098f3a007e2c2b5110be54acf9f384f",
+      "content_sha256": "e52e3338cc0c7ba3e6147943948a9cae2cff130dbcb95502fde3b8e521ed49c2",
+      "n": 5640,
+      "dim": 512
+     }
+    },
+    "ood_tin": {
+     "file": "PhaseC/assets/embeddings/clip_vitb16/cifar10/ood_tin.npz",
+     "n": 8793,
+     "dim": 512,
+     "source": "filtered TIN imglist benchmark_imglist/cifar10/test_tin.txt",
+     "n_source": 8793,
+     "subsample_seed": null,
+     "file_sha256": "55d20568e5822bc6d3752da4fa0a9e4aee2db1fb3eb245c0aa79ab841582895e",
+     "content_sha256": "c8446b64334e406637be649281caa745b1885f4fc5902773e80bb0a1bd98d141",
+     "ckpt_sha256": "c2bda5205e333cf9d77f0eb38614b1aeefdb3595748ca3d88a55369c87cc6cce",
+     "preprocess_sha256": "631ac8fedf38c19e0f2adee5ca56292f37d39f19afa165cbbf90357ac3a28734",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_tin.npz",
+      "file_sha256": "55d20568e5822bc6d3752da4fa0a9e4aee2db1fb3eb245c0aa79ab841582895e",
+      "content_sha256": "c8446b64334e406637be649281caa745b1885f4fc5902773e80bb0a1bd98d141",
+      "n": 8793,
+      "dim": 512
+     },
+     "openood_group": "near_ood",
+     "imglist_path": "benchmark_imglist/cifar10/test_tin.txt",
+     "imglist_sha256": "cf2ed2e4d8af1296646a4e7284852db57b121601518fdd94e0df7c2401df126f"
+    }
+   }
+  },
+  "dinov2_vitb14": {
+   "cifar10": {
+    "id_train": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/id_train.npz",
+     "n": 50000,
+     "dim": 768,
+     "source": "torchvision.CIFAR10",
+     "n_source": 50000,
+     "subsample_seed": null,
+     "file_sha256": "158eb7540e0f5ae8f386a93f8a4934051667cf371cb5571507fa6a0dded1a37e",
+     "content_sha256": "dad00123bbddd75b2f60e5ac9671fe423df42f1c2b12ca425e421038d833ad19",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_train.npz",
+      "file_sha256": "158eb7540e0f5ae8f386a93f8a4934051667cf371cb5571507fa6a0dded1a37e",
+      "content_sha256": "dad00123bbddd75b2f60e5ac9671fe423df42f1c2b12ca425e421038d833ad19",
+      "n": 50000,
+      "dim": 768
+     }
+    },
+    "id_test": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/id_test.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "torchvision.CIFAR10",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "e78295cab74871b37556ef897af82639a0a4d5ff287f73a19ebf0ccce96d3bd3",
+     "content_sha256": "af8aef4deccdfdbf6ee0b1952e0c70f447a759e0f450b05060793c55aa17a311",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_test.npz",
+      "file_sha256": "e78295cab74871b37556ef897af82639a0a4d5ff287f73a19ebf0ccce96d3bd3",
+      "content_sha256": "af8aef4deccdfdbf6ee0b1952e0c70f447a759e0f450b05060793c55aa17a311",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_ref": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/ood_ref.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "torchvision.CIFAR100",
+     "n_source": 50000,
+     "subsample_seed": 4107,
+     "file_sha256": "5bef5679da98c5c60bce69ee26e3d9ba9abd4e5134992d2c2a3fb5faaa578981",
+     "content_sha256": "0b57b66d970f879efcab8462dbd5e7372e90b26251d691f1eb915ccad15394e9",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_ref.npz",
+      "file_sha256": "5bef5679da98c5c60bce69ee26e3d9ba9abd4e5134992d2c2a3fb5faaa578981",
+      "content_sha256": "0b57b66d970f879efcab8462dbd5e7372e90b26251d691f1eb915ccad15394e9",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_cifar100": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/ood_cifar100.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "torchvision.CIFAR100",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "9edf4199de927406e1a287fdae9181c55e416c0f16cda3bff5d8a989257912d8",
+     "content_sha256": "f57cbd20f57fa4a4fcb185a0771932c356dc210f382269c03b3ac875782a57dc",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_cifar100.npz",
+      "file_sha256": "9edf4199de927406e1a287fdae9181c55e416c0f16cda3bff5d8a989257912d8",
+      "content_sha256": "f57cbd20f57fa4a4fcb185a0771932c356dc210f382269c03b3ac875782a57dc",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_mnist": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/ood_mnist.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "torchvision.MNIST(train=False)",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "15c0a6afa7f7b0d3eff15408e943986c696ea52bbec6935e4eb3bdde10bce302",
+     "content_sha256": "d6d274f0ab68436f55396ccf5ccb12e199827aa8e33da1d59737cefb0b7c10c7",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_mnist.npz",
+      "file_sha256": "15c0a6afa7f7b0d3eff15408e943986c696ea52bbec6935e4eb3bdde10bce302",
+      "content_sha256": "d6d274f0ab68436f55396ccf5ccb12e199827aa8e33da1d59737cefb0b7c10c7",
+      "n": 10000,
+      "dim": 768
+     },
+     "openood_group": "far_ood"
+    },
+    "ood_places365": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/ood_places365.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "openood folder images_classic/places365",
+     "n_source": 182532,
+     "subsample_seed": 4104,
+     "file_sha256": "5fd8e637bdb0432a33afb478f6e592760f72e8c11d0c8d23ece3282b52d252e8",
+     "content_sha256": "e622c06823be6145ffa35658ceb213c9069ccc2b12df6946cffdb4bfbca976fb",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_places365.npz",
+      "file_sha256": "5fd8e637bdb0432a33afb478f6e592760f72e8c11d0c8d23ece3282b52d252e8",
+      "content_sha256": "e622c06823be6145ffa35658ceb213c9069ccc2b12df6946cffdb4bfbca976fb",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_svhn": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/ood_svhn.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "openood folder images_classic/svhn",
+     "n_source": 26032,
+     "subsample_seed": 4102,
+     "file_sha256": "d683ee74dcb1bb52ccc725b85ad03fc7582e29e6840c9adcafe2140a6e79d40f",
+     "content_sha256": "cd0be4dc04fd5b50133740b12c07f3d3ea06e6e5f04864ad446988870ab04a5b",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_svhn.npz",
+      "file_sha256": "d683ee74dcb1bb52ccc725b85ad03fc7582e29e6840c9adcafe2140a6e79d40f",
+      "content_sha256": "cd0be4dc04fd5b50133740b12c07f3d3ea06e6e5f04864ad446988870ab04a5b",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_texture": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/ood_texture.npz",
+     "n": 5640,
+     "dim": 768,
+     "source": "openood folder images_classic/texture",
+     "n_source": 5640,
+     "subsample_seed": null,
+     "file_sha256": "952b2699e2c4f1dae836a914392df666350a538959b9ae7cf38a8f99fb27867a",
+     "content_sha256": "d3dffe0c8b041323d077051f9da9b77e35441aa395582b9c94111a4fa6b264e6",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_texture.npz",
+      "file_sha256": "952b2699e2c4f1dae836a914392df666350a538959b9ae7cf38a8f99fb27867a",
+      "content_sha256": "d3dffe0c8b041323d077051f9da9b77e35441aa395582b9c94111a4fa6b264e6",
+      "n": 5640,
+      "dim": 768
+     }
+    },
+    "ood_tin": {
+     "file": "PhaseC/assets/embeddings/dinov2_vitb14/cifar10/ood_tin.npz",
+     "n": 8793,
+     "dim": 768,
+     "source": "filtered TIN imglist benchmark_imglist/cifar10/test_tin.txt",
+     "n_source": 8793,
+     "subsample_seed": null,
+     "file_sha256": "e2e9a3621f7e3a8f9613d1f449d9929e05e723f20312df54a509f4c2b9403689",
+     "content_sha256": "22c81dfb5fd8a0c776ed102b19ba9d58fe92bb9fc6e7f7000a1991ba20d52692",
+     "ckpt_sha256": "a1d6c0d7e89b576db6a71b9da31a7f07a6427aecf2bdcd68e312d5bbb04d30a5",
+     "preprocess_sha256": "9e5379a8548aee07092bbd85d08693393f00c82b5d616e6daa5ab70e5e0fec8a",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_tin.npz",
+      "file_sha256": "e2e9a3621f7e3a8f9613d1f449d9929e05e723f20312df54a509f4c2b9403689",
+      "content_sha256": "22c81dfb5fd8a0c776ed102b19ba9d58fe92bb9fc6e7f7000a1991ba20d52692",
+      "n": 8793,
+      "dim": 768
+     },
+     "openood_group": "near_ood",
+     "imglist_path": "benchmark_imglist/cifar10/test_tin.txt",
+     "imglist_sha256": "cf2ed2e4d8af1296646a4e7284852db57b121601518fdd94e0df7c2401df126f"
+    }
+   }
+  },
+  "resnet18_cifar_openood": {
+   "cifar10": {
+    "id_train": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/id_train.npz",
+     "n": 50000,
+     "dim": 512,
+     "source": "torchvision.CIFAR10",
+     "n_source": 50000,
+     "subsample_seed": null,
+     "file_sha256": "5f30cae62d277184969eaafb1cffa4bffdc1f37f0b0e79138ebee55145fa06da",
+     "content_sha256": "6af7470fc4a801d489f6dec21f0561824032ec98ba48578608625f1202eb3922",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "306896dd19d2abc98d1d0f868c1723e70370f297b8d3229550cd86a9952f3e7e",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_train.npz",
+      "file_sha256": "5f30cae62d277184969eaafb1cffa4bffdc1f37f0b0e79138ebee55145fa06da",
+      "content_sha256": "6af7470fc4a801d489f6dec21f0561824032ec98ba48578608625f1202eb3922",
+      "n": 50000,
+      "dim": 512
+     }
+    },
+    "id_test": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/id_test.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "torchvision.CIFAR10",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "9acbddafc43a3bb5b7d63e7787c4a97529fab9df27d36e06547e91f723049405",
+     "content_sha256": "52adb1d54427a769416fee8be28e36446a9edc34279f54a8c19a8f9fb6c445d2",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "306896dd19d2abc98d1d0f868c1723e70370f297b8d3229550cd86a9952f3e7e",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_test.npz",
+      "file_sha256": "9acbddafc43a3bb5b7d63e7787c4a97529fab9df27d36e06547e91f723049405",
+      "content_sha256": "52adb1d54427a769416fee8be28e36446a9edc34279f54a8c19a8f9fb6c445d2",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_ref": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/ood_ref.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "torchvision.CIFAR100",
+     "n_source": 50000,
+     "subsample_seed": 4107,
+     "file_sha256": "eb1cc3ea9d71e6ce54466c63317af37c7aabfc77bb65cde8e6ae7103d696f501",
+     "content_sha256": "dedb576c72856dbd4a695a1f12770af36f2cbd88a4226c27acf480fff4b3f571",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "306896dd19d2abc98d1d0f868c1723e70370f297b8d3229550cd86a9952f3e7e",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_ref.npz",
+      "file_sha256": "eb1cc3ea9d71e6ce54466c63317af37c7aabfc77bb65cde8e6ae7103d696f501",
+      "content_sha256": "dedb576c72856dbd4a695a1f12770af36f2cbd88a4226c27acf480fff4b3f571",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_cifar100": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/ood_cifar100.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "torchvision.CIFAR100",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "e3a328a51f8e46b842e06ab3a59e4bddd7ade5fb0933ef6e21ac5acddb6a05b7",
+     "content_sha256": "66abd9eba6405d2ca6c51952c1cb3512d976d9d45b59e0e80056531ecbca5541",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "306896dd19d2abc98d1d0f868c1723e70370f297b8d3229550cd86a9952f3e7e",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_cifar100.npz",
+      "file_sha256": "e3a328a51f8e46b842e06ab3a59e4bddd7ade5fb0933ef6e21ac5acddb6a05b7",
+      "content_sha256": "66abd9eba6405d2ca6c51952c1cb3512d976d9d45b59e0e80056531ecbca5541",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_mnist": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/ood_mnist.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "torchvision.MNIST(train=False)",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "f4d5c60940248ed9af416840ac9f03e1c1e70d1c180033371a0ff20c0b806f3a",
+     "content_sha256": "e58392d087ac5ba2fd770a72909eec23686e20ed52d769de891aabf2affb284e",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "c2f9efee73a262c57e09d34c1eec643dc30e0652276617748ce4e336348f0656",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_mnist.npz",
+      "file_sha256": "f4d5c60940248ed9af416840ac9f03e1c1e70d1c180033371a0ff20c0b806f3a",
+      "content_sha256": "e58392d087ac5ba2fd770a72909eec23686e20ed52d769de891aabf2affb284e",
+      "n": 10000,
+      "dim": 512
+     },
+     "openood_group": "far_ood"
+    },
+    "ood_places365": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/ood_places365.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "openood folder images_classic/places365",
+     "n_source": 182532,
+     "subsample_seed": 4104,
+     "file_sha256": "d3b0b945df481d1dfedac06fcbbf92be0fb65348d172a3ba43d16d593f23b5c8",
+     "content_sha256": "75f529b7a3b417a7456aec09015165e8642235ce65dcdbbb22c82aa6ae56fb96",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "306896dd19d2abc98d1d0f868c1723e70370f297b8d3229550cd86a9952f3e7e",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_places365.npz",
+      "file_sha256": "d3b0b945df481d1dfedac06fcbbf92be0fb65348d172a3ba43d16d593f23b5c8",
+      "content_sha256": "75f529b7a3b417a7456aec09015165e8642235ce65dcdbbb22c82aa6ae56fb96",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_svhn": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/ood_svhn.npz",
+     "n": 10000,
+     "dim": 512,
+     "source": "openood folder images_classic/svhn",
+     "n_source": 26032,
+     "subsample_seed": 4102,
+     "file_sha256": "85ae417edb17729c80f12f917a00801ea406e7f64ba5a2d620ee15634e078bb4",
+     "content_sha256": "22b316c706877a12e9782250c46c634ba1b900945b0502d50534d2e758f725aa",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "306896dd19d2abc98d1d0f868c1723e70370f297b8d3229550cd86a9952f3e7e",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_svhn.npz",
+      "file_sha256": "85ae417edb17729c80f12f917a00801ea406e7f64ba5a2d620ee15634e078bb4",
+      "content_sha256": "22b316c706877a12e9782250c46c634ba1b900945b0502d50534d2e758f725aa",
+      "n": 10000,
+      "dim": 512
+     }
+    },
+    "ood_texture": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/ood_texture.npz",
+     "n": 5640,
+     "dim": 512,
+     "source": "openood folder images_classic/texture",
+     "n_source": 5640,
+     "subsample_seed": null,
+     "file_sha256": "c2a33d3dcf5ea6f7a0222ce6675a5e1ed1fa682be74d27d9684588925bf434e1",
+     "content_sha256": "941371885a554be46623b92cc2b31c1dfa999ad31c2349008a39eca2ad616bce",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "306896dd19d2abc98d1d0f868c1723e70370f297b8d3229550cd86a9952f3e7e",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_texture.npz",
+      "file_sha256": "c2a33d3dcf5ea6f7a0222ce6675a5e1ed1fa682be74d27d9684588925bf434e1",
+      "content_sha256": "941371885a554be46623b92cc2b31c1dfa999ad31c2349008a39eca2ad616bce",
+      "n": 5640,
+      "dim": 512
+     }
+    },
+    "ood_tin": {
+     "file": "PhaseC/assets/embeddings/resnet18_cifar_openood/cifar10/ood_tin.npz",
+     "n": 8793,
+     "dim": 512,
+     "source": "filtered TIN imglist benchmark_imglist/cifar10/test_tin.txt",
+     "n_source": 8793,
+     "subsample_seed": null,
+     "file_sha256": "88d515e29114f2e2b6dae1f688f0522a98e42fe086cd97b2842a2aab1a5b8241",
+     "content_sha256": "501a1ddae36c51bd1ffe153156897839c390422f4d872bb53a2ae0394cec057e",
+     "ckpt_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+     "preprocess_sha256": "c2f9efee73a262c57e09d34c1eec643dc30e0652276617748ce4e336348f0656",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_tin.npz",
+      "file_sha256": "88d515e29114f2e2b6dae1f688f0522a98e42fe086cd97b2842a2aab1a5b8241",
+      "content_sha256": "501a1ddae36c51bd1ffe153156897839c390422f4d872bb53a2ae0394cec057e",
+      "n": 8793,
+      "dim": 512
+     },
+     "openood_group": "near_ood",
+     "imglist_path": "benchmark_imglist/cifar10/test_tin.txt",
+     "imglist_sha256": "cf2ed2e4d8af1296646a4e7284852db57b121601518fdd94e0df7c2401df126f"
+    }
+   }
+  },
+  "resnet50_imagenet": {
+   "cifar10": {
+    "id_train": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/id_train.npz",
+     "n": 50000,
+     "dim": 2048,
+     "source": "torchvision.CIFAR10",
+     "n_source": 50000,
+     "subsample_seed": null,
+     "file_sha256": "ef4c5878ca5ceac8a405d014e0b387b3735159749590f2d71d75444ca1c86b08",
+     "content_sha256": "28a75cd6f43bf5a3450878644f5fc300a0da5c5d995e92345afa7f1844cb2a9e",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_train.npz",
+      "file_sha256": "ef4c5878ca5ceac8a405d014e0b387b3735159749590f2d71d75444ca1c86b08",
+      "content_sha256": "28a75cd6f43bf5a3450878644f5fc300a0da5c5d995e92345afa7f1844cb2a9e",
+      "n": 50000,
+      "dim": 2048
+     }
+    },
+    "id_test": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/id_test.npz",
+     "n": 10000,
+     "dim": 2048,
+     "source": "torchvision.CIFAR10",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "f9f8e2224161cb9b7beba41c1069a6259b0a843eb49822019fb2f30920be6f62",
+     "content_sha256": "ef69cafba5e7853ff9d2505ea4632a9df489ccbccf8b76f9075ef90fb1c58c3b",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_test.npz",
+      "file_sha256": "f9f8e2224161cb9b7beba41c1069a6259b0a843eb49822019fb2f30920be6f62",
+      "content_sha256": "ef69cafba5e7853ff9d2505ea4632a9df489ccbccf8b76f9075ef90fb1c58c3b",
+      "n": 10000,
+      "dim": 2048
+     }
+    },
+    "ood_ref": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/ood_ref.npz",
+     "n": 10000,
+     "dim": 2048,
+     "source": "torchvision.CIFAR100",
+     "n_source": 50000,
+     "subsample_seed": 4107,
+     "file_sha256": "5308f5e654a3f7f009c97fe882fd44e9f69c86ce6cb2678c8e637c0e99a0f1fe",
+     "content_sha256": "f1f566137f6be65023341ec92be588d60ab79b861e8d0559d719f90f5a9bbd35",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_ref.npz",
+      "file_sha256": "5308f5e654a3f7f009c97fe882fd44e9f69c86ce6cb2678c8e637c0e99a0f1fe",
+      "content_sha256": "f1f566137f6be65023341ec92be588d60ab79b861e8d0559d719f90f5a9bbd35",
+      "n": 10000,
+      "dim": 2048
+     }
+    },
+    "ood_cifar100": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/ood_cifar100.npz",
+     "n": 10000,
+     "dim": 2048,
+     "source": "torchvision.CIFAR100",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "7b2ecdc8b7f26e204756623704364314361c69a57dd5ce20e1e53a24e12b02d7",
+     "content_sha256": "c9664d170b1672d5500b62230f1e98c753b9598777f492a47f7639d28a803656",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_cifar100.npz",
+      "file_sha256": "7b2ecdc8b7f26e204756623704364314361c69a57dd5ce20e1e53a24e12b02d7",
+      "content_sha256": "c9664d170b1672d5500b62230f1e98c753b9598777f492a47f7639d28a803656",
+      "n": 10000,
+      "dim": 2048
+     }
+    },
+    "ood_mnist": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/ood_mnist.npz",
+     "n": 10000,
+     "dim": 2048,
+     "source": "torchvision.MNIST(train=False)",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "f11581e31e059e39400f18d285154a23edafc8eb5897da52da69e23ab11a3403",
+     "content_sha256": "12fa552e5fc11c8ef54cf404eee43161e137e6e9be4745af40bf7c82e2b878c4",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_mnist.npz",
+      "file_sha256": "f11581e31e059e39400f18d285154a23edafc8eb5897da52da69e23ab11a3403",
+      "content_sha256": "12fa552e5fc11c8ef54cf404eee43161e137e6e9be4745af40bf7c82e2b878c4",
+      "n": 10000,
+      "dim": 2048
+     },
+     "openood_group": "far_ood"
+    },
+    "ood_places365": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/ood_places365.npz",
+     "n": 10000,
+     "dim": 2048,
+     "source": "openood folder images_classic/places365",
+     "n_source": 182532,
+     "subsample_seed": 4104,
+     "file_sha256": "bd201e7c37526f17e2cee75b245fc4e627f05f14be1ef223523ade3a473a0bf3",
+     "content_sha256": "2c34fcddad424c229f65b038dbe7f586520639b23db8ce535eb0cb17e720cd44",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_places365.npz",
+      "file_sha256": "bd201e7c37526f17e2cee75b245fc4e627f05f14be1ef223523ade3a473a0bf3",
+      "content_sha256": "2c34fcddad424c229f65b038dbe7f586520639b23db8ce535eb0cb17e720cd44",
+      "n": 10000,
+      "dim": 2048
+     }
+    },
+    "ood_svhn": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/ood_svhn.npz",
+     "n": 10000,
+     "dim": 2048,
+     "source": "openood folder images_classic/svhn",
+     "n_source": 26032,
+     "subsample_seed": 4102,
+     "file_sha256": "f26a81d2ab4487d6023774c5abeef630011fe47674eb2e38470eaaf4bfd3ab73",
+     "content_sha256": "6d15b93c3056acb3bb4f56e9a212fd645f3270c737a8701c96acd59ba36a9483",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_svhn.npz",
+      "file_sha256": "f26a81d2ab4487d6023774c5abeef630011fe47674eb2e38470eaaf4bfd3ab73",
+      "content_sha256": "6d15b93c3056acb3bb4f56e9a212fd645f3270c737a8701c96acd59ba36a9483",
+      "n": 10000,
+      "dim": 2048
+     }
+    },
+    "ood_texture": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/ood_texture.npz",
+     "n": 5640,
+     "dim": 2048,
+     "source": "openood folder images_classic/texture",
+     "n_source": 5640,
+     "subsample_seed": null,
+     "file_sha256": "e1aeb3cff84a0156c4826b015cde85145f1dae4389328e5068d77f15d7a978ad",
+     "content_sha256": "6024386e543a9425852e83542fd7d5a97d9e1c23adb479e3ac176105e7dd4412",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_texture.npz",
+      "file_sha256": "e1aeb3cff84a0156c4826b015cde85145f1dae4389328e5068d77f15d7a978ad",
+      "content_sha256": "6024386e543a9425852e83542fd7d5a97d9e1c23adb479e3ac176105e7dd4412",
+      "n": 5640,
+      "dim": 2048
+     }
+    },
+    "ood_tin": {
+     "file": "PhaseC/assets/embeddings/resnet50_imagenet/cifar10/ood_tin.npz",
+     "n": 8793,
+     "dim": 2048,
+     "source": "filtered TIN imglist benchmark_imglist/cifar10/test_tin.txt",
+     "n_source": 8793,
+     "subsample_seed": null,
+     "file_sha256": "45ee30302286144f59e325250b3a424cdc59d2437528c74322318ddf9c7cf3b7",
+     "content_sha256": "e93962fd22410d1e5e2b146ddd9fc699b0b5e0a98eb05e07a0a937fb91e4ea1a",
+     "ckpt_sha256": "01eece8b0ce916a55fa899f03550ecb28eab6606cd50f6bd998f1920f9c1c3a7",
+     "preprocess_sha256": "a3e6a7e01a6fc055aa46dedf3642c57464f480c2cdd6425660484d39003234fd",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_tin.npz",
+      "file_sha256": "45ee30302286144f59e325250b3a424cdc59d2437528c74322318ddf9c7cf3b7",
+      "content_sha256": "e93962fd22410d1e5e2b146ddd9fc699b0b5e0a98eb05e07a0a937fb91e4ea1a",
+      "n": 8793,
+      "dim": 2048
+     },
+     "openood_group": "near_ood",
+     "imglist_path": "benchmark_imglist/cifar10/test_tin.txt",
+     "imglist_sha256": "cf2ed2e4d8af1296646a4e7284852db57b121601518fdd94e0df7c2401df126f"
+    }
+   }
+  },
+  "vitb16_imagenet": {
+   "cifar10": {
+    "id_train": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/id_train.npz",
+     "n": 50000,
+     "dim": 768,
+     "source": "torchvision.CIFAR10",
+     "n_source": 50000,
+     "subsample_seed": null,
+     "file_sha256": "b6cbc855783530fabf62a55df9e8476e918332ef1454b0b44e26e7ba0fd1b872",
+     "content_sha256": "53468f6c591bbd2fb68a67cdb209523caafa54c7b5c569eb64c6086b0e26a358",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_train.npz",
+      "file_sha256": "b6cbc855783530fabf62a55df9e8476e918332ef1454b0b44e26e7ba0fd1b872",
+      "content_sha256": "53468f6c591bbd2fb68a67cdb209523caafa54c7b5c569eb64c6086b0e26a358",
+      "n": 50000,
+      "dim": 768
+     }
+    },
+    "id_test": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/id_test.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "torchvision.CIFAR10",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "1b8194b89a1c0bc333e4f2dd9c308da9158140749687be1b727e160e4d645cdc",
+     "content_sha256": "82385f84d2e266657b0588ff4adbcb91815d71bf8a8547a27d57d7bcca008247",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "id_test.npz",
+      "file_sha256": "1b8194b89a1c0bc333e4f2dd9c308da9158140749687be1b727e160e4d645cdc",
+      "content_sha256": "82385f84d2e266657b0588ff4adbcb91815d71bf8a8547a27d57d7bcca008247",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_ref": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/ood_ref.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "torchvision.CIFAR100",
+     "n_source": 50000,
+     "subsample_seed": 4107,
+     "file_sha256": "c83f954172e11ff571587682c73a1c0214434363f0e5f0b5848614587d836a53",
+     "content_sha256": "d4ca0478a3d6a3073cb10a359ab617ba79354f3a3e1f1709ab19de422ad6ee0b",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_ref.npz",
+      "file_sha256": "c83f954172e11ff571587682c73a1c0214434363f0e5f0b5848614587d836a53",
+      "content_sha256": "d4ca0478a3d6a3073cb10a359ab617ba79354f3a3e1f1709ab19de422ad6ee0b",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_cifar100": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/ood_cifar100.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "torchvision.CIFAR100",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "cfda61262b8ee1b086fdc3a3293bb5f1d1fb77692c796b9725c364983439047b",
+     "content_sha256": "a7e209ac7a22b789b2a747a86e5a0d8edd9842b0da391e2c84de986638e4e255",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_cifar100.npz",
+      "file_sha256": "cfda61262b8ee1b086fdc3a3293bb5f1d1fb77692c796b9725c364983439047b",
+      "content_sha256": "a7e209ac7a22b789b2a747a86e5a0d8edd9842b0da391e2c84de986638e4e255",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_mnist": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/ood_mnist.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "torchvision.MNIST(train=False)",
+     "n_source": 10000,
+     "subsample_seed": null,
+     "file_sha256": "f0d23dd0346a031eade425985771e0e0a2867c52d10a5c0c37ba82566c877f82",
+     "content_sha256": "875038c0ef79f16488a150219ac09ff2b2f34707c1b8ff4b7314b9ffdd314e81",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_mnist.npz",
+      "file_sha256": "f0d23dd0346a031eade425985771e0e0a2867c52d10a5c0c37ba82566c877f82",
+      "content_sha256": "875038c0ef79f16488a150219ac09ff2b2f34707c1b8ff4b7314b9ffdd314e81",
+      "n": 10000,
+      "dim": 768
+     },
+     "openood_group": "far_ood"
+    },
+    "ood_places365": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/ood_places365.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "openood folder images_classic/places365",
+     "n_source": 182532,
+     "subsample_seed": 4104,
+     "file_sha256": "53dd1594f4b1682271464bfbb54b8a253f07f6bd7bc40be72d978aaa95f6e35e",
+     "content_sha256": "abda757604816b10ab4bc3a376e718d1c432d47b924fe1b85c6655fe5084cd78",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_places365.npz",
+      "file_sha256": "53dd1594f4b1682271464bfbb54b8a253f07f6bd7bc40be72d978aaa95f6e35e",
+      "content_sha256": "abda757604816b10ab4bc3a376e718d1c432d47b924fe1b85c6655fe5084cd78",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_svhn": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/ood_svhn.npz",
+     "n": 10000,
+     "dim": 768,
+     "source": "openood folder images_classic/svhn",
+     "n_source": 26032,
+     "subsample_seed": 4102,
+     "file_sha256": "a23634195bd872c073d0e200226d5b978dc03cecb4117e047ae6954efd519d58",
+     "content_sha256": "c5f23dafab208717240553c7c918374707ea1ef91d49f524a24d36f4650d5e8a",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_svhn.npz",
+      "file_sha256": "a23634195bd872c073d0e200226d5b978dc03cecb4117e047ae6954efd519d58",
+      "content_sha256": "c5f23dafab208717240553c7c918374707ea1ef91d49f524a24d36f4650d5e8a",
+      "n": 10000,
+      "dim": 768
+     }
+    },
+    "ood_texture": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/ood_texture.npz",
+     "n": 5640,
+     "dim": 768,
+     "source": "openood folder images_classic/texture",
+     "n_source": 5640,
+     "subsample_seed": null,
+     "file_sha256": "c43484692a785118d99c13c2332bd9bf3d056d2c4a5723c2229b63edf7006e1d",
+     "content_sha256": "370c5aef7f6ab7a8057374a1c164e97e9c593b5538ebd9a03237590509563828",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_texture.npz",
+      "file_sha256": "c43484692a785118d99c13c2332bd9bf3d056d2c4a5723c2229b63edf7006e1d",
+      "content_sha256": "370c5aef7f6ab7a8057374a1c164e97e9c593b5538ebd9a03237590509563828",
+      "n": 5640,
+      "dim": 768
+     }
+    },
+    "ood_tin": {
+     "file": "PhaseC/assets/embeddings/vitb16_imagenet/cifar10/ood_tin.npz",
+     "n": 8793,
+     "dim": 768,
+     "source": "filtered TIN imglist benchmark_imglist/cifar10/test_tin.txt",
+     "n_source": 8793,
+     "subsample_seed": null,
+     "file_sha256": "c278ae768aea6733061af79be1445f08bab3b4210fbb5f752f6a006d99e96410",
+     "content_sha256": "690b99eea6804338cb818d9bb99ef3e4c707dcbd1c58259481a3e705e3268b21",
+     "ckpt_sha256": "debda5fb3edbb379e9329fa9c6d1be449145994ed2932b7873eb2e16067ccddf",
+     "preprocess_sha256": "9c050c6200caa614b7c8b787f39d5927f8cfb1a9b95bbc3536d2b35ccec55c9c",
+     "device_name": "NVIDIA A100-SXM4-80GB",
+     "torch": "2.1.1",
+     "sidecar": {
+      "file": "ood_tin.npz",
+      "file_sha256": "c278ae768aea6733061af79be1445f08bab3b4210fbb5f752f6a006d99e96410",
+      "content_sha256": "690b99eea6804338cb818d9bb99ef3e4c707dcbd1c58259481a3e705e3268b21",
+      "n": 8793,
+      "dim": 768
+     },
+     "openood_group": "near_ood",
+     "imglist_path": "benchmark_imglist/cifar10/test_tin.txt",
+     "imglist_sha256": "cf2ed2e4d8af1296646a4e7284852db57b121601518fdd94e0df7c2401df126f"
+    }
+   }
+  }
+ },
+ "datasets": {
+  "id_sets": {
+   "cifar10": {
+    "ood": [
+     "cifar100",
+     "tin",
+     "mnist",
+     "svhn",
+     "texture",
+     "places365"
+    ],
+    "near_ood": [
+     "cifar100",
+     "tin"
+    ],
+    "far_ood": [
+     "mnist",
+     "svhn",
+     "texture",
+     "places365"
+    ]
+   },
+   "imagenet200": {
+    "ood": [
+     "ssb_hard",
+     "ninco",
+     "inaturalist",
+     "texture",
+     "openimage_o"
+    ]
+   }
+  },
+  "cifar10_near_ood": [
+   "cifar100",
+   "tin"
+  ],
+  "cifar10_far_ood": [
+   "mnist",
+   "svhn",
+   "texture",
+   "places365"
+  ],
+  "cifar10_tin_imglists": [
+   "benchmark_imglist/cifar10/test_tin.txt",
+   "benchmark_imglist/cifar10/test_tin200.txt",
+   "imglist/cifar10/test_tin.txt",
+   "imglist/tin_cifar10_filtered.txt"
+  ],
+  "max_ood": 10000,
+  "max_ref": 10000,
+  "imagenet200_train_per_class": 260,
+  "archive_md5": {
+   "cifar10": "c58f30108f718f92721af3b95e74349a",
+   "cifar100": "eb9058c3a382ffc7106e4002c42a8d85"
+  },
+  "difficulty_axis": "OpenOOD near/far labels are informational only. Reported difficulty ordering and reach-vs-difficulty plots use measured identity-baseline AUROC per (backbone, ood_set, scorer) from generalisation_audit.csv.",
+  "tin_filter_note": "CIFAR-10 TIN must come from an OpenOOD/SCOOD filtered imglist (~1,207 CIFAR-10-class overlaps removed). Raw images_classic/tin is refused.",
+  "note": "per-split source, counts, imglist_sha256 and seeds are under `embeddings`"
+ },
+ "openood_resnet18_pairing": {
+  "checkpoint_version": "v1",
+  "checkpoint_id": "cifar10_res18",
+  "file_sha256": "05ea017319591f6134ed866d5fefc7ae889f0c42e8472302dc4b598447ab8eec",
+  "state_dict_sha256": "78ec703a95852119219d1ed06ef73c300d93f596c8bde10f1413ca2db3a25612",
+  "source_url": "https://drive.google.com/uc?id=1rPEScK7TFjBn_W_frO-8RSPwIG6_x0fJ",
+  "benchmark_pairing_note": "checkpoint is OpenOOD v1 (cifar10_res18); PhaseC far-OOD ladder follows the v1.5 taxonomy (MNIST, SVHN, Textures, Places365) rather than v1's FashionMNIST. Numbers are not drop-in comparable to the published OpenOOD v1 leaderboard row.",
+  "far_ood_ladder_used": [
+   "mnist",
+   "svhn",
+   "texture",
+   "places365"
+  ],
+  "far_ood_as_published_for_this_ckpt": [
+   "mnist",
+   "fashionmnist",
+   "texture",
+   "places365"
+  ]
+ },
+ "seeds": {
+  "dataset_subsampling": {
+   "ood_cifar100": 4101,
+   "ood_svhn": 4102,
+   "ood_texture": 4103,
+   "ood_places365": 4104,
+   "ood_tin": 4105,
+   "ood_lsun": 4106,
+   "ood_ref": 4107,
+   "ood_mnist": 4108,
+   "ood_ssb_hard": 4111,
+   "ood_ninco": 4112,
+   "ood_inaturalist": 4113,
+   "ood_openimage_o": 4115,
+   "imagenet200/id_train": 4121
+  },
+  "adapter_training": [
+   42,
+   52,
+   62,
+   72,
+   82,
+   92,
+   102,
+   112,
+   122,
+   132
+  ],
+  "operator_seeds": {
+   "deterministic": [
+    0
+   ],
+   "ortho_scale": [
+    0,
+    1,
+    2
+   ],
+   "general_affine": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "residual_nonlinear": [
+    0,
+    1,
+    2,
+    3,
+    4
+   ],
+   "adapter": [
+    42,
+    52,
+    62,
+    72,
+    82,
+    92,
+    102,
+    112,
+    122,
+    132
+   ]
+  },
+  "operator_rng_stream_ids": {
+   "ortho_scale": 1,
+   "general_affine": 2,
+   "residual_nonlinear": 3
+  },
+  "pair_sampling": 20260101,
+  "bounds_subsample": 20260102,
+  "audit_smoke_subsample": 20260103
+ },
+ "protocol": {
+  "temper_gammas": [
+   -0.5,
+   -0.25,
+   0.0,
+   0.25,
+   0.5,
+   0.75,
+   1.0
+  ],
+  "zca_alphas": [
+   0.0,
+   0.25,
+   0.5,
+   0.75,
+   1.0
+  ],
+  "residual_t": [
+   0.05,
+   0.1,
+   0.25,
+   0.5
+  ],
+  "adapter_alphas": [
+   0.0,
+   0.25,
+   0.5,
+   0.75,
+   1.0
+  ],
+  "general_affine_cond": 10.0,
+  "check1_thresholds": {
+   "tau": 0.002,
+   "S_high": 0.02,
+   "F0": 0.0001
+  },
+  "check1_grid": {
+   "tau": [
+    0.001,
+    0.002,
+    0.005,
+    0.01
+   ],
+   "S_high": [
+    0.005,
+    0.01,
+    0.02,
+    0.05,
+    0.1
+   ]
+  },
+  "n_pairs_default": 2000000,
+  "bounds_n_per_population": 600,
+  "ratio_valid_min": 0.99,
+  "ratio_preferred_spearman": 0.5,
+  "scorers": [
+   "maha",
+   "cosine",
+   "knn10",
+   "kde",
+   "rmd"
+  ],
+  "reg_eps": 1e-05,
+  "adapter_hp": {
+   "bottleneck": 16,
+   "epochs": 30,
+   "batch_half": 128,
+   "lr": 0.001,
+   "weight_decay": 0.0001,
+   "lambda_adv": 1.0,
+   "disc_hidden": 128,
+   "gelu": "exact"
+  }
+ },
+ "adapters": {
+  "clip_vitb16": {
+   "cifar10": {
+    "adapter_seed102": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed102.pt",
+     "sha256": "da2bceb3af598140a94e774aa3baac2a2b77114eee85b209d4483ac152193712"
+    },
+    "adapter_seed112": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed112.pt",
+     "sha256": "380a846144d7b0aadd86689f53603a33e131f213e8590c89f7a2a36ab21bb476"
+    },
+    "adapter_seed122": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed122.pt",
+     "sha256": "b932fe826279fc89b6497f6a69f0b73f5a16f00d6a8001f927b7390c0df46242"
+    },
+    "adapter_seed132": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed132.pt",
+     "sha256": "6a5e4e8b3b4244da79cd416783c9390a3f290702a9b076e725b4b61ff835621d"
+    },
+    "adapter_seed42": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed42.pt",
+     "sha256": "e358aedbe0a6b0995a85fd09522ef12d0032fff64da94414a1077f353e5f7988"
+    },
+    "adapter_seed52": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed52.pt",
+     "sha256": "3b279cbd06d128a37d6e8ba5e1db7317a16a3e09c1f65666e76a019b20a84a49"
+    },
+    "adapter_seed62": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed62.pt",
+     "sha256": "414a16a00afef553526487b527cd3da1b945486c0d2ba41fe04af0553b2823da"
+    },
+    "adapter_seed72": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed72.pt",
+     "sha256": "e6832d0fdeac0210a99f7bb65f3e276819808a40b4825bd898abf75fd2d3c79d"
+    },
+    "adapter_seed82": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed82.pt",
+     "sha256": "f3b19a8fffb7e977e389d4424a71c514abc92fc1b7dd400bc0f0b11444b8498e"
+    },
+    "adapter_seed92": {
+     "file": "PhaseC/assets/adapters/clip_vitb16/cifar10/adapter_seed92.pt",
+     "sha256": "c7e9afd7562eebd31a81c98cf7d026ebb6fc69f434f9faf01e4f5d20d7c58f1c"
+    }
+   }
+  },
+  "dinov2_vitb14": {
+   "cifar10": {
+    "adapter_seed102": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed102.pt",
+     "sha256": "2cc9ab6329febe6cd44f1234bd518831deffb78252958729ea0d0521769fb0cc"
+    },
+    "adapter_seed112": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed112.pt",
+     "sha256": "a009bc1b82f00fdfaf6e06b6e7edb7b3db7bac74aedae34bfeaebf902c3ea303"
+    },
+    "adapter_seed122": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed122.pt",
+     "sha256": "d32414273a47cd8e19ede6f19beb6647cba36ac80146184c663f9bce68275447"
+    },
+    "adapter_seed132": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed132.pt",
+     "sha256": "cf7393d0c2373972dae2e9e4af6b97e7db45b878e99eef767045f028e1e8af13"
+    },
+    "adapter_seed42": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed42.pt",
+     "sha256": "f64e4c911884acad3b7e08833edb9e9ea6dcead8827293451a07aa05ea3c0dda"
+    },
+    "adapter_seed52": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed52.pt",
+     "sha256": "8f05891b3a9988c5b2f470e27450441ea5e342e84ddf86a991592c35277a1706"
+    },
+    "adapter_seed62": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed62.pt",
+     "sha256": "8bcd44119fa5adfda14b7604504b91e3bcb7a9ab7b974dd50313d8ec1ee64e4d"
+    },
+    "adapter_seed72": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed72.pt",
+     "sha256": "02375250bbfdb8b352c2e12bc15915210e636a988958cb6a697b964c414db79e"
+    },
+    "adapter_seed82": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed82.pt",
+     "sha256": "ab5acd1b207a7b447fe2b3c2607b1e78f8410a2c964cefb4a279f85b47ce6dfb"
+    },
+    "adapter_seed92": {
+     "file": "PhaseC/assets/adapters/dinov2_vitb14/cifar10/adapter_seed92.pt",
+     "sha256": "24bf2287b917e58d9ca40d3cafc784323e7857d5acd02811fc8fa2e586a99fae"
+    }
+   }
+  },
+  "resnet18_cifar_openood": {
+   "cifar10": {
+    "adapter_seed102": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed102.pt",
+     "sha256": "5617c5be021f885c873a5a852bfe64b2d42191560c5601535ddb9626259297b9"
+    },
+    "adapter_seed112": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed112.pt",
+     "sha256": "f999facb14d00b8e42db9c63fc521a221b06c2ab75d5d5800050660f3f610109"
+    },
+    "adapter_seed122": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed122.pt",
+     "sha256": "1433012ed6218f4b885ee4642c3eb6a603d61e3b213ec9f6909894990f678ccf"
+    },
+    "adapter_seed132": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed132.pt",
+     "sha256": "2ec962aa89f81b3ed66105f21d672e5fc1adb59fd2271a8ad78aa2ad5593d769"
+    },
+    "adapter_seed42": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed42.pt",
+     "sha256": "894dbe9915c200ac382607252961f551355f2d0a36c97567ec8b7fbcdca509b1"
+    },
+    "adapter_seed52": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed52.pt",
+     "sha256": "d5e5d5483a2982f337a708404c237a736ab9c66d1622379769fbcfe07d57fe19"
+    },
+    "adapter_seed62": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed62.pt",
+     "sha256": "d36dafcbf85f1fd478a8ddc2cefa30cacc5b03d5651435cfc13356679a6c145a"
+    },
+    "adapter_seed72": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed72.pt",
+     "sha256": "31b579958f45c3a9f09af537c06f7e25e9985a3696e31975da7f1cc460624887"
+    },
+    "adapter_seed82": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed82.pt",
+     "sha256": "9421bd64641e7551ea500bbe7f7c99dbb2aa59e82058659a96cf70f7f9064c70"
+    },
+    "adapter_seed92": {
+     "file": "PhaseC/assets/adapters/resnet18_cifar_openood/cifar10/adapter_seed92.pt",
+     "sha256": "e85a860ee2e7b665596229a28c60a0e6b8dd5353e1577e662c1a46f4ad7e16fe"
+    }
+   }
+  },
+  "resnet50_imagenet": {
+   "cifar10": {
+    "adapter_seed102": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed102.pt",
+     "sha256": "22ab52c3fb33354a285615815e91107590487b061d97896bd95f7a6305a77743"
+    },
+    "adapter_seed112": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed112.pt",
+     "sha256": "96fc835feaf29b7b0e8879fdec0ff1f0a9c1bbb2d0ba26876915b2b75742e033"
+    },
+    "adapter_seed122": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed122.pt",
+     "sha256": "2e772301d5aab602b390f21f8ffd753f957400a4456da3265051b51c43d6cf46"
+    },
+    "adapter_seed132": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed132.pt",
+     "sha256": "e34bc7dd5df8253fb49a63db9d63c2ce1d2b09990b3f851e92f576b966bb89e1"
+    },
+    "adapter_seed42": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed42.pt",
+     "sha256": "ffcbc71fd3cf91b5c007322765000dc9cf76a300f5f9f8b51488a0231dd38ae3"
+    },
+    "adapter_seed52": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed52.pt",
+     "sha256": "5b2616ccb42ae54eb68e763c9adb7ea3aa78af3c122e03fc1bada1f9c283f59f"
+    },
+    "adapter_seed62": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed62.pt",
+     "sha256": "95e5242535e721e289e350a7a3c0d108425d4da5f81a9eceaa07ad35c2d387fb"
+    },
+    "adapter_seed72": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed72.pt",
+     "sha256": "90ca31398d26b688724639fd74b48a72105d3adc71d1a1262dafdf9e385503cb"
+    },
+    "adapter_seed82": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed82.pt",
+     "sha256": "fad9ef2e75b6cb0719c7fab6415dcd2b04a2247db7579f5655b09cea2d35d6ba"
+    },
+    "adapter_seed92": {
+     "file": "PhaseC/assets/adapters/resnet50_imagenet/cifar10/adapter_seed92.pt",
+     "sha256": "e90e93b243f4701d180e0ad41d63c3cad56ac01edfc1a6f994bbb2325801fb43"
+    }
+   }
+  },
+  "vitb16_imagenet": {
+   "cifar10": {
+    "adapter_seed102": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed102.pt",
+     "sha256": "15ba4a5b5b7847e3663d92bff12c0d50f35c1f966fe964a3279491b5b23c361b"
+    },
+    "adapter_seed112": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed112.pt",
+     "sha256": "712fcb4efe695a467d38bb215aba66b3241066a9583d3d8d1d191f8e51cddee7"
+    },
+    "adapter_seed122": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed122.pt",
+     "sha256": "630f4658012bce2a14d6151503524dde2e68b8b3bd455127ac6c15b88ee3a190"
+    },
+    "adapter_seed132": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed132.pt",
+     "sha256": "d454584951ae3567ec29bcb65973e36f387c15dfd6ec117b3ffeb14f4ed58d15"
+    },
+    "adapter_seed42": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed42.pt",
+     "sha256": "567806a7088b0d4af35221739a89bf111bf29dd6d97a967a4b247048c0c39676"
+    },
+    "adapter_seed52": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed52.pt",
+     "sha256": "aed5a21854215964edac04ad3e59af790ff7039a4218df3cc95d04d6c6b80c1a"
+    },
+    "adapter_seed62": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed62.pt",
+     "sha256": "9e56cdf7889728c5df733d3f27a1d46a13ab809784caf3522259809fc34fad03"
+    },
+    "adapter_seed72": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed72.pt",
+     "sha256": "8ec36d58ae84c7eaadf9306fbe4347cfb1fa4e32737214a740c099076f40d8e6"
+    },
+    "adapter_seed82": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed82.pt",
+     "sha256": "50c156eabdcbec1145119a96ebac81cba538c87fe243121c87452409bbb7aae1"
+    },
+    "adapter_seed92": {
+     "file": "PhaseC/assets/adapters/vitb16_imagenet/cifar10/adapter_seed92.pt",
+     "sha256": "10fe96f332f5e4ff33cd1a70d7f97718d454e0ce8c87a65899e2598051df8b98"
+    }
+   }
+  }
+ },
+ "outputs": {
+  "check2_feasibility.json": {
+   "sha256": "d19f5c39f032bf66e4ff256ac0fa08fee7402716aec299a0b1af7978208e5e8a",
+   "bytes": 3627
+  },
+  "check3_construction.csv": {
+   "sha256": "735d81c89098eb99c712656899daca706dc07dbb66346f5bd98cae7c7c9ff23d",
+   "bytes": 45407
+  },
+  "download_gdown.log": {
+   "sha256": "e806408e67449b39c263e35f70e0470a7b76046276565df8b36da8cb15962fdd",
+   "bytes": 142219
+  },
+  "download_svhn.log": {
+   "sha256": "e13e5b416b0c32430c69ea6434e6929b73a5694f251d470d82808dc2b70778a2",
+   "bytes": 884
+  },
+  "download_tv.log": {
+   "sha256": "96a48c044299ef3808f89990c2a98559e2d36d6f946ed726ba65cbe920e24959",
+   "bytes": 5303
+  },
+  "download_tv_extra.log": {
+   "sha256": "0c3416199f41066d4087bf31d2689bd6ab2c7eb5ccc0d82806b8380468ea3969",
+   "bytes": 3903
+  }
+ },
+ "scripts": {
+  "PhaseC/analysis/__init__.py": "567536d55beded673e02556e50cc3f81ab76d853f9bd911085f22ffb26a499fe",
+  "PhaseC/analysis/backbones.py": "3db1b391be5684dbf3d559170673dcb7d4d6432d6e7e852740d941d5b9126834",
+  "PhaseC/analysis/bounds.py": "e29ed1ee3f60d65b0d91e9e36eed727c5f607784bb2b163e799ce486cf8425df",
+  "PhaseC/analysis/checks.py": "02dff94faed1ab2b7cc2b7b5b99558a1f5cc901325e18898ebe770b3fde9f306",
+  "PhaseC/analysis/datasets_phasec.py": "af860edbfa16082929abd783425219575a017a31ce3ae1a5fd5857833a5a7614",
+  "PhaseC/analysis/extract_embeddings.py": "24cc03ed76d286082862e76061a6c171f60def17b429fb320cf55e56d1285f1c",
+  "PhaseC/analysis/install_tin_imglist.py": "fd118bb5f4ae43a381affd9e0a1147926c08c5aca8b6d25220c2abef9eaed0ac",
+  "PhaseC/analysis/operators.py": "69988bec36721c436ab1db065ddcf9f742927a49c11e949f3c77f0763ccf08a6",
+  "PhaseC/analysis/reach.py": "805d64d7346fc33f39c048d89b27e72c61e75d653c996af60a728b7ad2a7ad6b",
+  "PhaseC/analysis/resnet18_32x32.py": "35971b201a9e4c1493687cafd4ad5465afe33b667e86f6e0f4da37531f01f516",
+  "PhaseC/analysis/run_audit.py": "787d2f5735e55863f01f343c3604ccf6640c843acd77e94ad41fd93fb38bcd4e",
+  "PhaseC/analysis/scorers.py": "dead647e7de34c3ecea57e4198f65fdbebdd6f04a12f22012bece0c960da1743",
+  "PhaseC/analysis/train_adapters.py": "ca9166227a0676b81e454298bdd334b382659a28370cee193c01d3b6acfcc34c",
+  "PhaseC/analysis/write_findings.py": "424726e1a29a2464cc0f854d598323be5caa825dc36a7fcefcd03e0aae2702ca",
+  "PhaseC/analysis/write_manifest.py": "5ddd5b739dd8d2b25a73467c9e89209fac99d8890490358a1eff6a62961482f9",
+  "PhaseB/analysis/data_roots.py": "09e014901ed1402575030e6927cae734427425a596b7bb05fe680ad989769e41"
+ }
+}

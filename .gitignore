@@ -28,3 +28,14 @@ PhaseB/external/PanDerm/
 # who cannot regenerate them; distributed as a release asset, never committed.
 embeddings_items*.zip
 per_example_scores.zip
+
+# Phase C: downloaded datasets, extracted embeddings, trained adapters, fetched checkpoints, smoke outputs.
+# Analysis scripts, pinned preprocessing JSON, manifest, audit CSVs/notes ARE tracked.
+# Embedding / adapter / checkpoint binaries are gitignored; SHA-256 lives in outputs/manifest.json
+# (same pattern as Phase B: regenerate from pins, do not vendor the tensors).
+PhaseC/data/
+PhaseC/assets/embeddings/
+PhaseC/assets/adapters/
+PhaseC/assets/checkpoints/
+PhaseC/outputs/smoke/
+PhaseC/outputs/logs/
