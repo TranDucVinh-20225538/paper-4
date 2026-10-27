@@ -28,13 +28,20 @@ Without ImageNet-1k train/val on disk, ImageNet-200 extraction cannot start.
 Acquisition must provide a path (or a download source the cluster can reach) and
 be recorded in the manifest before round-two extract.
 
-## ImageNet-21k (SSB-hard)
+## ImageNet-21k (full) vs OpenOOD-packaged SSB-hard
 
-**Unavailable.** Only HuggingFace model caches mentioning `in21k` were found
-(weights, not the dataset). Per the brief: **do not substitute** another set and
-call it SSB-hard. If 21k remains absent after acquisition planning, **drop
-SSB-hard** and state that near-OOD on this cluster is NINCO-only (plus whatever
-else is actually present).
+**Full ImageNet-21k: unavailable** on this cluster (only HF model caches
+mentioning `in21k`). We will **not** invent a substitute and call it SSB-hard.
+
+**However:** OpenOOD v1.5 ships a curated `ssb_hard` image archive under
+`images_largescale/` (gdown id `1PzkA-WGG8Z18h0ooL_pDdz9cO-DCIouE` in
+`OpenOOD/scripts/download/download.py`). That archive *is* the OpenOOD
+benchmark artifact for SSB-hard (drawn from 21k upstream), not a homemade
+replacement. **Plan:** download OpenOOD’s `ssb_hard` package; do **not** stage
+full 21k. If that gdown fails, drop SSB-hard and say near-OOD is NINCO-only.
+
+Same pattern for NINCO / iNaturalist-OOD / OpenImage-O / (optional) OpenOOD’s
+`imagenet_1k` packaging — each has a gdown id in that script.
 
 ## OpenOOD install / version
 
@@ -54,18 +61,25 @@ fetched; do not assume v1 ≡ v1.5 split definitions.
 
 ## What can start now (I/O only, parallel with CIFAR-10 sweep)
 
-1. Fetch OpenOOD **benchmark_imglist** for `imagenet200/` and `imagenet/` (small).
-2. Reuse round-one **Textures/DTD** files; path-list SHA-256 already measured:
+1. Fetch OpenOOD **benchmark_imglist** (gdown id `1lI1j0_fDDvjIt9JlWAw09X8ks-yrR_H1`) — in flight.
+2. Reuse round-one **Textures/DTD**; path-list SHA-256:
    `c7161032d3e42e9ebef03649f2474ca7bdfcdd9c91caafde46660a2499155b55` (5 640 images).
-3. **Cannot** start ImageNet-1k / 21k / NINCO / iNaturalist / OpenImage-O image
-   pulls until a source URL or shared path is known — none is on this cluster today.
+3. Queue OpenOOD image zips (`ssb_hard`, `ninco`, `inaturalist`, `openimage_o`) via
+   the same download script — I/O only; no GPU.
+4. **ImageNet-1k** remains the hard gap: either OpenOOD’s `imagenet_1k` gdown
+   (`1i1ipLDFARR-JZ9argXd2-0a6DXwVhXEj`, large) or a shared ILSVRC path. Not on
+   disk today; do not start round-two extract until it is.
+
+OpenOOD version for round two: **v1.5 download script / imglist zip** (NeurIPS
+2023 DistShift short version lineage). Exact imglist file SHA-256 recorded in
+the manifest once the zip lands.
 
 ## Gap summary (design impact)
 
 | Set | Runnable now? | If missing |
 |---|---|---|
-| ImageNet-200 ID (needs 1k) | **No** | Block round-two extract |
-| SSB-hard (needs 21k) | **No** | Drop SSB-hard; say so in FINDINGS |
-| NINCO / iNaturalist-OOD / OpenImage-O | Lists absent; images absent | Fetch with OpenOOD script once 1k path exists |
-| Textures/DTD | **Yes** (reuse CIFAR-10 copy) | — |
+| ImageNet-200 ID (needs 1k) | **No** (1k absent) | Block extract |
+| SSB-hard | Lists via imglist zip; images via OpenOOD `ssb_hard` gdown (**not** full 21k) | Drop only if that package fails |
+| NINCO / iNaturalist-OOD / OpenImage-O | Same — OpenOOD packages | Fetch in parallel |
+| Textures/DTD | **Yes** (reuse) | — |
 | ResNet-18 on IN-200 | Code path exists; needs 1k+lists | Keep deliberately OOD (see `imagenet200_scope.md`) |

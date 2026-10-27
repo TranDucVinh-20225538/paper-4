@@ -9,7 +9,7 @@ ResNet-18 role so FINDINGS does not have to invent a defence later.
 | Role | Set | Source |
 |---|---|---|
 | ID | ImageNet-200 | OpenOOD 200-class list **verbatim** (`benchmark_imglist/imagenet200/train_*.txt`, `val_*.txt`, `test_*.txt`); record file SHA-256 in the manifest when fetched |
-| Near-OOD | SSB-hard | OpenOOD `benchmark_imglist/imagenet/test_ssb_hard.txt` — **requires ImageNet-21k**; drop if 21k absent (see `imagenet200_feasibility.md`) |
+| Near-OOD | SSB-hard | OpenOOD `test_ssb_hard.txt` + OpenOOD-packaged `images_largescale/ssb_hard` (curated from 21k upstream; **not** full 21k). Drop only if that package is unavailable — never a homemade substitute (see `imagenet200_feasibility.md`) |
 | Near-OOD | NINCO | OpenOOD `test_ninco.txt` + NINCO images |
 | Far-OOD | iNaturalist (OOD subset) | OpenOOD `test_inaturalist.txt` — the OOD subset, not full iNat |
 | Far-OOD | Textures/DTD | **Reuse CIFAR-10 round files** under `images_classic/texture` (5 640 images); path-list SHA-256 `c7161032d3e42e9ebef03649f2474ca7bdfcdd9c91caafde46660a2499155b55` |

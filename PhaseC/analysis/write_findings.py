@@ -32,6 +32,8 @@ PHASEC = HERE.parent
 REPO = PHASEC.parent
 sys.path.insert(0, str(HERE))
 
+# kde = Phase B σ̄ bandwidth (published column). kde_det = addition with det(Σ)^(1/(2d));
+# never treat kde_det as an erratum replacing kde (see notes/kde_bandwidth_mechanism.md).
 SCORERS = ("maha", "cosine", "knn10", "kde", "kde_det", "rmd")
 AFFINE = ("ortho_scale", "spectral_temper", "zca", "general_affine")
 OUTSIDE = ("radial_l2", "residual_nonlinear", "adapter")
