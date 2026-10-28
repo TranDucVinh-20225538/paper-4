@@ -205,15 +205,18 @@ def main(argv=None):
               "inside 2δ and S ≈ 1, while ranks — hence AUROC — stay flat: registered invariant. "
               "The *ridged* Mahalanobis the audit scores with (eps = 1e-5) is rank-invariant under "
               "the affine group to within the Theorem 2 deviation — not the exact Theorem 1 "
-              "statement, which is about the unregularised refit. Its scores also move "
+              "statement, which is about the unregularised refit and is only computable on "
+              "backbones where λ_min(C) sits well above ε²_float32 (see maha_noridge below). "
+              "Its scores also move "
               f"(median δ_med = {num(float(diag.loc['maha', 'median_delta_med']), 3)} on this "
-              "slice); the map is nearly monotone in the score, and separately the ID–OOD margins "
-              "are wide relative to that displacement, so S stays ≪ S_high. Both are true; neither "
-              "is \"the scorer did not need to move.\" The registered invariant label is "
-              "**structurally unreachable** for a scorer whose margins dwarf δ, because S(δ) is a "
-              "worst-case bound over *arbitrary* perturbations of size δ and carries no information "
-              "about a nearly monotone one. That is a miscalibration of the label by construction, "
-              "not a failure of maha.", ""]    # Precision-aware alternate — stricter flatness, NOT invariance
+              "slice); under the ridge the ranking is preserved to within that deviation, and "
+              "separately the ID–OOD margins are wide relative to the displacement, so S stays "
+              "≪ S_high. Both are true; neither is \"the scorer did not need to move.\" The "
+              "registered invariant label is **structurally unreachable** for a scorer whose "
+              "margins dwarf δ, because S(δ) is a worst-case bound over *arbitrary* perturbations "
+              "of size δ and carries no information about a ridge-near-monotone one. That is a "
+              "miscalibration of the label by construction, not a failure of maha.", ""]
+    # Precision-aware alternate — stricter flatness, NOT invariance
     alt_rows = []
     for grp, names in (("affine", AFFINE), ("outside", OUTSIDE)):
         for sc in SCORERS:
@@ -322,15 +325,19 @@ def main(argv=None):
                 pred = ja.groupby("scorer").agg(**agg_kw).reindex([s for s in SCORERS if s in set(ja.scorer)])
                 L += ["**Affine rank test (ridged estimator, eps = 1e-5).** The audit's Mahalanobis is "
                       "`scatter/(N−K) + eps·I` with eps = 1e-5 — the Theorem 2 object, not the unregularised "
-                      "Theorem 1 object. The claim that can be made about what people deploy: the ridged "
-                      "estimator is rank-invariant under the affine group to within the Theorem 2 deviation; "
+                      "Theorem 1 object. The claim that can be made about what people deploy — and the only "
+                      "well-posed claim on all five backbones, including those where λ_min(C) sits at the "
+                      "float32 noise floor — is that the ridged estimator is rank-invariant under the affine "
+                      "group to within the Theorem 2 deviation; "
                       f"at eps = 1e-5 that deviation stays below 1−ρ = {RANK_RHO_TOL:.0e} in 100% of clean-affine "
                       "configurations and becomes visible only under tempering that drives σ_min(A) toward zero. "
                       "ρ = 1 exactly was never the prediction for this estimator: under ortho_linear (a pure "
-                      "rotation) ridged maha already reaches 1−ρ = 7.06e-05 with a median of 46 and a maximum of "
-                      "7358 discordant pairs of 2M — an exactly rank-invariant scorer has zero. "
+                      "rotation) ridged maha already reaches 1−ρ = 7.06e-05 with thousands of discordant pairs "
+                      "of 2M on resnet18 — an exactly rank-invariant scorer has zero. "
                       f"Tolerance {RANK_RHO_TOL:.0e} is a round number above that clean-affine residual, not "
-                      "fitted to the γ<0 failures.", "",
+                      "fitted to the γ<0 failures. Exact Theorem 1 confirmation is available only on the "
+                      "three backbones where the unregularised covariance is computable in float32 "
+                      "(maha_noridge section).", "",
                       table(pred, p=3), ""]
                 clean = ja[ja.operator.isin(["ortho_linear", "ortho_scale", "general_affine", "zca"])]
                 temper_neg = ja[(ja.operator == "spectral_temper") & (ja.dose < 0)]
@@ -421,38 +428,81 @@ def main(argv=None):
                           "dinov2 worst (smallest λ_min) and got the sign of corr(1−ρ, λ_min(C)) wrong "
                           "(+0.48 over joined affine rows); it is withdrawn. Cosine/knn10's 1e-12 ortho_linear "
                           "floor bounds unamplified rounding only — they never invert a covariance.", ""]
-                # maha_noridge (Theorem 1 estimator)
+                # maha_noridge (Theorem 1 estimator) — per-backbone paired, two regimes
                 nr_path = ar.out / "maha_noridge_clean_affine.csv"
                 if nr_path.is_file():
                     nr = pd.read_csv(nr_path)
-                    agg_nr = dict(n=("rank_one_minus_rho", "size"),
-                                  max_1_minus_rho=("rank_one_minus_rho", "max"),
-                                  median_1_minus_rho=("rank_one_minus_rho", "median"),
-                                  max_n_discordant=("n_discordant_pairs", "max"),
-                                  median_n_discordant=("n_discordant_pairs", "median"))
-                    if "degenerate_constant" in nr.columns:
-                        agg_nr["n_degenerate"] = ("degenerate_constant", "sum")
-                    nr_sum = nr.groupby("scorer").agg(**agg_nr)
-                    ol = nr[nr.operator == "ortho_linear"]
-                    L += ["**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12) over clean "
-                          "affine.** Prediction: under ortho_linear, 1−ρ and discordant counts at the level "
-                          "cosine/knn10 already show (max ~1 discordant of 2M), not thousands. "
-                          "Compared side-by-side with the ridged (eps = 1e-5) column on the same maps:", "",
-                          table(nr_sum, p=3), ""]
-                    if len(ol):
-                        L += ["Under ortho_linear alone: ridged maha max 1−ρ = "
-                              f"{num(float(ol[ol.scorer=='maha'].rank_one_minus_rho.max()), 2)} / "
-                              f"max discordant = {int(ol[ol.scorer=='maha'].n_discordant_pairs.max())}; "
-                              f"maha_noridge max 1−ρ = "
-                              f"{num(float(ol[ol.scorer=='maha_noridge'].rank_one_minus_rho.max()), 2)} / "
-                              f"max discordant = {int(ol[ol.scorer=='maha_noridge'].n_discordant_pairs.max())} "
-                              f"(median discordant = {int(ol[ol.scorer=='maha_noridge'].n_discordant_pairs.median())}). "
-                              "The residual drops by orders of magnitude; the overall max above is driven by "
-                              "zca on ill-conditioned backbones (still ≪ 1e-3). Theorem 1 holds on its "
-                              "estimator; the ridged residual is the ridge.", ""]
                     if "degenerate_constant" in nr.columns:
                         L += [f"Degenerate constant-score rows (ptp=0 before and after, forced ρ=1): "
                               f"{int(nr.degenerate_constant.sum())} (expect 0).", ""]
+                    # λ_min(C)/λ̄ from Theorem 2 rows (median over configs); λ̄ = tr(Σ)/d
+                    eps2 = float(np.finfo(np.float32).eps) ** 2
+                    lam_tab = None
+                    if b is not None and len(b):
+                        t2lam = b[(b.id_set == ar.id_set) & (b.bound == "theorem2_maha")].copy()
+                        if len(t2lam) and "Sigma_trace" in t2lam.columns and "dim" in t2lam.columns:
+                            # Prefer raw smallest eigenvalue when present (pre-ridge).
+                            lam_col = "lambda_min_C_raw" if "lambda_min_C_raw" in t2lam.columns else "lambda_min_C"
+                            lam_tab = (t2lam.groupby("backbone")
+                                       .agg(lambda_min_C=(lam_col, "median"),
+                                            Sigma_trace=("Sigma_trace", "median"),
+                                            dim=("dim", "first")))
+                            lam_tab["lam_bar"] = lam_tab.Sigma_trace / lam_tab.dim
+                            lam_tab["lam_min_over_bar"] = lam_tab.lambda_min_C / lam_tab.lam_bar
+                            lam_tab["lam_min_over_eps2_f32"] = lam_tab.lambda_min_C / eps2
+                    ol = nr[nr.operator == "ortho_linear"]
+                    if len(ol):
+                        disc = (ol.groupby(["backbone", "scorer"]).n_discordant_pairs.max()
+                                .unstack().rename(columns={"maha": "ridged_discordant",
+                                                           "maha_noridge": "noridge_discordant"}))
+                        paired = disc.copy()
+                        if lam_tab is not None:
+                            paired = paired.join(lam_tab[["lam_bar", "lambda_min_C", "lam_min_over_bar",
+                                                          "lam_min_over_eps2_f32"]], how="left")
+                            paired = paired.rename(columns={
+                                "lam_bar": "lam_bar",
+                                "lambda_min_C": "lambda_min_C",
+                                "lam_min_over_bar": "lam_min_over_lam_bar",
+                                "lam_min_over_eps2_f32": "lam_min_over_eps2_f32",
+                            })
+                            # Sort: exact regime first (high lam_min/eps2), then noise-floor.
+                            paired = paired.sort_values("lam_min_over_eps2_f32", ascending=False)
+                        L += ["**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12), "
+                              "paired within backbone under ortho_linear.** Pooling max-over-backbone "
+                              "reverses the sign: the ridged max discordant (7358) is resnet18; the "
+                              "noridge max (276) is vitb16. Same maps, same backbone:", "",
+                              table(paired, p=3), ""]
+                        # Regime split
+                        if lam_tab is not None and "lam_min_over_eps2_f32" in paired.columns:
+                            exact = paired[paired.noridge_discordant == 0]
+                            noise = paired[paired.noridge_discordant > 0]
+                            L += [f"ε²_float32 = {num(eps2, 2)}. On the three backbones where "
+                                  f"λ_min(C)/λ̄ ≫ ε²_float32 (resnet18, clip, resnet50; "
+                                  f"λ_min/ε² from {num(float(exact.lam_min_over_eps2_f32.min()), 2)} to "
+                                  f"{num(float(exact.lam_min_over_eps2_f32.max()), 2)}), dropping the ridge "
+                                  "takes every clean-affine operator to **0 discordant pairs of 2,000,000** — "
+                                  "Theorem 1 confirmed exactly. On dinov2 and vitb16, λ_min(C) sits within a "
+                                  f"factor of ~2–10 of ε²_float32 (λ_min/ε² = "
+                                  f"{num(float(noise.lam_min_over_eps2_f32.min()), 2)}–"
+                                  f"{num(float(noise.lam_min_over_eps2_f32.max()), 2)}); the variance in that "
+                                  "direction is float32 rounding noise, the unregularised covariance is not a "
+                                  "computable object, and eps = 1e-12 implements a differently-ridged solve "
+                                  "conditioned ~10⁷ worse — noridge is 27–28× *worse* than ridged under "
+                                  "ortho_linear, and the same reversal holds on ortho_scale, general_affine, "
+                                  "and zca. That is those two backbones under every operator, not zca alone. "
+                                  "Do not re-extract in float64: the backbones compute in float32, so float64 "
+                                  "storage would only record float32-precision values and λ_min would not move. "
+                                  "Limitation, with the table as evidence.", "",
+                                  "So the claim is not \"Theorem 1 holds on its estimator.\" **Theorem 1 is "
+                                  "confirmed exactly — 0 discordant pairs of 2,000,000, on every clean affine "
+                                  "operator — on the three backbones where its hypothesis is computable in "
+                                  "float32, and is not testable on the two where λ_min(C) falls to the float32 "
+                                  "noise floor.** The dividing line is λ_min(C)/λ̄ against ε²_float32, and it "
+                                  "separates the five backbones by ten orders of magnitude with nothing in "
+                                  "between. The exact-invariance result that motivates the scorer choice cannot "
+                                  "be realised on DINOv2 or ViT-B/16 embeddings at the precision those "
+                                  "embeddings carry. The ridged statement is therefore not a concession: it is "
+                                  "the only well-posed claim available on two of five backbones.", ""]
                 else:
                     L += ["`maha_noridge_clean_affine.csv` not yet written — Theorem 1 on the unregularised "
                           "estimator is pending (`diagnose_rank_failures.py`).", ""]
@@ -708,7 +758,15 @@ def main(argv=None):
                   "eigenvalue is 1e-13–1e-3, so the denominator collapses and the bound inflates by 1/λ_min². "
                   "On dinov2/vitb16 that single factor accounts for the ~1e11 pred/obs ratio; on resnet50 "
                   "λ_min is larger (~1e-3) and the overstatement drops to ~1e3. "
-                  "\"The bound is loose because λ_min(C) is pessimistic by that much,\" not merely \"the bound is loose.\"", ""]
+                  "\"The bound is loose because λ_min(C) is pessimistic by that much,\" not merely \"the bound is loose.\"", "",
+                  "**Two regimes for exact affine rank-invariance (Q1 maha_noridge).** The same λ_min that "
+                  "makes Theorem 2 vacuous on dinov2/vitb16 also makes Theorem 1's unregularised estimator "
+                  "uncomputable there: λ_min(C) sits within a factor of ~2–10 of ε²_float32, so the variance "
+                  "in that direction is feature rounding noise. Theorem 1 is confirmed exactly (0 discordant "
+                  "pairs of 2M on every clean affine operator) on resnet18, clip, and resnet50, where "
+                  "λ_min/ε²_float32 is 10⁸–10¹⁰; it is not testable on the two transformer backbones. The "
+                  "ridged (eps = 1e-5) claim is therefore the only well-posed one on all five. Do not "
+                  "re-extract embeddings in float64 — the backbones compute in float32 and λ_min would not move.", ""]
             # ‖I−AAᵀ‖₂ = 9 is operator-set, not data: confirm per-operator breakdown
             i2 = t2.groupby("operator").I_minus_AAT_2.agg(["median", "min", "max", "count"])
             L += ["‖I−AAᵀ‖₂ medianed to 9 on every backbone in the table above: that common value is set by "

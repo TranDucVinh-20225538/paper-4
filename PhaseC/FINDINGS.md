@@ -34,7 +34,7 @@ Shares of configurations (dose > 0, all backbones, OOD rungs, seeds). `flat_inva
 | maha | 90 | 3.00e-06 | 2.54 | 7.45e-05 | 0 | 0.744 |
 | knn10 | 90 | 0 | 7.29 | 0.999 | 0.989 | 0.0111 |
 
-knn10's scores move under scale (median δ_med large) so many ID–OOD pairs sit inside 2δ and S ≈ 1, while ranks — hence AUROC — stay flat: registered invariant. The *ridged* Mahalanobis the audit scores with (eps = 1e-5) is rank-invariant under the affine group to within the Theorem 2 deviation — not the exact Theorem 1 statement, which is about the unregularised refit. Its scores also move (median δ_med = 2.54 on this slice); the map is nearly monotone in the score, and separately the ID–OOD margins are wide relative to that displacement, so S stays ≪ S_high. Both are true; neither is "the scorer did not need to move." The registered invariant label is **structurally unreachable** for a scorer whose margins dwarf δ, because S(δ) is a worst-case bound over *arbitrary* perturbations of size δ and carries no information about a nearly monotone one. That is a miscalibration of the label by construction, not a failure of maha.
+knn10's scores move under scale (median δ_med large) so many ID–OOD pairs sit inside 2δ and S ≈ 1, while ranks — hence AUROC — stay flat: registered invariant. The *ridged* Mahalanobis the audit scores with (eps = 1e-5) is rank-invariant under the affine group to within the Theorem 2 deviation — not the exact Theorem 1 statement, which is about the unregularised refit and is only computable on backbones where λ_min(C) sits well above ε²_float32 (see maha_noridge below). Its scores also move (median δ_med = 2.54 on this slice); under the ridge the ranking is preserved to within that deviation, and separately the ID–OOD margins are wide relative to the displacement, so S stays ≪ S_high. Both are true; neither is "the scorer did not need to move." The registered invariant label is **structurally unreachable** for a scorer whose margins dwarf δ, because S(δ) is a worst-case bound over *arbitrary* perturbations of size δ and carries no information about a ridge-near-monotone one. That is a miscalibration of the label by construction, not a failure of maha.
 
 ### Precision-aware alternate (`invariant_fp` — not used by the paper)
 
@@ -70,25 +70,25 @@ Flat cases then separate on their own evidence (`reach.check1_rank_reading`, rho
 | affine | maha | 540 | 0.02 | 0.98 | 0 | 0.0037 | 0 | 0 | 1 | 1.9e-06 | 9.6e+02 |
 | affine | cosine | 540 | 0.74 | 0 | 0.033 | 0.21 | 0 | 0.015 | 0 | 0.049 | 1.9e+05 |
 | affine | knn10 | 540 | 0.55 | 0.18 | 0.0019 | 0.26 | 0 | 0.015 | 0.39 | 0.0088 | 7.6e+04 |
-| affine | kde | 444 | 0.61 | 0.12 | 0.016 | 0.25 | 0 | 0.0023 | 0.31 | 0.01 | 8.4e+04 |
-| affine | kde_det | 378 | 0.73 | 0.048 | 0.0079 | 0.2 | 0 | 0.013 | 0.17 | 0.021 | 1.2e+05 |
+| affine | kde | 462 | 0.62 | 0.12 | 0.015 | 0.24 | 0 | 0.0022 | 0.32 | 0.01 | 8.4e+04 |
+| affine | kde_det | 396 | 0.72 | 0.061 | 0.0076 | 0.19 | 0 | 0.013 | 0.22 | 0.021 | 1.2e+05 |
 | affine | rmd | 540 | 0.0056 | 0.96 | 0 | 0.03 | 0 | 0 | 0.97 | 4.6e-06 | 1.6e+03 |
 | outside | maha | 1830 | 0.38 | 0.58 | 0.0038 | 0.034 | 0 | 0 | 0.94 | 4.0e-04 | 1.6e+04 |
 | outside | cosine | 1830 | 0.66 | 0.28 | 0.014 | 0.051 | 0 | 0 | 0.81 | 0.32 | 5.1e+05 |
 | outside | knn10 | 1830 | 0.67 | 0.27 | 0.0016 | 0.052 | 0 | 0.0011 | 0.83 | 0.11 | 2.9e+05 |
-| outside | kde | 108 | 0.16 | 0.78 | 0.0093 | 0.056 | 0 | 0 | 0.92 | 1.8e-05 | 3.4e+03 |
-| outside | kde_det | 108 | 0.2 | 0.75 | 0.0093 | 0.037 | 0 | 0 | 0.94 | 3.1e-05 | 4.6e+03 |
+| outside | kde | 306 | 0.078 | 0.9 | 0.0033 | 0.02 | 0 | 0 | 0.98 | 3.9e-05 | 5e+03 |
+| outside | kde_det | 306 | 0.13 | 0.85 | 0.0033 | 0.02 | 0 | 0 | 0.97 | 5.9e-05 | 6.3e+03 |
 | outside | rmd | 1830 | 0.56 | 0.13 | 0 | 0.31 | 0 | 0 | 0.29 | 0.027 | 1.4e+05 |
 
-**Affine rank test (ridged estimator, eps = 1e-5).** The audit's Mahalanobis is `scatter/(N−K) + eps·I` with eps = 1e-5 — the Theorem 2 object, not the unregularised Theorem 1 object. The claim that can be made about what people deploy: the ridged estimator is rank-invariant under the affine group to within the Theorem 2 deviation; at eps = 1e-5 that deviation stays below 1−ρ = 1e-03 in 100% of clean-affine configurations and becomes visible only under tempering that drives σ_min(A) toward zero. ρ = 1 exactly was never the prediction for this estimator: under ortho_linear (a pure rotation) ridged maha already reaches 1−ρ = 7.06e-05 with a median of 46 and a maximum of 7358 discordant pairs of 2M — an exactly rank-invariant scorer has zero. Tolerance 1e-03 is a round number above that clean-affine residual, not fitted to the γ<0 failures.
+**Affine rank test (ridged estimator, eps = 1e-5).** The audit's Mahalanobis is `scatter/(N−K) + eps·I` with eps = 1e-5 — the Theorem 2 object, not the unregularised Theorem 1 object. The claim that can be made about what people deploy — and the only well-posed claim on all five backbones, including those where λ_min(C) sits at the float32 noise floor — is that the ridged estimator is rank-invariant under the affine group to within the Theorem 2 deviation; at eps = 1e-5 that deviation stays below 1−ρ = 1e-03 in 100% of clean-affine configurations and becomes visible only under tempering that drives σ_min(A) toward zero. ρ = 1 exactly was never the prediction for this estimator: under ortho_linear (a pure rotation) ridged maha already reaches 1−ρ = 7.06e-05 with thousands of discordant pairs of 2M on resnet18 — an exactly rank-invariant scorer has zero. Tolerance 1e-03 is a round number above that clean-affine residual, not fitted to the γ<0 failures. Exact Theorem 1 confirmation is available only on the three backbones where the unregularised covariance is computable in float32 (maha_noridge section).
 
 | scorer | n | min_rho | median_rho | max_1_minus_rho | frac_rho_eq_1 | median_n_discordant |
 |---|---|---|---|---|---|---|
 | maha | 630 | 0.98 | 1 | 0.0204 | 0.981 | 476 |
 | cosine | 630 | 0.702 | 0.962 | 0.298 | 0.143 | 1.66e+05 |
 | knn10 | 630 | 0.765 | 0.994 | 0.235 | 0.295 | 6.49e+04 |
-| kde | 534 | 0.84 | 0.994 | 0.16 | 0.23 | 6.70e+04 |
-| kde_det | 378 | 0.736 | 0.979 | 0.264 | 0.0476 | 1.21e+05 |
+| kde | 552 | 0.84 | 0.993 | 0.16 | 0.228 | 6.83e+04 |
+| kde_det | 396 | 0.736 | 0.979 | 0.264 | 0.0606 | 1.18e+05 |
 | rmd | 630 | 0.979 | 1 | 0.0206 | 0.971 | 1.45e+03 |
 
 clean affine (ortho_linear, ortho_scale, general_affine, zca): maha n=450, max 1−ρ=2.8e-04, frac ≥ 1−tol = 100.0%; rmd n=450, max 1−ρ=9.4e-04, frac ≥ 1−tol = 100.0%.
@@ -169,16 +169,21 @@ float64 storage at eps = 1e-5 vs production float32:
 
 Spearman(log10 eps, 1−ρ) = 0.759; median (f64 1−ρ)/(f32 1−ρ) = 1. float64 storage leaves the residual unchanged; raising eps makes it worse. **Winner: (A) ridge discrepancy.** The earlier sentence blaming "negative γ amplifies small eigenvalues before the float32 refit" predicted dinov2 worst (smallest λ_min) and got the sign of corr(1−ρ, λ_min(C)) wrong (+0.48 over joined affine rows); it is withdrawn. Cosine/knn10's 1e-12 ortho_linear floor bounds unamplified rounding only — they never invert a covariance.
 
-**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12) over clean affine.** Prediction: under ortho_linear, 1−ρ and discordant counts at the level cosine/knn10 already show (max ~1 discordant of 2M), not thousands. Compared side-by-side with the ridged (eps = 1e-5) column on the same maps:
-
-| scorer | n | max_1_minus_rho | median_1_minus_rho | max_n_discordant | median_n_discordant | n_degenerate |
-|---|---|---|---|---|---|---|
-| maha | 450 | 2.82e-04 | 2.50e-07 | 14876 | 357 | 0 |
-| maha_noridge | 450 | 6.32e-06 | 1.20e-11 | 1718 | 0 | 0 |
-
-Under ortho_linear alone: ridged maha max 1−ρ = 7.1e-05 / max discordant = 7358; maha_noridge max 1−ρ = 1.7e-07 / max discordant = 276 (median discordant = 0). The residual drops by orders of magnitude; the overall max above is driven by zca on ill-conditioned backbones (still ≪ 1e-3). Theorem 1 holds on its estimator; the ridged residual is the ridge.
-
 Degenerate constant-score rows (ptp=0 before and after, forced ρ=1): 0 (expect 0).
+
+**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12), paired within backbone under ortho_linear.** Pooling max-over-backbone reverses the sign: the ridged max discordant (7358) is resnet18; the noridge max (276) is vitb16. Same maps, same backbone:
+
+| backbone | ridged_discordant | noridge_discordant | lam_bar | lambda_min_C | lam_min_over_lam_bar | lam_min_over_eps2_f32 |
+|---|---|---|---|---|---|---|
+| resnet50_imagenet | 147 | 0 | 0.113 | 3.50e-04 | 0.00311 | 2.46e+10 |
+| clip_vitb16 | 1292 | 0 | 0.0336 | 1.45e-05 | 4.33e-04 | 1.02e+09 |
+| resnet18_cifar_openood | 7358 | 0 | 0.0047 | 1.26e-05 | 0.00268 | 8.86e+08 |
+| vitb16_imagenet | 6 | 276 | 1.13 | 1.42e-13 | 1.26e-13 | 10 |
+| dinov2_vitb14 | 7 | 194 | 2.16 | 6.65e-14 | 3.07e-14 | 4.68 |
+
+ε²_float32 = 1.4e-14. On the three backbones where λ_min(C)/λ̄ ≫ ε²_float32 (resnet18, clip, resnet50; λ_min/ε² from 8.9e+08 to 2.5e+10), dropping the ridge takes every clean-affine operator to **0 discordant pairs of 2,000,000** — Theorem 1 confirmed exactly. On dinov2 and vitb16, λ_min(C) sits within a factor of ~2–10 of ε²_float32 (λ_min/ε² = 4.7–10); the variance in that direction is float32 rounding noise, the unregularised covariance is not a computable object, and eps = 1e-12 implements a differently-ridged solve conditioned ~10⁷ worse — noridge is 27–28× *worse* than ridged under ortho_linear, and the same reversal holds on ortho_scale, general_affine, and zca. That is those two backbones under every operator, not zca alone. Do not re-extract in float64: the backbones compute in float32, so float64 storage would only record float32-precision values and λ_min would not move. Limitation, with the table as evidence.
+
+So the claim is not "Theorem 1 holds on its estimator." **Theorem 1 is confirmed exactly — 0 discordant pairs of 2,000,000, on every clean affine operator — on the three backbones where its hypothesis is computable in float32, and is not testable on the two where λ_min(C) falls to the float32 noise floor.** The dividing line is λ_min(C)/λ̄ against ε²_float32, and it separates the five backbones by ten orders of magnitude with nothing in between. The exact-invariance result that motivates the scorer choice cannot be realised on DINOv2 or ViT-B/16 embeddings at the precision those embeddings carry. The ridged statement is therefore not a concession: it is the only well-posed claim available on two of five backbones.
 
 Sensitivity over tau in [.001,.01] and S_high in [.005,.1] (20 cells), registered labels:
 
@@ -341,6 +346,8 @@ Theorem 2 holds in 100.0% of 105 affine configurations — the first numerical e
 | vitb16_imagenet | 2.5e-12 | 9.2e+10 | 3.9e-13 | 0.33 | 9 | 9.0e+06 | 7e+03 | 1.1 |
 
 Across configurations, median λ_min(C) = 3.5e-05, median ‖I−AAᵀ‖₂ = 9, median factor eps·‖I−AAᵀ‖₂/denom = 5.9e+04, median implied ‖y‖² = 3.3e+03. The dominant pessimism is λ_min(C): in high-d embeddings the ridge-stabilised smallest eigenvalue is 1e-13–1e-3, so the denominator collapses and the bound inflates by 1/λ_min². On dinov2/vitb16 that single factor accounts for the ~1e11 pred/obs ratio; on resnet50 λ_min is larger (~1e-3) and the overstatement drops to ~1e3. "The bound is loose because λ_min(C) is pessimistic by that much," not merely "the bound is loose."
+
+**Two regimes for exact affine rank-invariance (Q1 maha_noridge).** The same λ_min that makes Theorem 2 vacuous on dinov2/vitb16 also makes Theorem 1's unregularised estimator uncomputable there: λ_min(C) sits within a factor of ~2–10 of ε²_float32, so the variance in that direction is feature rounding noise. Theorem 1 is confirmed exactly (0 discordant pairs of 2M on every clean affine operator) on resnet18, clip, and resnet50, where λ_min/ε²_float32 is 10⁸–10¹⁰; it is not testable on the two transformer backbones. The ridged (eps = 1e-5) claim is therefore the only well-posed one on all five. Do not re-extract embeddings in float64 — the backbones compute in float32 and λ_min would not move.
 
 ‖I−AAᵀ‖₂ medianed to 9 on every backbone in the table above: that common value is set by the operator family, not the data. Per operator (Theorem 2 rows):
 
