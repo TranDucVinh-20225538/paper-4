@@ -3,9 +3,10 @@
 Why: the audit needs nothing from the images except the embedding each frozen backbone
 assigns them, so extraction is done once, pinned, and every later script reads arrays.
 Before any embedding is written the live torchvision transform is compared with the pinned
-preprocessing record (assets/preprocessing/<backbone>.json; written on first use from the
-registry, committed afterwards, so a later edit to the registry cannot silently change what an
-existing embedding file means).
+preprocessing record (assets/preprocessing/<backbone>.json). The pin must already exist and be
+readable — a missing pin aborts; the job never auto-writes a pin and continues. A passing check
+is recorded to transform_guard.json before the first embedding write so a silent absence is
+detectable afterwards.
 
     python3 PhaseC/analysis/extract_embeddings.py --backbone resnet50_imagenet --id-set cifar10 --device cuda
 
@@ -138,11 +139,14 @@ def main(argv=None):
 
     pin = backbones.pin_path(a.backbone)
     if not pin.is_file():
-        print(f"[extract] no pinned preprocessing for {a.backbone}; writing {pin} from the registry")
-        backbones.write_pin(bb)
+        raise SystemExit(
+            f"[extract] TRANSFORM GUARD FAILED: pinned preprocessing missing for {a.backbone}: {pin}. "
+            f"Write the pin deliberately (backbones.py --write-pins) and commit it before extract; "
+            f"auto-writing a pin and continuing is forbidden.")
     tf = bb.build_transform()
-    dsp.assert_transform(tf, pin)
-    pre_sha = hashlib.sha256(pin.read_bytes()).hexdigest()
+    # Fail closed: assert_transform converts any exception into SystemExit. Do not wrap this.
+    guard = dsp.assert_transform(tf, pin)
+    pre_sha = guard["pin_sha256"]
 
     try:
         model = bb.load_model(device)
@@ -156,6 +160,17 @@ def main(argv=None):
     bdir = a.out / a.backbone
     odir = bdir / a.id_set
     odir.mkdir(parents=True, exist_ok=True)
+    # Receipt before the first embedding write: silent absence of this file means the guard did not run.
+    receipt = {
+        **guard,
+        "backbone": a.backbone,
+        "id_set": a.id_set,
+        "ckpt_sha256": ckpt_sha,
+        "checked_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "before_first_write": True,
+    }
+    (odir / "transform_guard.json").write_text(json.dumps(receipt, indent=2) + "\n")
+    print(f"[extract] transform guard PASSED; receipt {odir / 'transform_guard.json'}")
     shutil.copyfile(pin, bdir / "preprocess.json")
     def _prov_line(k, v):
         if isinstance(v, (list, dict, tuple)):

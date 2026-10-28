@@ -1,76 +1,91 @@
 {
  "relative_cutoff_kappa2": 1e-06,
- "n_cells": 15,
- "spearman_a_c_mean_vs_mean_abs_log_sigma_dev": {
-  "rho": 0.9819805060619657,
-  "p": 8.648244862274882e-11,
-  "n": 15
- },
- "spearman_a_c_mean_vs_max_abs_dauroc_kde": {
-  "rho": 0.8837824554557693,
-  "p": 1.2428949604302423e-05,
-  "n": 15
- },
- "spearman_a_c_max_vs_max_abs_dauroc_kde": {
-  "rho": 0.8837824554557693,
-  "p": 1.2428949604302423e-05,
-  "n": 15
- },
- "spearman_kappa2_mean_vs_max_abs_dauroc_kde": {
-  "rho": 0.49099025303098287,
-  "p": 0.0630989066582577,
-  "n": 15
- },
- "backbone_level_n5": {
-  "spearman_a_c_mean_vs_mean_abs_log_sigma_dev": {
-   "rho": 0.9999999999999999,
-   "p": 1.4042654220543672e-24
+ "id_set": "cifar10",
+ "clarification": "The earlier report \u03c1\u22480.88 was a_c's own correlation (a_c_mean vs max|\u0394AUROC|kde), computed fresh in this export \u2014 not the \u03c3\u0304-deviation figure restated. Those two predictors agree to two digits on the 15-cell panel (a_c\u2194|\u0394AUROC| \u03c1=0.88; \u03c3\u0304-dev\u2194|\u0394AUROC| \u03c1=0.88) because a_c predicts the \u03c3\u0304 move that drives the AUROC move. At backbone aggregate n=5 that \u03c1 is descriptive only (p\u2248.05). The test is class-level.",
+ "class_level_test": {
+  "n": 50,
+  "n_backbones": 5,
+  "n_classes_per_backbone": 10,
+  "spearman_a_c_vs_mean_abs_delta_score": {
+   "rho": -0.09330132052821127,
+   "p": 0.5192763079677907,
+   "n": 50
   },
+  "spearman_a_c_vs_mean_abs_log_sigma_dev": {
+   "rho": 0.9524609843937575,
+   "p": 2.0068145140294975e-26,
+   "n": 50
+  }
+ },
+ "backbone_aggregate_descriptive": {
+  "n": 5,
+  "n_cells_15": 15,
   "spearman_a_c_mean_vs_max_abs_dauroc_kde": {
-   "rho": 0.8999999999999998,
-   "p": 0.03738607346849874
+   "rho": 0.8837824554557693,
+   "p": 1.2428949604302423e-05,
+   "n": 15
   },
-  "rows": [
-   {
-    "backbone": "clip_vitb16",
-    "a_c_mean": 2.3119745803361633,
-    "a_c_max": 2.469525665897927,
-    "kappa2_mean": 260786.44258071887,
-    "mean_abs_log_dev": 0.04876223789333334,
-    "max_abs_dauroc": 0.00526359
+  "spearman_sigma_dev_vs_max_abs_dauroc_kde": {
+   "rho": 0.8821428571428571,
+   "p": 1.3558210624788689e-05,
+   "n": 15
+  },
+  "spearman_a_c_mean_vs_mean_abs_log_sigma_dev": {
+   "rho": 0.9819805060619657,
+   "p": 8.648244862274882e-11,
+   "n": 15
+  },
+  "backbone_level_n5": {
+   "spearman_a_c_mean_vs_mean_abs_log_sigma_dev": {
+    "rho": 0.9999999999999999,
+    "p": 1.4042654220543672e-24
    },
-   {
-    "backbone": "dinov2_vitb14",
-    "a_c_mean": 1.8505252045924299,
-    "a_c_max": 2.0010818309771237,
-    "kappa2_mean": 51088.0103545308,
-    "mean_abs_log_dev": 0.0024765275489999996,
-    "max_abs_dauroc": 0.00013397
+   "spearman_a_c_mean_vs_max_abs_dauroc_kde": {
+    "rho": 0.8999999999999998,
+    "p": 0.03738607346849874
    },
-   {
-    "backbone": "resnet18_cifar_openood",
-    "a_c_mean": 6.449935273468751,
-    "a_c_max": 7.0734314573051496,
-    "kappa2_mean": 163999.1798287939,
-    "mean_abs_log_dev": 0.1522434821,
-    "max_abs_dauroc": 0.00593943
-   },
-   {
-    "backbone": "resnet50_imagenet",
-    "a_c_mean": 3.621927963767207,
-    "a_c_max": 3.718309903503688,
-    "kappa2_mean": 121284.95355574787,
-    "mean_abs_log_dev": 0.09746463326666667,
-    "max_abs_dauroc": 0.00929377
-   },
-   {
-    "backbone": "vitb16_imagenet",
-    "a_c_mean": 2.0489077365046966,
-    "a_c_max": 2.163137090724164,
-    "kappa2_mean": 34523.02945493661,
-    "mean_abs_log_dev": 0.01435624317,
-    "max_abs_dauroc": 0.00127216
-   }
-  ]
+   "rows": [
+    {
+     "backbone": "clip_vitb16",
+     "a_c_mean": 2.3119745803361633,
+     "a_c_max": 2.469525665897927,
+     "kappa2_mean": 260786.44258071887,
+     "mean_abs_log_dev": 0.04876223789333334,
+     "max_abs_dauroc": 0.00526359
+    },
+    {
+     "backbone": "dinov2_vitb14",
+     "a_c_mean": 1.8505252045924299,
+     "a_c_max": 2.0010818309771237,
+     "kappa2_mean": 51088.0103545308,
+     "mean_abs_log_dev": 0.0024765275489999996,
+     "max_abs_dauroc": 0.00013397
+    },
+    {
+     "backbone": "resnet18_cifar_openood",
+     "a_c_mean": 6.449935273468751,
+     "a_c_max": 7.0734314573051496,
+     "kappa2_mean": 163999.1798287939,
+     "mean_abs_log_dev": 0.1522434821,
+     "max_abs_dauroc": 0.00593943
+    },
+    {
+     "backbone": "resnet50_imagenet",
+     "a_c_mean": 3.621927963767207,
+     "a_c_max": 3.718309903503688,
+     "kappa2_mean": 121284.95355574787,
+     "mean_abs_log_dev": 0.09746463326666667,
+     "max_abs_dauroc": 0.00929377
+    },
+    {
+     "backbone": "vitb16_imagenet",
+     "a_c_mean": 2.0489077365046966,
+     "a_c_max": 2.163137090724164,
+     "kappa2_mean": 34523.02945493661,
+     "mean_abs_log_dev": 0.01435624317,
+     "max_abs_dauroc": 0.00127216
+    }
+   ]
+  }
  }
 }

@@ -1,8 +1,11 @@
-# ImageNet-200 round — scope (before numbers exist)
+# ImageNet-200 — round three scope (before numbers exist)
 
-Round two is in scope. Extraction starts only after the CIFAR-10 sweep and its
-bounds evaluation close. This note fixes splits, seeds, overlap, and the
-ResNet-18 role so FINDINGS does not have to invent a defence later.
+Originally planned as round two; blocked at the ID set because ImageNet-1k is
+absent on this cluster (ImageNet-200 ⊂ ImageNet-1k). **Round two is CIFAR-100**
+(`cifar100_scope.md`). This file remains the prep for round three, contingent
+on an ImageNet-1k path. Extraction starts only after CIFAR-10 and CIFAR-100
+close. Splits, seeds, overlap, and the ResNet-18 role are fixed here so
+FINDINGS does not invent a defence later.
 
 ## Splits (OpenOOD taxonomy)
 
@@ -77,6 +80,7 @@ preprocessing JSON (`Resize(32)`, CIFAR-10 mean/std) and must pass
 ## Order
 
 1. CIFAR-10 sweep + bounds close.
-2. ImageNet-1k path available; imglists hashed in manifest.
-3. Drop or keep SSB-hard based on 21k presence.
-4. Extract → adapters → audit (same operator grid).
+2. CIFAR-100 round two (`cifar100_scope.md`).
+3. ImageNet-1k path available (admin query outside `/data2`; do not wait on the answer to run CIFAR-100); imglists hashed in manifest.
+4. Drop or keep SSB-hard based on packaged archive presence.
+5. Extract → adapters → audit (same operator grid).

@@ -16,7 +16,11 @@ ID sets
                  1,207 CIFAR-10-class overlaps removed; never the raw TinyImageNet dump).
                  Far-OOD (OpenOOD label): mnist, svhn, texture (DTD), places365.
                  `ood_ref` is CIFAR-100 *train*, adapter construction only, never evaluated.
-    imagenet200  OpenOOD ImageNet-200 from benchmark_imglist (round two; not this launch).
+    cifar100     Round two. OpenOOD CIFAR-100 benchmark: ID CIFAR-100 (n_c = 500),
+                 near-OOD CIFAR-10 + TIN (filtered cifar100 imglist), far-OOD MNIST,
+                 SVHN, texture, Places365. Same image sources as round one in reverse
+                 ID/near roles. `ood_ref` is CIFAR-10 *train*, adapter construction only.
+    imagenet200  OpenOOD ImageNet-200 (round three; contingent on ImageNet-1k ID path).
 
 TIN is loaded only via an OpenOOD/SCOOD imglist. Loading the raw `images_classic/tin`
 tree would reintroduce the 1,207 class-overlapping images OpenOOD removed and would
@@ -59,6 +63,7 @@ __all__ = ["SEEDS", "MAX_OOD", "ID_SETS", "OOD_NAMES", "DatasetUnavailable", "su
 SEEDS = {
     "ood_cifar100": 4101, "ood_svhn": 4102, "ood_texture": 4103, "ood_places365": 4104,
     "ood_tin": 4105, "ood_lsun": 4106, "ood_ref": 4107, "ood_mnist": 4108,
+    "ood_cifar10": 4109,               # CIFAR-100 round: CIFAR-10 test as near-OOD
     "ood_ssb_hard": 4111, "ood_ninco": 4112, "ood_inaturalist": 4113, "ood_openimage_o": 4115,
     "imagenet200/id_train": 4121,      # the per-class draw of the 260-per-class training subset
 }
@@ -69,15 +74,22 @@ MAX_OOD = 10_000
 MAX_REF = 10_000
 IMAGENET200_TRAIN_PER_CLASS = 260     # 200 x 260 = 52,000, the size of CIFAR-10 train
 
-# OpenOOD CIFAR-10 taxonomy (informational). Difficulty reporting uses measured baseline AUROC.
+# OpenOOD CIFAR taxonomy (informational). Difficulty reporting uses measured baseline AUROC.
 CIFAR10_NEAR_OOD = ("cifar100", "tin")
 CIFAR10_FAR_OOD = ("mnist", "svhn", "texture", "places365")
+CIFAR100_NEAR_OOD = ("cifar10", "tin")
+CIFAR100_FAR_OOD = ("mnist", "svhn", "texture", "places365")
 
 ID_SETS = {
     "cifar10": {
         "ood": ("cifar100", "tin", "mnist", "svhn", "texture", "places365"),
         "near_ood": CIFAR10_NEAR_OOD,
         "far_ood": CIFAR10_FAR_OOD,
+    },
+    "cifar100": {
+        "ood": ("cifar10", "tin", "mnist", "svhn", "texture", "places365"),
+        "near_ood": CIFAR100_NEAR_OOD,
+        "far_ood": CIFAR100_FAR_OOD,
     },
     "imagenet200": {"ood": ("ssb_hard", "ninco", "inaturalist", "texture", "openimage_o")},
 }
@@ -90,6 +102,12 @@ CIFAR10_TIN_IMGLISTS = (
     "benchmark_imglist/cifar10/test_tin200.txt",
     "imglist/cifar10/test_tin.txt",                    # after installing from SCOOD/OpenOOD zip
     "imglist/tin_cifar10_filtered.txt",
+)
+#: OpenOOD imglists for CIFAR-100 TIN (filtered for CIFAR-100 class overlap). Raw tin/ forbidden.
+CIFAR100_TIN_IMGLISTS = (
+    "benchmark_imglist/cifar100/test_tin.txt",
+    "benchmark_imglist/cifar100/test_tin200.txt",
+    "imglist/cifar100/test_tin.txt",
 )
 
 CIFAR10_MD5 = "c58f30108f718f92721af3b95e74349a"
@@ -326,14 +344,13 @@ def _resolve_imglist_file(rel_candidates):
         f"Raw TinyImageNet folder loading is forbidden (would reintroduce ~1,207 CIFAR-10-class overlaps).")
 
 
-def _cifar10_tin_filtered():
-    """OpenOOD/SCOOD filtered TinyImageNet OOD for CIFAR-10 — never the raw tin/ tree.
+def _tin_filtered(imglist_candidates, id_label):
+    """OpenOOD/SCOOD filtered TinyImageNet OOD for a CIFAR ID set — never the raw tin/ tree.
 
-    OpenOOD removes ~1,207 TIN images that share CIFAR-10 class semantics (SCOOD re-split);
-    v1.5 additionally holds out 1,000 images / 20 categories as OOD val. The imglist path and
+    OpenOOD removes TIN images that share ID-class semantics; the imglist path and
     SHA-256 are recorded so the manifest can show exactly which filter was used.
     """
-    root, lst = _resolve_imglist_file(CIFAR10_TIN_IMGLISTS)
+    root, lst = _resolve_imglist_file(imglist_candidates)
     # Also accept SCOOD-style lists that mark ID-overlap rows with a non-negative label: keep only OOD (label < 0).
     paths, labels = [], []
     for ln in lst.read_text().splitlines():
@@ -381,7 +398,7 @@ def _cifar10_tin_filtered():
                 "source": f"filtered TIN imglist {lst} (resolved by basename under tin/test/images)",
                 "imglist_path": str(lst), "imglist_sha256": hashlib.sha256(lst.read_bytes()).hexdigest(),
                 "n_listed": len(abs_paths), "openood_group": "near_ood",
-                "filter_note": "OpenOOD/SCOOD CIFAR-10-class overlap filter (~1,207 removed); raw tin/ forbidden"}
+                "filter_note": f"OpenOOD/SCOOD {id_label}-class overlap filter; raw tin/ forbidden"}
         raise DatasetUnavailable(f"TIN imglist {lst}: first image {paths[0]} not found under {bases_u}")
     abs_paths = [base / p for p in paths]
     missing = sum(1 for p in abs_paths if not p.is_file())
@@ -395,7 +412,15 @@ def _cifar10_tin_filtered():
         "source": f"filtered TIN imglist {rel_lst}",
         "imglist_path": rel_lst, "imglist_sha256": hashlib.sha256(lst.read_bytes()).hexdigest(),
         "n_listed": len(abs_paths), "openood_group": "near_ood",
-        "filter_note": "OpenOOD/SCOOD CIFAR-10-class overlap filter (~1,207 removed); raw tin/ forbidden"}
+        "filter_note": f"OpenOOD/SCOOD {id_label}-class overlap filter; raw tin/ forbidden"}
+
+
+def _cifar10_tin_filtered():
+    return _tin_filtered(CIFAR10_TIN_IMGLISTS, "CIFAR-10")
+
+
+def _cifar100_tin_filtered():
+    return _tin_filtered(CIFAR100_TIN_IMGLISTS, "CIFAR-100")
 
 
 _IMAGENET200_LISTS = {
@@ -447,6 +472,33 @@ def _raw_split(id_set, split, download):
             return _cifar10_tin_filtered()
         if name == "lsun":
             return _openood_folder(name)
+    elif id_set == "cifar100":
+        if split in ("id_train", "id_test"):
+            return _tv_cifar(100, split == "id_train", download)
+        name = "ref" if split == "ood_ref" else split[4:]
+        if name == "ref":
+            ds, info = _tv_cifar(10, True, download)
+            return ds, {**info, "role": "adapter-construction reference (CIFAR-10 train), never evaluated"}
+        if name == "cifar10":
+            ds, info = _tv_cifar(10, False, download)
+            return ds, {**info, "openood_group": "near_ood"}
+        tv = {"svhn": _tv_svhn, "texture": _tv_dtd, "places365": _tv_places, "mnist": _tv_mnist}
+        if name in tv:
+            try:
+                ds, info = tv[name](download)
+                group = "near_ood" if name in CIFAR100_NEAR_OOD else ("far_ood" if name in CIFAR100_FAR_OOD else None)
+                if group:
+                    info = {**info, "openood_group": group}
+                return ds, info
+            except DatasetUnavailable as e_tv:
+                try:
+                    ds, info = _openood_folder(name)
+                    group = "near_ood" if name in CIFAR100_NEAR_OOD else ("far_ood" if name in CIFAR100_FAR_OOD else None)
+                    return ds, {**info, **({"openood_group": group} if group else {})}
+                except DatasetUnavailable as e_oo:
+                    raise DatasetUnavailable(f"{name}: torchvision: {e_tv}; openood: {e_oo}")
+        if name == "tin":
+            return _cifar100_tin_filtered()
     elif id_set == "imagenet200":
         if split in _IMAGENET200_LISTS:
             ds, info = _openood_list(_IMAGENET200_LISTS[split])
@@ -511,36 +563,55 @@ DATASET_LEVEL_RGB = "PIL image .convert('RGB') before the pipeline"
 
 
 def assert_transform(tf, json_path):
-    """Raise SystemExit if the live transform differs from the pinned record in any op, size,
-    interpolation, antialias flag, mean or std, or if the dataset-level RGB convert is missing.
+    """Fail-closed: abort the process if the live transform does not match the pin.
 
-    The RGB convert is not a torchvision op (PIL mode change before the pipeline). It is
-    pinned under `dataset_level` and applied by `WithTransform` / `ImageList` so single-
-    channel sets (MNIST) take the same channel-replication + resize + Normalize path as
-    every other rung, under the same guard.
+    Any exception while reading or comparing the pin — missing file, unreadable JSON,
+    schema error, op/size/mean/std drift, missing dataset_level — becomes SystemExit.
+    Callers must not catch this; a guard that is logged and skipped is worse than none.
     """
-    pin = json.load(open(json_path))
-    pinned_level = pin.get("dataset_level")
-    if pinned_level != DATASET_LEVEL_RGB:
-        raise SystemExit(
-            f"preprocessing drift: dataset_level {pinned_level!r} vs pinned {DATASET_LEVEL_RGB!r} "
-            f"(grayscale→RGB must be the pinned contract, not a loader-side fork)"
-        )
-    spec = pin["pipeline"]
-    live = describe_transform(tf)
-    got, want = [s["op"] for s in live], [s["op"] for s in spec]
-    if got != want:
-        raise SystemExit(f"preprocessing drift: live {got} vs pinned {want}")
-    for l, p in zip(live, spec):
-        for k in ("size", "interpolation", "antialias"):
-            if k in p and l.get(k) != p[k]:
-                raise SystemExit(f"preprocessing drift in {p['op']}.{k}: live {l.get(k)} vs pinned {p[k]}")
-        if p["op"] == "Normalize":
-            if not (np.allclose(l["mean"], p["mean"]) and np.allclose(l["std"], p["std"])):
-                raise SystemExit(f"normalisation drift: live {l['mean']}/{l['std']} vs pinned {p['mean']}/{p['std']}")
-    print(f"[datasets] preprocessing matches the pinned record {Path(json_path).name}: "
+    json_path = Path(json_path)
+    try:
+        if not json_path.is_file():
+            raise FileNotFoundError(f"pinned preprocessing missing: {json_path}")
+        try:
+            pin = json.loads(json_path.read_text())
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError) as e:
+            raise RuntimeError(f"pinned preprocessing unreadable: {json_path}: {e}") from e
+        pinned_level = pin.get("dataset_level")
+        if pinned_level != DATASET_LEVEL_RGB:
+            raise RuntimeError(
+                f"preprocessing drift: dataset_level {pinned_level!r} vs pinned {DATASET_LEVEL_RGB!r} "
+                f"(grayscale→RGB must be the pinned contract, not a loader-side fork)"
+            )
+        if "pipeline" not in pin:
+            raise RuntimeError(f"pinned preprocessing has no pipeline: {json_path}")
+        spec = pin["pipeline"]
+        live = describe_transform(tf)
+        got, want = [s["op"] for s in live], [s["op"] for s in spec]
+        if got != want:
+            raise RuntimeError(f"preprocessing drift: live {got} vs pinned {want}")
+        for l, p in zip(live, spec):
+            for k in ("size", "interpolation", "antialias"):
+                if k in p and l.get(k) != p[k]:
+                    raise RuntimeError(
+                        f"preprocessing drift in {p['op']}.{k}: live {l.get(k)} vs pinned {p[k]}")
+            if p["op"] == "Normalize":
+                if not (np.allclose(l["mean"], p["mean"]) and np.allclose(l["std"], p["std"])):
+                    raise RuntimeError(
+                        f"normalisation drift: live {l['mean']}/{l['std']} vs pinned {p['mean']}/{p['std']}")
+    except SystemExit:
+        raise
+    except Exception as e:
+        raise SystemExit(f"[datasets] TRANSFORM GUARD FAILED (abort before write): {e}") from e
+    print(f"[datasets] preprocessing matches the pinned record {json_path.name}: "
           f"dataset_level=RGB + {got}")
-    return True
+    return {
+        "passed": True,
+        "pin_path": str(json_path),
+        "pin_sha256": hashlib.sha256(json_path.read_bytes()).hexdigest(),
+        "pipeline_ops": got,
+        "dataset_level": DATASET_LEVEL_RGB,
+    }
 
 
 # ---------------------------------------------------------------- status CLI

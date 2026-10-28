@@ -237,17 +237,20 @@ def main(argv=None):
         if len(lad):
             L += ["S(delta_med) of the alpha=1 adapter per rung (median over backbones and seeds), "
                   "same difficulty order:", "", table(lad, p=2), ""]
-            # Spearman of reach vs baseline difficulty per scorer
-            if "auroc" in (base.columns if base is not None else []):
-                join = ad1.merge(
-                    ida_bb.rename(columns={"value": "auroc_baseline"})[["backbone", "ood_set", "scorer", "auroc_baseline"]],
-                    on=["backbone", "ood_set", "scorer"], how="left")
+            # Spearman of reach vs baseline difficulty per scorer.
+            # Prefer the identity AUROC from the long table (one value per backbone×OOD×scorer);
+            # do not merge onto ad1's wide `auroc_baseline` column — that name already exists
+            # in the pivot and a merge would produce _x/_y suffixes.
+            base_auroc = (ida_bb.groupby(["backbone", "ood_set", "scorer"], as_index=False)
+                          .value.median().rename(columns={"value": "auroc_id"}))
+            if len(base_auroc) and "S_med" in ad1.columns:
+                join = ad1.merge(base_auroc, on=["backbone", "ood_set", "scorer"], how="left")
                 spear = []
                 for sc, g in join.groupby("scorer"):
-                    g = g.dropna(subset=["S_med", "auroc_baseline"])
+                    g = g.dropna(subset=["S_med", "auroc_id"])
                     if len(g) < 3:
                         continue
-                    rho = spearmanr(g["auroc_baseline"], g["S_med"]).statistic
+                    rho = spearmanr(g["auroc_id"], g["S_med"]).statistic
                     spear.append((sc, float(rho), len(g)))
                 if spear:
                     L += ["Spearman rho(baseline AUROC, S_med) of the alpha=1 adapter (positive ⇒ easier rungs show higher reach):",

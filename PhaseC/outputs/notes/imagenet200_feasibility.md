@@ -26,7 +26,9 @@ ImageNet-21k is multiple terabytes — staging 21k here is not automatic.
 
 Without ImageNet-1k train/val on disk, ImageNet-200 extraction cannot start.
 Acquisition must provide a path (or a download source the cluster can reach) and
-be recorded in the manifest before round-two extract.
+be recorded in the manifest before round-three extract. **Round two is CIFAR-100**
+(`cifar100_scope.md`). One admin query asks whether ImageNet-1k exists outside
+`/data2` (`imagenet1k_admin_query.md`); do not wait on that answer.
 
 ## ImageNet-21k (full) vs OpenOOD-packaged SSB-hard
 
