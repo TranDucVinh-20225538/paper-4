@@ -30,9 +30,9 @@ from __future__ import annotations
 
 import numpy as np
 
-__all__ = ["N_PAIRS", "sample_pairs", "ranking_reach", "ranking_reach_detail",
-           "realized_reordering_F", "realized_reordering_detail", "check1_reading"]
-
+__all__ = ["N_PAIRS", "RANK_RHO_TOL", "sample_pairs", "ranking_reach", "ranking_reach_detail",
+           "realized_reordering_F", "realized_reordering_detail", "check1_reading",
+           "check1_rank_reading"]
 N_PAIRS = 2_000_000
 
 
@@ -120,6 +120,12 @@ def check1_reading(delta_auroc, S, F, tau=0.002, S_high=0.02, F0=1e-4, n_pairs=N
     (|dAUROC| >= tau); then, for flat responses, F > F0 -> cancelling, else
     S >= S_high -> invariant, else insensitive. Thresholds tau, S_high and F0 are
     the registered defaults; they are returned so the reading is auditable.
+
+    This registered predicate is unchanged. It is known to be unreachable for an
+    exactly rank-invariant scorer whose margins dwarf δ (Mahalanobis under the
+    affine group): S(δ) is a worst-case bound over arbitrary perturbations, and
+    carries no information about a monotone one. Use check1_rank_reading when
+    the claim is rank preservation.
     """
     out = {"tau": tau, "S_high": S_high, "F0": F0, "delta_auroc": delta_auroc, "S": S, "F": F}
     if not all(np.isfinite([delta_auroc, S, F])):
@@ -142,3 +148,52 @@ def check1_reading(delta_auroc, S, F, tau=0.002, S_high=0.02, F0=1e-4, n_pairs=N
                           "the scorer was in reach and did not reorder"}
     return {**out, "label": "insensitive", "flat": True,
             "reason": f"flat and S={S:.3g} < {S_high}: almost no pair was within reach"}
+
+
+#: Spearman rho within this of 1.0 counts as rank preservation under float32 scoring.
+#: Exact arithmetic would demand 1e-9 or tighter; observed 1−rho for Mahalanobis under
+#: ortho_linear/ortho_scale is up to ~1e-4 (rank ties from float32), so 1e-3 is the
+#: operating tolerance. Always report 1−rho and discordant-pair counts beside the label.
+RANK_RHO_TOL = 1e-3
+
+
+def check1_rank_reading(delta_auroc, S, F, rho, tau=0.002, S_high=0.02, F0=1e-4,
+                        n_pairs=N_PAIRS, rho_tol=RANK_RHO_TOL):
+    """Classify a flat AUROC using rank preservation, not reach.
+
+    Rank-invariance is a statement about ordering; S(δ) cannot confirm or deny
+    it (worst-case over arbitrary perturbations of size δ, vacuous for a
+    monotone map). Order of tests mirrors check1_reading for the non-flat
+    cases, then for flat responses:
+        invariant     rho = 1 within rho_tol (ordering preserved)
+        cancelling    rho < 1 and F > F0
+        insensitive   rho < 1 and S < S_high
+        flat_high_reach  rho < 1, F <= F0, S >= S_high
+                      (registered-invariant case without rank preservation)
+
+    Does not replace check1_reading; report both.
+    """
+    out = {"tau": tau, "S_high": S_high, "F0": F0, "delta_auroc": delta_auroc, "S": S, "F": F,
+           "rho": rho, "rho_tol": rho_tol}
+    if not all(np.isfinite([delta_auroc, S, F])) or not np.isfinite(rho):
+        return {**out, "label": "undefined", "flat": None, "reason": "non-finite input"}
+    ad = abs(delta_auroc)
+    se = np.sqrt(max(F * (1 - F), 0.0) / n_pairs)
+    if ad > F + 4 * se + 1e-12:
+        return {**out, "label": "inconsistent", "flat": ad < tau,
+                "reason": f"|dAUROC|={ad:.3g} exceeds F={F:.3g}"}
+    if ad >= tau:
+        return {**out, "label": "moved", "flat": False,
+                "reason": f"|dAUROC|={ad:.3g} >= tau={tau}"}
+    if rho >= 1.0 - rho_tol:
+        return {**out, "label": "invariant", "flat": True,
+                "reason": f"flat and rank_spearman={rho:.12g} within {rho_tol} of 1: ordering preserved"}
+    if F > F0:
+        return {**out, "label": "cancelling", "flat": True,
+                "reason": f"flat, rho={rho:.6g} < 1, F={F:.3g} > F0: reorderings offset"}
+    if S < S_high:
+        return {**out, "label": "insensitive", "flat": True,
+                "reason": f"flat, rho={rho:.6g} < 1, S={S:.3g} < {S_high}: displacement small vs margins"}
+    return {**out, "label": "flat_high_reach", "flat": True,
+            "reason": f"flat, rho={rho:.6g} < 1, F <= F0, S >= S_high: AUROC flat with high reach "
+                      "but ranks not preserved — the registered invariant without rank evidence"}

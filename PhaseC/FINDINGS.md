@@ -34,11 +34,11 @@ Shares of configurations (dose > 0, all backbones, OOD rungs, seeds). `flat_inva
 | maha | 90 | 3.00e-06 | 2.54 | 7.45e-05 | 0 | 0.744 |
 | knn10 | 90 | 0 | 7.29 | 0.999 | 0.989 | 0.0111 |
 
-knn10's *scores* move under scale (median δ_med large) so many ID–OOD pairs sit inside 2δ and S ≈ 1, while ranks — hence AUROC — stay flat: invariant. Mahalanobis is exactly rank-invariant under the affine group (Theorem 1); its ID–OOD gaps dwarf δ_med, so S stays ≪ S_high and the same flat reading is labelled insensitive. Exact rank-invariance with large margins therefore makes the registered invariant label **structurally unreachable**: S(δ) is small precisely because the scorer did not need to move. That is a miscalibration of the label, not a failure of maha. Q3's refit-versus-closed-form relative error of ~1e-5 (float32) and Q4's |dAUROC| ~3e-06 are the arithmetic residual, not an operator effect.
+knn10's scores move under scale (median δ_med large) so many ID–OOD pairs sit inside 2δ and S ≈ 1, while ranks — hence AUROC — stay flat: registered invariant. Mahalanobis is exactly rank-invariant under the affine group (Theorem 1). Its scores also move (median δ_med = 2.54 on this slice): the map is monotone in the score, so it reorders nothing, and separately the ID–OOD margins are wide relative to that displacement, so S stays ≪ S_high. Both are true; neither is "the scorer did not need to move." The registered invariant label is **structurally unreachable** for an exactly invariant scorer with wide margins, because S(δ) is a worst-case bound over *arbitrary* perturbations of size δ and carries no information about a perturbation known to be monotone. That is a miscalibration of the label by construction, not a floating-point issue and not a failure of maha. Q3's refit-versus-closed-form relative error of ~1e-5 (float32) and Q4's |dAUROC| ~3e-06 are the arithmetic residual, not an operator effect.
 
-### Precision-aware alternate (registered predicate unchanged)
+### Precision-aware alternate (`invariant_fp` — not used by the paper)
 
-Same tests, except a flat reading with F ≤ F0 and |dAUROC| ≤ 1e-05 (= max(64·ε_float32, 1e-5) on the AUROC scale) is counted as `invariant_fp`: movement at that scale is attributed to arithmetic, not to the operator. The registered column above is not silently edited.
+Same registered tests, except a flat reading with F ≤ F0 and |dAUROC| ≤ 1e-05 is counted as `invariant_fp`. This **drops the reach requirement**: it is a stricter flatness test ("AUROC did not move at arithmetic scale"), which is weaker evidence than the registered label's "AUROC did not move although it could have." Two different claims should not share a name; the column is retained so the registered predicate is not silently edited, and so the contrast with the rank-preserving reading below is visible. The paper does not treat `invariant_fp` as invariance.
 
 | group | scorer | n | invariant_or_fp | invariant_fp_only | insensitive | cancelling | flat_inv_or_fp_share |
 |---|---|---|---|---|---|---|---|
@@ -54,6 +54,52 @@ Same tests, except a flat reading with F ≤ F0 and |dAUROC| ≤ 1e-05 (= max(64
 | outside | kde | 1830 | 0.032 | 0.032 | 0.0093 | 0.28 | 0.1 |
 | outside | kde_det | 1830 | 0.025 | 0.025 | 0.0077 | 0.3 | 0.074 |
 | outside | rmd | 1830 | 0.0022 | 0.0022 | 0.0011 | 0.43 | 0.005 |
+
+### Rank-preserving reading (what the paper uses)
+
+Rank-invariance is a statement about ordering, so test ordering. Over each evaluation population (ID test + OOD rung):
+
+    rho = spearman(s(z), s_tilde(T z))
+
+Flat cases then separate on their own evidence (`reach.check1_rank_reading`, rho_tol=1e-03): **invariant** if rho = 1 within tolerance (report 1−rho and the count of discordant pairs among a PAIR_SEED sample); **cancelling** if rho < 1, AUROC flat, F > F0; **insensitive** if rho < 1, AUROC flat, S < S_high; **flat_high_reach** if rho < 1, F ≤ F0, S ≥ S_high (the registered-invariant case without rank preservation). The registered predicate is not edited — that it is unreachable for an exactly invariant scorer is a finding about Check 1, which ships as a library.
+
+| group | scorer | n | moved | invariant | insensitive | cancelling | inconsistent | flat_high_reach | flat_invariant_share | median_1_minus_rho | median_n_discordant |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| affine | maha | 540 | 0.02 | 0.98 | 0 | 0.0037 | 0 | 0 | 1 | 1.9e-06 | 9.6e+02 |
+| affine | cosine | 540 | 0.74 | 0 | 0.033 | 0.21 | 0 | 0.015 | 0 | 0.049 | 1.9e+05 |
+| affine | knn10 | 540 | 0.55 | 0.18 | 0.0019 | 0.26 | 0 | 0.015 | 0.39 | 0.0088 | 7.6e+04 |
+| affine | rmd | 540 | 0.0056 | 0.96 | 0 | 0.03 | 0 | 0 | 0.97 | 4.6e-06 | 1.6e+03 |
+| outside | maha | 906 | 0.23 | 0.72 | 0.0022 | 0.042 | 0 | 0 | 0.94 | 3.4e-04 | 1.5e+04 |
+| outside | cosine | 906 | 0.51 | 0.39 | 0.017 | 0.079 | 0 | 0 | 0.8 | 0.0051 | 5.4e+04 |
+| outside | knn10 | 906 | 0.54 | 0.39 | 0.0022 | 0.061 | 0 | 0.0022 | 0.86 | 0.049 | 1.9e+05 |
+| outside | rmd | 906 | 0.4 | 0.23 | 0 | 0.37 | 0 | 0 | 0.38 | 0.027 | 1.3e+05 |
+
+**Affine prediction test.** Under the affine operators (ortho_linear, ortho_scale, general_affine, zca, spectral_temper; dose ≠ 0), Theorem 1 says maha (and rmd) are rank-invariant, so rho should be 1 in essentially every configuration; cosine, knn10 and kde sit outside parts of that group and should fall below 1 where they do. Tolerance: 1−rho ≤ 1e-03 (float32 operating floor; raw 1−rho and discordant counts are reported beside the label).
+
+| scorer | n | min_rho | median_rho | max_1_minus_rho | frac_rho_eq_1 | median_n_discordant |
+|---|---|---|---|---|---|---|
+| maha | 630 | 0.98 | 1 | 0.0204 | 0.981 | 476 |
+| cosine | 630 | 0.702 | 0.962 | 0.298 | 0.143 | 1.66e+05 |
+| knn10 | 630 | 0.765 | 0.994 | 0.235 | 0.295 | 6.49e+04 |
+| rmd | 630 | 0.979 | 1 | 0.0206 | 0.971 | 1.45e+03 |
+
+clean affine (ortho_linear, ortho_scale, general_affine, zca): maha n=450, min rho=1, max 1−rho=2.8e-04, frac ≥ 1−tol = 100.0%; rmd max 1−rho=9.4e-04, frac ≥ 1−tol = 100.0%.
+
+spectral_temper γ>0: maha n=120, min rho=1, max 1−rho=1.9e-04, frac ≥ 1−tol = 100.0%; rmd max 1−rho=8.6e-04, frac ≥ 1−tol = 100.0%.
+
+spectral_temper γ<0: maha n=60, min rho=0.98, max 1−rho=0.02, frac ≥ 1−tol = 80.0%; rmd max 1−rho=0.021, frac ≥ 1−tol = 70.0%.
+
+**maha below 1−1e-03 under an affine map in 12 readings** (worst 1−rho = 0.02). Breakdown by operator: spectral_temper 12. This is a numerical issue under extreme tempering (negative γ amplifies small eigenvalues before the float32 refit), not a counterexample to Theorem 1 in exact arithmetic — clean affine (including zca and γ>0 temper) stays inside tolerance:
+
+| backbone | ood_set | operator | dose | seed | rank_spearman | rank_one_minus_rho |
+|---|---|---|---|---|---|---|
+| resnet18_cifar_openood | tin | spectral_temper | -0.5 | 0 | 0.98 | 0.0204 |
+| resnet18_cifar_openood | cifar100 | spectral_temper | -0.5 | 0 | 0.98 | 0.0202 |
+| resnet18_cifar_openood | mnist | spectral_temper | -0.5 | 0 | 0.98 | 0.0195 |
+| resnet18_cifar_openood | places365 | spectral_temper | -0.5 | 0 | 0.981 | 0.0186 |
+| resnet18_cifar_openood | texture | spectral_temper | -0.5 | 0 | 0.986 | 0.0144 |
+
+Scorers not yet in `rank_preservation.csv`: kde, kde_det (re-run `compute_rank_preservation.py` with those scorers).
 
 Sensitivity over tau in [.001,.01] and S_high in [.005,.1] (20 cells), registered labels:
 
@@ -178,7 +224,7 @@ S(delta_med) of the alpha=1 adapter per rung (median over backbones and seeds), 
 | places365 | 0.0045 | 0.76 | 1 | 1 | 1 | 0.06 |
 | cifar100 | 0.016 | 0.99 | 1 | 1 | 1 | 0.043 |
 
-Spearman rho(baseline AUROC, S_med) of the alpha=1 adapter (positive ⇒ easier rungs show higher reach; below-chance cells excluded):
+Spearman rho(baseline AUROC, S_med) of the alpha=1 adapter (positive ⇒ easier rungs show higher reach; below-chance cells excluded). The below-chance exclusion moves reported numbers materially: kde goes from ρ = -0.0874 (n=300) pooled to ρ = -0.23 (n=280) — same sign, magnitude nearly tripled. That shift is carried by 2 named below-chance cells (20 of 300 seed-level rows). A reader should know the figure is sensitive to those few cells.
 
 | scorer | spearman_rho | n |
 |---|---|---|
@@ -216,6 +262,18 @@ Theorem 2 holds in 100.0% of 105 affine configurations — the first numerical e
 | vitb16_imagenet | 2.5e-12 | 9.2e+10 | 3.9e-13 | 0.33 | 9 | 9.0e+06 | 7e+03 | 1.1 |
 
 Across configurations, median λ_min(C) = 3.5e-05, median ‖I−AAᵀ‖₂ = 9, median factor eps·‖I−AAᵀ‖₂/denom = 5.9e+04, median implied ‖y‖² = 3.3e+03. The dominant pessimism is λ_min(C): in high-d embeddings the ridge-stabilised smallest eigenvalue is 1e-13–1e-3, so the denominator collapses and the bound inflates by 1/λ_min². On dinov2/vitb16 that single factor accounts for the ~1e11 pred/obs ratio; on resnet50 λ_min is larger (~1e-3) and the overstatement drops to ~1e3. "The bound is loose because λ_min(C) is pessimistic by that much," not merely "the bound is loose."
+
+‖I−AAᵀ‖₂ medianed to 9 on every backbone in the table above: that common value is set by the operator family, not the data. Per operator (Theorem 2 rows):
+
+| operator | median | min | max | count |
+|---|---|---|---|---|
+| general_affine | 9 | 9 | 9 | 25 |
+| ortho_linear | 0.253 | 0.0479 | 1.89 | 15 |
+| ortho_scale | 1.95 | 0.373 | 1.99 | 15 |
+| spectral_temper | 277 | 0.939 | 1.00e+12 | 30 |
+| zca | 5.92e+04 | 207 | 1.00e+12 | 20 |
+
+ortho_linear with c ∈ [0.5, 2] has |1 − c²| ∈ [0, 3] (observed median ~0.25); ortho_scale is O(1). The median of 9 is exactly general_affine's construction (cond_target=10.0, every seed ‖I−AAᵀ‖₂ = 9); zca and spectral_temper contribute still larger values. No constant is leaking in.
 
 Lemma 2 (cosine, retained-quantity form) holds in 100.0% of 105 configurations at tightness 0.12–0.23 (within an order of magnitude of the observation) — useful, unlike Theorem 2. Median tightness by operator: general_affine 0.19, ortho_linear 1.7e-09, ortho_scale 0.15, spectral_temper 0.19, zca 0.21.
 

@@ -245,32 +245,45 @@ def relative_mahalanobis_scores(Ztr, ytr, Zev, eps=REG_EPS):
     return md_cls - md_bg, bg_mean, bg_precision
 
 
-def score_all(Ztr, ytr, Zev, eps=REG_EPS):
-    """All scorers fit on (Ztr, ytr) and applied to Zev.
+def score_all(Ztr, ytr, Zev, eps=REG_EPS, names=None):
+    """Scorers fit on (Ztr, ytr) and applied to Zev.
+
+    names: subset of SCORER_NAMES to compute (default: all). Shared Gaussian fit
+    is always run when any of maha/cosine/kde/kde_det is requested; rmd and knn10
+    have their own fits.
 
     Returns a dict:
-      scores        {maha, cosine, knn10, kde, kde_det, rmd} -> float64 arrays over Zev
-      classes, means, precision (shared, ridge included), cov
-      bg_mean, bg_precision   the Relative Mahalanobis background Gaussian
+      scores        {requested names} -> float64 arrays over Zev
+      classes, means, precision (shared, ridge included), cov  (may be None)
+      bg_mean, bg_precision   the Relative Mahalanobis background Gaussian (or None)
       eps, n_train, n_classes
     Phase B returned (scores, means, precision); the dict carries the same three
     plus what the bounds module needs.
     """
-    classes, means, cov, precision = fit_class_gaussian(Ztr, ytr, eps)
-    maha = mahalanobis_min_sq(Zev, means, cov)
-    rmd, bg_mean, bg_precision = relative_mahalanobis_scores(Ztr, ytr, Zev, eps)
-    scores = {
-        "maha": maha,
-        "cosine": cosine_scores(Zev, means),
-        "knn10": knn_scores(Ztr, Zev),
-        "kde": kde_scores(Ztr, ytr, Zev, classes=classes),
-        "kde_det": kde_det_scores(Ztr, ytr, Zev, classes=classes),
-        "rmd": rmd,
-    }
+    want = tuple(SCORER_NAMES if names is None else names)
+    need_gauss = any(n in want for n in ("maha", "cosine", "kde", "kde_det"))
+    classes = means = cov = precision = None
+    bg_mean = bg_precision = None
+    scores = {}
+    if need_gauss:
+        classes, means, cov, precision = fit_class_gaussian(Ztr, ytr, eps)
+    if "maha" in want:
+        scores["maha"] = mahalanobis_min_sq(Zev, means, cov)
+    if "cosine" in want:
+        scores["cosine"] = cosine_scores(Zev, means)
+    if "knn10" in want:
+        scores["knn10"] = knn_scores(Ztr, Zev)
+    if "kde" in want:
+        scores["kde"] = kde_scores(Ztr, ytr, Zev, classes=classes)
+    if "kde_det" in want:
+        scores["kde_det"] = kde_det_scores(Ztr, ytr, Zev, classes=classes)
+    if "rmd" in want:
+        scores["rmd"], bg_mean, bg_precision = relative_mahalanobis_scores(Ztr, ytr, Zev, eps)
     return {
         "scores": scores, "classes": classes, "means": means, "cov": cov,
         "precision": precision, "bg_mean": bg_mean, "bg_precision": bg_precision,
-        "eps": eps, "n_train": int((np.asarray(ytr) >= 0).sum()), "n_classes": len(classes),
+        "eps": eps, "n_train": int((np.asarray(ytr) >= 0).sum()),
+        "n_classes": 0 if classes is None else len(classes),
     }
 
 

@@ -252,6 +252,25 @@ def evaluate_population(s_before, s_after, n_id, sl, n_pairs, base_auroc, base_f
     q["delta_referrals_per_1000"] = 1000.0 * q["delta_fpr95"]
     diff = np.abs(a - b)
     q["delta_med"], q["delta_max"] = float(np.median(diff)), float(diff.max())
+    # Rank preservation over the evaluation population (ID test + this OOD). Spearman
+    # of scores before vs after; discordant pairs among a PAIR_SEED sample of the same size
+    # as the ID–OOD F sample. Reach cannot evidence invariance; this can.
+    if np.ptp(b) == 0 and np.ptp(a) == 0:
+        rho_rank = 1.0
+    elif np.ptp(b) == 0 or np.ptp(a) == 0:
+        rho_rank = float("nan")
+    else:
+        rho_rank = float(spearmanr(b, a).statistic)
+    q["rank_spearman"] = rho_rank
+    q["rank_one_minus_rho"] = float(1.0 - rho_rank) if np.isfinite(rho_rank) else float("nan")
+    rng_r = np.random.default_rng(PAIR_SEED)
+    ii = rng_r.integers(0, len(b), n_pairs)
+    jj = rng_r.integers(0, len(b), n_pairs)
+    db = np.sign(b[ii] - b[jj])
+    da = np.sign(a[ii] - a[jj])
+    untied = db != 0
+    q["n_discordant_pairs"] = float(int(np.sum(untied & (db != da))))
+    q["n_pairs_untied_before"] = float(int(untied.sum()))
     sr_med = reach.ranking_reach_detail(sb_id, sb_ood, q["delta_med"], "additive", n_pairs, PAIR_SEED)
     sr_max = reach.ranking_reach_detail(sb_id, sb_ood, q["delta_max"], "additive", n_pairs, PAIR_SEED)
     q["S_med"], q["S_max"] = sr_med["S"], sr_max["S"]
