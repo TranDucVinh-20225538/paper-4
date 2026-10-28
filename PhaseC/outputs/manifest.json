@@ -1,9 +1,24 @@
 {
- "written": "2026-10-27T08:52:39+00:00",
+ "written": "2026-10-27T21:55:02+00:00",
  "git": {
-  "commit": "671d907f7ce8102134eb41540085fb3963c1eff8",
+  "commit": "899168d6de67b3c9e8f43dd93992c39d595b7a2a",
   "dirty_files": [
-   "?? PhaseC/"
+   "M PhaseC/analysis/backbones.py",
+   " M PhaseC/analysis/datasets_phasec.py",
+   " M PhaseC/analysis/export_kde_anisotropy.py",
+   " M PhaseC/analysis/extract_embeddings.py",
+   " M PhaseC/outputs/bounds_evaluation.csv",
+   " M PhaseC/outputs/check1_readings.csv",
+   " M PhaseC/outputs/generalisation_audit.csv",
+   " M PhaseC/outputs/kde_anisotropy_per_class.csv",
+   " M PhaseC/outputs/notes/imagenet200_feasibility.md",
+   " M PhaseC/outputs/notes/imagenet200_scope.md",
+   " M PhaseC/outputs/notes/kde_anisotropy_predictor.json",
+   "?? PhaseC/outputs/kde_anisotropy_class_join.csv",
+   "?? PhaseC/outputs/notes/cifar100_scope.md",
+   "?? PhaseC/outputs/notes/imagenet1k_admin_query.md",
+   "?? PhaseC/outputs/notes/kde_anisotropy_predictor.md",
+   "?? PhaseC/outputs/notes/transform_guard_failclosed.md"
   ]
  },
  "packages": {
@@ -32,9 +47,10 @@
    "dim": 512,
    "source_url": "https://drive.google.com/uc?id=1byGeYxM_PlLjT72wZsMQvP6popJeWBgt",
    "id_sets": [
-    "cifar10"
+    "cifar10",
+    "cifar100"
    ],
-   "description": "OpenOOD ResNet18_32x32 on CIFAR-10, post-avgpool 512-d. Prefers cifar10_res18_v1.5; accepts cifar10_res18 (v1) when v1.5 is unavailable \u2014 see provenance.openood_checkpoint_version and benchmark_pairing_note.",
+   "description": "OpenOOD ResNet18_32x32 on CIFAR-10, post-avgpool 512-d. Prefers cifar10_res18_v1.5; accepts cifar10_res18 (v1) when v1.5 is unavailable \u2014 see provenance.openood_checkpoint_version and benchmark_pairing_note. On CIFAR-100 ID this is the reverse-overlap case (trained on what is now near-OOD).",
    "frozen_from": {
     "repo": "https://github.com/Jingkang50/OpenOOD",
     "network": "resnet18_32x32",
@@ -99,6 +115,7 @@
    "source_url": "https://download.pytorch.org/models/resnet50-0676ba61.pth",
    "id_sets": [
     "cifar10",
+    "cifar100",
     "imagenet200"
    ],
    "description": "torchvision resnet50 IMAGENET1K_V1, fc stripped, post-avgpool 2048-d",
@@ -155,6 +172,7 @@
    "source_url": "https://huggingface.co/timm/vit_base_patch16_224.augreg2_in21k_ft_in1k",
    "id_sets": [
     "cifar10",
+    "cifar100",
     "imagenet200"
    ],
    "description": "timm vit_base_patch16_224 (augreg2_in21k_ft_in1k), CLS after final norm, 768-d",
@@ -224,6 +242,7 @@
    "source_url": "https://dl.fbaipublicfiles.com/dinov2/dinov2_vitb14/dinov2_vitb14_pretrain.pth",
    "id_sets": [
     "cifar10",
+    "cifar100",
     "imagenet200"
    ],
    "description": "DINOv2 ViT-B/14 (LVD-142M), CLS token after final norm, 768-d",
@@ -280,6 +299,7 @@
    "source_url": "https://huggingface.co/timm/vit_base_patch16_clip_224.openai",
    "id_sets": [
     "cifar10",
+    "cifar100",
     "imagenet200"
    ],
    "description": "OpenAI CLIP ViT-B/16 image tower (timm quickgelu variant), projected 512-d",
@@ -1354,6 +1374,26 @@
      "places365"
     ]
    },
+   "cifar100": {
+    "ood": [
+     "cifar10",
+     "tin",
+     "mnist",
+     "svhn",
+     "texture",
+     "places365"
+    ],
+    "near_ood": [
+     "cifar10",
+     "tin"
+    ],
+    "far_ood": [
+     "mnist",
+     "svhn",
+     "texture",
+     "places365"
+    ]
+   },
    "imagenet200": {
     "ood": [
      "ssb_hard",
@@ -1421,6 +1461,7 @@
    "ood_lsun": 4106,
    "ood_ref": 4107,
    "ood_mnist": 4108,
+   "ood_cifar10": 4109,
    "ood_ssb_hard": 4111,
    "ood_ninco": 4112,
    "ood_inaturalist": 4113,
@@ -1444,6 +1485,11 @@
     0
    ],
    "ortho_scale": [
+    0,
+    1,
+    2
+   ],
+   "ortho_linear": [
     0,
     1,
     2
@@ -1477,6 +1523,7 @@
   },
   "operator_rng_stream_ids": {
    "ortho_scale": 1,
+   "ortho_linear": 4,
    "general_affine": 2,
    "residual_nonlinear": 3
   },
@@ -1544,6 +1591,7 @@
    "cosine",
    "knn10",
    "kde",
+   "kde_det",
    "rmd"
   ],
   "reg_eps": 1e-05,
@@ -1781,13 +1829,21 @@
   }
  },
  "outputs": {
+  "bounds_evaluation.csv": {
+   "sha256": "3457bee8bf678ba19df68a1f84a71ae0a7fb48adcf5ef86d87c307744c35faac",
+   "bytes": 73046
+  },
+  "check1_readings.csv": {
+   "sha256": "41a59318acc57df7bef7efd6a570a34fe2365737ea2c8b53e53ee1c4e945bd0b",
+   "bytes": 57573844
+  },
   "check2_feasibility.json": {
-   "sha256": "d19f5c39f032bf66e4ff256ac0fa08fee7402716aec299a0b1af7978208e5e8a",
-   "bytes": 3627
+   "sha256": "008201eb4ab3d7ef034f20230ec54355846556961f99e6aaf95abcd0de42aef7",
+   "bytes": 3672
   },
   "check3_construction.csv": {
-   "sha256": "735d81c89098eb99c712656899daca706dc07dbb66346f5bd98cae7c7c9ff23d",
-   "bytes": 45407
+   "sha256": "98298e5f9e53110e7709f0b54607c68e2215036df28a09fe6b1df39596ed9837",
+   "bytes": 75141
   },
   "download_gdown.log": {
    "sha256": "e806408e67449b39c263e35f70e0470a7b76046276565df8b36da8cb15962fdd",
@@ -1804,23 +1860,53 @@
   "download_tv_extra.log": {
    "sha256": "0c3416199f41066d4087bf31d2689bd6ab2c7eb5ccc0d82806b8380468ea3969",
    "bytes": 3903
+  },
+  "generalisation_audit.csv": {
+   "sha256": "c7f58486a800df20fb3d9516d556549af1ad8cc371b5a955a314c47315fc837a",
+   "bytes": 41532679
+  },
+  "kde_anisotropy_class_join.csv": {
+   "sha256": "15686727541af5e7b13fe206fd8df03fee6f7481d68b6a25aab5beca938e0709",
+   "bytes": 7786
+  },
+  "kde_anisotropy_gate_join.csv": {
+   "sha256": "3c880abe836922d79832002c5412824e43a36a28083f375bdec65daca9702e14",
+   "bytes": 1454
+  },
+  "kde_anisotropy_per_backbone.csv": {
+   "sha256": "b46bb3338a909e6f1e28a8e8a2652982dc5a544c208acb13cb2c6354219d2c8e",
+   "bytes": 587
+  },
+  "kde_anisotropy_per_class.csv": {
+   "sha256": "3990b6949123bf08524de61c7379016df213a587bb28bf335fffa112bb7250a9",
+   "bytes": 6254
+  },
+  "kde_det_gate.csv": {
+   "sha256": "5cf4ca92cc82420c7acb847d8af1c3b825643d6b94aa1ef84ccc92ca8c68a99d",
+   "bytes": 25629
+  },
+  "kde_sigma_bar.csv": {
+   "sha256": "a1d143cd9f5bb6a3a8d4f91ae25e791703d5f58e34d523026554e69475505ded",
+   "bytes": 36148
   }
  },
  "scripts": {
   "PhaseC/analysis/__init__.py": "567536d55beded673e02556e50cc3f81ab76d853f9bd911085f22ffb26a499fe",
-  "PhaseC/analysis/backbones.py": "3db1b391be5684dbf3d559170673dcb7d4d6432d6e7e852740d941d5b9126834",
+  "PhaseC/analysis/backbones.py": "fbb3ebd91fdd75075b752ce202185a6e4a39be52d252d6835784cff774e5224c",
   "PhaseC/analysis/bounds.py": "e29ed1ee3f60d65b0d91e9e36eed727c5f607784bb2b163e799ce486cf8425df",
   "PhaseC/analysis/checks.py": "02dff94faed1ab2b7cc2b7b5b99558a1f5cc901325e18898ebe770b3fde9f306",
-  "PhaseC/analysis/datasets_phasec.py": "af860edbfa16082929abd783425219575a017a31ce3ae1a5fd5857833a5a7614",
-  "PhaseC/analysis/extract_embeddings.py": "24cc03ed76d286082862e76061a6c171f60def17b429fb320cf55e56d1285f1c",
+  "PhaseC/analysis/confirm_kde_bandwidth.py": "d203f75792fbee46ca5001fed23943e70b60ad9febc99c2e59ae96f2574aee1a",
+  "PhaseC/analysis/datasets_phasec.py": "64b8f8eb3b5a16766e458cc4e1345f6cf5e776f623875c8bdebd2bbf5c2fc20c",
+  "PhaseC/analysis/export_kde_anisotropy.py": "220b958c56b16532593f7cbd8be218a94fa072eb5e2b8a759eb1df80d1b115db",
+  "PhaseC/analysis/extract_embeddings.py": "624b0d86f506d87fc200ba72e59eac77bcbd7e15ceea6eb1cc75c280507f7ea6",
   "PhaseC/analysis/install_tin_imglist.py": "fd118bb5f4ae43a381affd9e0a1147926c08c5aca8b6d25220c2abef9eaed0ac",
-  "PhaseC/analysis/operators.py": "69988bec36721c436ab1db065ddcf9f742927a49c11e949f3c77f0763ccf08a6",
+  "PhaseC/analysis/operators.py": "a56c58b50e704bbb2113457fbe969b6c0f7804efe161dbaa5214d219a4a3728e",
   "PhaseC/analysis/reach.py": "805d64d7346fc33f39c048d89b27e72c61e75d653c996af60a728b7ad2a7ad6b",
   "PhaseC/analysis/resnet18_32x32.py": "35971b201a9e4c1493687cafd4ad5465afe33b667e86f6e0f4da37531f01f516",
-  "PhaseC/analysis/run_audit.py": "787d2f5735e55863f01f343c3604ccf6640c843acd77e94ad41fd93fb38bcd4e",
-  "PhaseC/analysis/scorers.py": "dead647e7de34c3ecea57e4198f65fdbebdd6f04a12f22012bece0c960da1743",
+  "PhaseC/analysis/run_audit.py": "09e424c2b379e4e030f1d35f8b644d5e884e595d43b8fb4e04db39f6bf2f4744",
+  "PhaseC/analysis/scorers.py": "83848cb55f701db6e8f18c2c8352dc8f2eecf25694e6963e92087c3ee836ad0f",
   "PhaseC/analysis/train_adapters.py": "ca9166227a0676b81e454298bdd334b382659a28370cee193c01d3b6acfcc34c",
-  "PhaseC/analysis/write_findings.py": "424726e1a29a2464cc0f854d598323be5caa825dc36a7fcefcd03e0aae2702ca",
+  "PhaseC/analysis/write_findings.py": "ad1ed789dec714ec1ef69f9715b1980dc79095ac5fa1495ae5e6d661730c6f32",
   "PhaseC/analysis/write_manifest.py": "5ddd5b739dd8d2b25a73467c9e89209fac99d8890490358a1eff6a62961482f9",
   "PhaseB/analysis/data_roots.py": "09e014901ed1402575030e6927cae734427425a596b7bb05fe680ad989769e41"
  }

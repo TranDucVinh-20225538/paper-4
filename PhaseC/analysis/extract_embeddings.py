@@ -120,7 +120,9 @@ def main(argv=None):
     ap.add_argument("--id-set", default="cifar10", choices=sorted(dsp.ID_SETS))
     ap.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     ap.add_argument("--batch-size", type=int, default=256)
-    ap.add_argument("--num-workers", type=int, default=min(8, os.cpu_count() or 1))
+    # Default 2: NFS homes often raise Errno 16 on DataLoader worker tempdir cleanup
+    # with many workers; the writes themselves succeed, but the process can exit non-zero.
+    ap.add_argument("--num-workers", type=int, default=2)
     ap.add_argument("--splits", nargs="*", default=None, help="subset of splits (default: all for the ID set)")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--download", action="store_true", help="allow torchvision to download missing archives")

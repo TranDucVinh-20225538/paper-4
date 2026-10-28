@@ -1,39 +1,42 @@
 {
  "relative_cutoff_kappa2": 1e-06,
  "id_set": "cifar10",
- "clarification": "The earlier report \u03c1\u22480.88 was a_c's own correlation (a_c_mean vs max|\u0394AUROC|kde), computed fresh in this export \u2014 not the \u03c3\u0304-deviation figure restated. Those two predictors agree to two digits on the 15-cell panel (a_c\u2194|\u0394AUROC| \u03c1=0.88; \u03c3\u0304-dev\u2194|\u0394AUROC| \u03c1=0.88) because a_c predicts the \u03c3\u0304 move that drives the AUROC move. At backbone aggregate n=5 that \u03c1 is descriptive only (p\u2248.05). The test is class-level.",
+ "clarification": "The earlier report \u03c1\u22480.88 was a_c's own correlation (a_c_mean vs max|\u0394AUROC|kde), computed fresh \u2014 not the \u03c3\u0304-deviation figure restated. On the 15-cell panel (5 backbones \u00d7 3 seeds, clustered \u2014 five independent units, not fifteen) a_c\u2194|\u0394AUROC| \u03c1=0.88 and \u03c3\u0304-dev\u2194|\u0394AUROC| \u03c1=0.88 agree to two digits because a_c predicts the \u03c3\u0304 move. That panel is descriptive only; the test with power is class-level n=50.",
+ "score_shift_attribution": "ID evaluation points only; each point attributed to argmax_c log p_c (the density term that drives the KDE score), not to the ground-truth label.",
  "class_level_test": {
   "n": 50,
   "n_backbones": 5,
   "n_classes_per_backbone": 10,
-  "spearman_a_c_vs_mean_abs_delta_score": {
-   "rho": -0.09330132052821127,
-   "p": 0.5192763079677907,
+  "spearman_a_c_vs_mean_abs_delta_score_argmax": {
+   "rho": -0.09291716686674668,
+   "p": 0.5210054483879641,
    "n": 50
   },
   "spearman_a_c_vs_mean_abs_log_sigma_dev": {
    "rho": 0.9524609843937575,
    "p": 2.0068145140294975e-26,
-   "n": 50
+   "n": 50,
+   "note": "mechanism link; the one with power"
   }
  },
  "backbone_aggregate_descriptive": {
-  "n": 5,
-  "n_cells_15": 15,
+  "n_independent_backbones": 5,
+  "n_cells_15_clustered": 15,
+  "note": "15 cells = 5 backbones \u00d7 3 seeds; treat as n=5, not n=15",
   "spearman_a_c_mean_vs_max_abs_dauroc_kde": {
    "rho": 0.8837824554557693,
    "p": 1.2428949604302423e-05,
-   "n": 15
+   "n_cells": 15
   },
   "spearman_sigma_dev_vs_max_abs_dauroc_kde": {
    "rho": 0.8821428571428571,
    "p": 1.3558210624788689e-05,
-   "n": 15
+   "n_cells": 15
   },
   "spearman_a_c_mean_vs_mean_abs_log_sigma_dev": {
    "rho": 0.9819805060619657,
    "p": 8.648244862274882e-11,
-   "n": 15
+   "n_cells": 15
   },
   "backbone_level_n5": {
    "spearman_a_c_mean_vs_mean_abs_log_sigma_dev": {
