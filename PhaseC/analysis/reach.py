@@ -150,10 +150,11 @@ def check1_reading(delta_auroc, S, F, tau=0.002, S_high=0.02, F0=1e-4, n_pairs=N
             "reason": f"flat and S={S:.3g} < {S_high}: almost no pair was within reach"}
 
 
-#: Spearman rho within this of 1.0 counts as rank preservation under float32 scoring.
-#: Exact arithmetic would demand 1e-9 or tighter; observed 1−rho for Mahalanobis under
-#: ortho_linear/ortho_scale is up to ~1e-4 (rank ties from float32), so 1e-3 is the
-#: operating tolerance. Always report 1−rho and discordant-pair counts beside the label.
+#: Spearman rho within this of 1.0 counts as rank preservation for the ridged
+#: (eps=1e-5) scorer the audit deploys. Round number chosen above the clean-affine
+#: residual of that estimator (~1e-4, the Theorem 2 scale), not fitted to γ<0
+#: failures. Exact unregularised Mahalanobis would demand ~0 discordant pairs.
+#: Always report 1−rho and discordant-pair counts beside the label.
 RANK_RHO_TOL = 1e-3
 
 

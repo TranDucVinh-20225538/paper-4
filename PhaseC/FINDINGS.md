@@ -34,7 +34,7 @@ Shares of configurations (dose > 0, all backbones, OOD rungs, seeds). `flat_inva
 | maha | 90 | 3.00e-06 | 2.54 | 7.45e-05 | 0 | 0.744 |
 | knn10 | 90 | 0 | 7.29 | 0.999 | 0.989 | 0.0111 |
 
-knn10's scores move under scale (median δ_med large) so many ID–OOD pairs sit inside 2δ and S ≈ 1, while ranks — hence AUROC — stay flat: registered invariant. Mahalanobis is exactly rank-invariant under the affine group (Theorem 1). Its scores also move (median δ_med = 2.54 on this slice): the map is monotone in the score, so it reorders nothing, and separately the ID–OOD margins are wide relative to that displacement, so S stays ≪ S_high. Both are true; neither is "the scorer did not need to move." The registered invariant label is **structurally unreachable** for an exactly invariant scorer with wide margins, because S(δ) is a worst-case bound over *arbitrary* perturbations of size δ and carries no information about a perturbation known to be monotone. That is a miscalibration of the label by construction, not a floating-point issue and not a failure of maha. Q3's refit-versus-closed-form relative error of ~1e-5 (float32) and Q4's |dAUROC| ~3e-06 are the arithmetic residual, not an operator effect.
+knn10's scores move under scale (median δ_med large) so many ID–OOD pairs sit inside 2δ and S ≈ 1, while ranks — hence AUROC — stay flat: registered invariant. The *ridged* Mahalanobis the audit scores with (eps = 1e-5) is rank-invariant under the affine group to within the Theorem 2 deviation — not the exact Theorem 1 statement, which is about the unregularised refit. Its scores also move (median δ_med = 2.54 on this slice); the map is nearly monotone in the score, and separately the ID–OOD margins are wide relative to that displacement, so S stays ≪ S_high. Both are true; neither is "the scorer did not need to move." The registered invariant label is **structurally unreachable** for a scorer whose margins dwarf δ, because S(δ) is a worst-case bound over *arbitrary* perturbations of size δ and carries no information about a nearly monotone one. That is a miscalibration of the label by construction, not a failure of maha.
 
 ### Precision-aware alternate (`invariant_fp` — not used by the paper)
 
@@ -61,45 +61,124 @@ Rank-invariance is a statement about ordering, so test ordering. Over each evalu
 
     rho = spearman(s(z), s_tilde(T z))
 
-Flat cases then separate on their own evidence (`reach.check1_rank_reading`, rho_tol=1e-03): **invariant** if rho = 1 within tolerance (report 1−rho and the count of discordant pairs among a PAIR_SEED sample); **cancelling** if rho < 1, AUROC flat, F > F0; **insensitive** if rho < 1, AUROC flat, S < S_high; **flat_high_reach** if rho < 1, F ≤ F0, S ≥ S_high (the registered-invariant case without rank preservation). The registered predicate is not edited — that it is unreachable for an exactly invariant scorer is a finding about Check 1, which ships as a library.
+Flat cases then separate on their own evidence (`reach.check1_rank_reading`, rho_tol=1e-03): **invariant** if rho = 1 within tolerance (report 1−rho and the count of discordant pairs among a PAIR_SEED sample); **cancelling** if rho < 1, AUROC flat, F > F0; **insensitive** if rho < 1, AUROC flat, S < S_high; **flat_high_reach** if rho < 1, F ≤ F0, S ≥ S_high (the registered-invariant case without rank preservation). The registered predicate is not edited — that it is unreachable for a wide-margin flat scorer is a finding about Check 1, which ships as a library. `n_discordant_pairs` counts sampled pairs that were untied before and whose sign(s_i−s_j) changed after — including before-untied → after-tied, not only flips.
+
+**Harness control (dose-0 identity maps).** spectral_temper γ=0, zca α=0, adapter α=0 (240 backbone×operator×seed×scorer cells over the four scorers above; every OOD rung): max 1−ρ = 1.1e-16, max discordant pairs = 0 out of 2,000,000. Every non-zero reading elsewhere is therefore attributable, not ambient.
 
 | group | scorer | n | moved | invariant | insensitive | cancelling | inconsistent | flat_high_reach | flat_invariant_share | median_1_minus_rho | median_n_discordant |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | affine | maha | 540 | 0.02 | 0.98 | 0 | 0.0037 | 0 | 0 | 1 | 1.9e-06 | 9.6e+02 |
 | affine | cosine | 540 | 0.74 | 0 | 0.033 | 0.21 | 0 | 0.015 | 0 | 0.049 | 1.9e+05 |
 | affine | knn10 | 540 | 0.55 | 0.18 | 0.0019 | 0.26 | 0 | 0.015 | 0.39 | 0.0088 | 7.6e+04 |
+| affine | kde | 444 | 0.61 | 0.12 | 0.016 | 0.25 | 0 | 0.0023 | 0.31 | 0.01 | 8.4e+04 |
+| affine | kde_det | 378 | 0.73 | 0.048 | 0.0079 | 0.2 | 0 | 0.013 | 0.17 | 0.021 | 1.2e+05 |
 | affine | rmd | 540 | 0.0056 | 0.96 | 0 | 0.03 | 0 | 0 | 0.97 | 4.6e-06 | 1.6e+03 |
-| outside | maha | 906 | 0.23 | 0.72 | 0.0022 | 0.042 | 0 | 0 | 0.94 | 3.4e-04 | 1.5e+04 |
-| outside | cosine | 906 | 0.51 | 0.39 | 0.017 | 0.079 | 0 | 0 | 0.8 | 0.0051 | 5.4e+04 |
-| outside | knn10 | 906 | 0.54 | 0.39 | 0.0022 | 0.061 | 0 | 0.0022 | 0.86 | 0.049 | 1.9e+05 |
-| outside | rmd | 906 | 0.4 | 0.23 | 0 | 0.37 | 0 | 0 | 0.38 | 0.027 | 1.3e+05 |
+| outside | maha | 1830 | 0.38 | 0.58 | 0.0038 | 0.034 | 0 | 0 | 0.94 | 4.0e-04 | 1.6e+04 |
+| outside | cosine | 1830 | 0.66 | 0.28 | 0.014 | 0.051 | 0 | 0 | 0.81 | 0.32 | 5.1e+05 |
+| outside | knn10 | 1830 | 0.67 | 0.27 | 0.0016 | 0.052 | 0 | 0.0011 | 0.83 | 0.11 | 2.9e+05 |
+| outside | kde | 108 | 0.16 | 0.78 | 0.0093 | 0.056 | 0 | 0 | 0.92 | 1.8e-05 | 3.4e+03 |
+| outside | kde_det | 108 | 0.2 | 0.75 | 0.0093 | 0.037 | 0 | 0 | 0.94 | 3.1e-05 | 4.6e+03 |
+| outside | rmd | 1830 | 0.56 | 0.13 | 0 | 0.31 | 0 | 0 | 0.29 | 0.027 | 1.4e+05 |
 
-**Affine prediction test.** Under the affine operators (ortho_linear, ortho_scale, general_affine, zca, spectral_temper; dose ≠ 0), Theorem 1 says maha (and rmd) are rank-invariant, so rho should be 1 in essentially every configuration; cosine, knn10 and kde sit outside parts of that group and should fall below 1 where they do. Tolerance: 1−rho ≤ 1e-03 (float32 operating floor; raw 1−rho and discordant counts are reported beside the label).
+**Affine rank test (ridged estimator, eps = 1e-5).** The audit's Mahalanobis is `scatter/(N−K) + eps·I` with eps = 1e-5 — the Theorem 2 object, not the unregularised Theorem 1 object. The claim that can be made about what people deploy: the ridged estimator is rank-invariant under the affine group to within the Theorem 2 deviation; at eps = 1e-5 that deviation stays below 1−ρ = 1e-03 in 100% of clean-affine configurations and becomes visible only under tempering that drives σ_min(A) toward zero. ρ = 1 exactly was never the prediction for this estimator: under ortho_linear (a pure rotation) ridged maha already reaches 1−ρ = 7.06e-05 with a median of 46 and a maximum of 7358 discordant pairs of 2M — an exactly rank-invariant scorer has zero. Tolerance 1e-03 is a round number above that clean-affine residual, not fitted to the γ<0 failures.
 
 | scorer | n | min_rho | median_rho | max_1_minus_rho | frac_rho_eq_1 | median_n_discordant |
 |---|---|---|---|---|---|---|
 | maha | 630 | 0.98 | 1 | 0.0204 | 0.981 | 476 |
 | cosine | 630 | 0.702 | 0.962 | 0.298 | 0.143 | 1.66e+05 |
 | knn10 | 630 | 0.765 | 0.994 | 0.235 | 0.295 | 6.49e+04 |
+| kde | 534 | 0.84 | 0.994 | 0.16 | 0.23 | 6.70e+04 |
+| kde_det | 378 | 0.736 | 0.979 | 0.264 | 0.0476 | 1.21e+05 |
 | rmd | 630 | 0.979 | 1 | 0.0206 | 0.971 | 1.45e+03 |
 
-clean affine (ortho_linear, ortho_scale, general_affine, zca): maha n=450, min rho=1, max 1−rho=2.8e-04, frac ≥ 1−tol = 100.0%; rmd max 1−rho=9.4e-04, frac ≥ 1−tol = 100.0%.
+clean affine (ortho_linear, ortho_scale, general_affine, zca): maha n=450, max 1−ρ=2.8e-04, frac ≥ 1−tol = 100.0%; rmd n=450, max 1−ρ=9.4e-04, frac ≥ 1−tol = 100.0%.
 
-spectral_temper γ>0: maha n=120, min rho=1, max 1−rho=1.9e-04, frac ≥ 1−tol = 100.0%; rmd max 1−rho=8.6e-04, frac ≥ 1−tol = 100.0%.
+spectral_temper γ>0: maha n=120, max 1−ρ=1.9e-04, frac ≥ 1−tol = 100.0%; rmd n=120, max 1−ρ=8.6e-04, frac ≥ 1−tol = 100.0%.
 
-spectral_temper γ<0: maha n=60, min rho=0.98, max 1−rho=0.02, frac ≥ 1−tol = 80.0%; rmd max 1−rho=0.021, frac ≥ 1−tol = 70.0%.
+spectral_temper γ<0: maha n=60, max 1−ρ=0.02, frac ≥ 1−tol = 80.0%; rmd n=60, max 1−ρ=0.021, frac ≥ 1−tol = 70.0%.
 
-**maha below 1−1e-03 under an affine map in 12 readings** (worst 1−rho = 0.02). Breakdown by operator: spectral_temper 12. This is a numerical issue under extreme tempering (negative γ amplifies small eigenvalues before the float32 refit), not a counterexample to Theorem 1 in exact arithmetic — clean affine (including zca and γ>0 temper) stays inside tolerance:
+On every clean operator rmd's max 1−ρ exceeds maha's by 3–4× (rmd inverts two ridged fits). Cosine and knn10 on the same rounded cloud under ortho_linear sit at 1−ρ ≈ 1e-12 with 0–1 discordant pairs — that bounds unamplified storage rounding at 1e-12; those scorers never invert a covariance, so the bound does not by itself refute a condition-amplified float32 story:
 
-| backbone | ood_set | operator | dose | seed | rank_spearman | rank_one_minus_rho |
+| operator | maha | rmd |
+|---|---|---|
+| general_affine | 2.82e-04 | 9.42e-04 |
+| ortho_linear | 7.06e-05 | 2.72e-04 |
+| ortho_scale | 7.33e-05 | 2.84e-04 |
+| zca | 1.91e-04 | 8.59e-04 |
+
+**Below 1−1e-03 under an affine map: 30 readings (maha 12, rmd 18) across two backbones.** All are spectral_temper γ<0:
+
+| backbone | dose | scorer | n_below_tol | worst_1_minus_rho |
+|---|---|---|---|---|
+| clip_vitb16 | -0.5 | rmd | 5 | 0.0066 |
+| clip_vitb16 | -0.25 | rmd | 1 | 0.00283 |
+| resnet18_cifar_openood | -0.5 | maha | 6 | 0.0204 |
+| resnet18_cifar_openood | -0.5 | rmd | 6 | 0.0206 |
+| resnet18_cifar_openood | -0.25 | maha | 6 | 0.00317 |
+| resnet18_cifar_openood | -0.25 | rmd | 6 | 0.00551 |
+
+Worst five by 1−ρ (of six OOD rungs at the worst cell; svhn on resnet18 γ=−0.5 maha is sixth at 1−ρ = 0.0102 and is omitted from this top-five only):
+
+| backbone | ood_set | operator | dose | seed | scorer | rank_spearman | rank_one_minus_rho |
+|---|---|---|---|---|---|---|---|
+| resnet18_cifar_openood | texture | spectral_temper | -0.5 | 0 | rmd | 0.979 | 0.0206 |
+| resnet18_cifar_openood | tin | spectral_temper | -0.5 | 0 | maha | 0.98 | 0.0204 |
+| resnet18_cifar_openood | cifar100 | spectral_temper | -0.5 | 0 | maha | 0.98 | 0.0202 |
+| resnet18_cifar_openood | mnist | spectral_temper | -0.5 | 0 | maha | 0.98 | 0.0195 |
+| resnet18_cifar_openood | places365 | spectral_temper | -0.5 | 0 | maha | 0.981 | 0.0186 |
+
+γ-profile on resnet18 maha (max 1−ρ over OOD), monotone through zero — operator-driven, not ambient:
+
+| dose | max_1_minus_rho |
+|---|---|
+| -0.5 | 0.0204 |
+| -0.25 | 0.00317 |
+| 0 | 1.11e-16 |
+| 0.25 | 1.59e-04 |
+| 0.5 | 1.88e-04 |
+| 0.75 | 1.90e-04 |
+| 1 | 1.91e-04 |
+
+**Attribution of the γ<0 failures (ridge vs float32 storage).** Two mechanisms share a λ_min signature and scale with eps in opposite directions: (A) the ridge discrepancy — refit uses ACAᵀ+eps·I where equivariance needs ACAᵀ+eps·AAᵀ, relative size eps‖I−AAᵀ‖/λ_min(C+eps), grows with eps; (B) float32 rounding of the stored cloud, amplified by cond(C+eps·I), falls as eps rises. Both were run on the failing configurations only (resnet18, clip; γ ∈ {−0.5,−0.25}; maha, rmd).
+
+Worst 1−ρ under the eps sweep (float32 storage):
+
+| backbone | dose | scorer | 1e-07 | 1e-05 | 0.001 |
+|---|---|---|---|---|---|
+| clip_vitb16 | -0.5 | maha | 1.62e-05 | 2.03e-04 | 0.0158 |
+| clip_vitb16 | -0.5 | rmd | 0.00198 | 0.0066 | 0.0449 |
+| clip_vitb16 | -0.25 | maha | 3.16e-07 | 3.78e-05 | 0.00273 |
+| clip_vitb16 | -0.25 | rmd | 3.83e-05 | 0.00283 | 0.0182 |
+| resnet18_cifar_openood | -0.5 | maha | 4.40e-04 | 0.0204 | 0.0352 |
+| resnet18_cifar_openood | -0.5 | rmd | 9.25e-04 | 0.0206 | 0.0124 |
+| resnet18_cifar_openood | -0.25 | maha | 4.77e-06 | 0.00317 | 0.0122 |
+| resnet18_cifar_openood | -0.25 | rmd | 1.17e-05 | 0.00551 | 0.0054 |
+
+float64 storage at eps = 1e-5 vs production float32:
+
+| backbone | dose | scorer | worst_1m_f32 | worst_1m_f64 | f64_over_f32 |
+|---|---|---|---|---|---|
+| clip_vitb16 | -0.5 | maha | 2.03e-04 | 2.03e-04 | 1 |
+| clip_vitb16 | -0.5 | rmd | 0.0066 | 0.0066 | 1 |
+| clip_vitb16 | -0.25 | maha | 3.78e-05 | 3.78e-05 | 1 |
+| clip_vitb16 | -0.25 | rmd | 0.00283 | 0.00283 | 1 |
+| resnet18_cifar_openood | -0.5 | maha | 0.0204 | 0.0204 | 1 |
+| resnet18_cifar_openood | -0.5 | rmd | 0.0206 | 0.0206 | 1 |
+| resnet18_cifar_openood | -0.25 | maha | 0.00317 | 0.00317 | 1 |
+| resnet18_cifar_openood | -0.25 | rmd | 0.00551 | 0.00551 | 1 |
+
+Spearman(log10 eps, 1−ρ) = 0.759; median (f64 1−ρ)/(f32 1−ρ) = 1. float64 storage leaves the residual unchanged; raising eps makes it worse. **Winner: (A) ridge discrepancy.** The earlier sentence blaming "negative γ amplifies small eigenvalues before the float32 refit" predicted dinov2 worst (smallest λ_min) and got the sign of corr(1−ρ, λ_min(C)) wrong (+0.48 over joined affine rows); it is withdrawn. Cosine/knn10's 1e-12 ortho_linear floor bounds unamplified rounding only — they never invert a covariance.
+
+**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12) over clean affine.** Prediction: under ortho_linear, 1−ρ and discordant counts at the level cosine/knn10 already show (max ~1 discordant of 2M), not thousands. Compared side-by-side with the ridged (eps = 1e-5) column on the same maps:
+
+| scorer | n | max_1_minus_rho | median_1_minus_rho | max_n_discordant | median_n_discordant | n_degenerate |
 |---|---|---|---|---|---|---|
-| resnet18_cifar_openood | tin | spectral_temper | -0.5 | 0 | 0.98 | 0.0204 |
-| resnet18_cifar_openood | cifar100 | spectral_temper | -0.5 | 0 | 0.98 | 0.0202 |
-| resnet18_cifar_openood | mnist | spectral_temper | -0.5 | 0 | 0.98 | 0.0195 |
-| resnet18_cifar_openood | places365 | spectral_temper | -0.5 | 0 | 0.981 | 0.0186 |
-| resnet18_cifar_openood | texture | spectral_temper | -0.5 | 0 | 0.986 | 0.0144 |
+| maha | 450 | 2.82e-04 | 2.50e-07 | 14876 | 357 | 0 |
+| maha_noridge | 450 | 6.32e-06 | 1.20e-11 | 1718 | 0 | 0 |
 
-Scorers not yet in `rank_preservation.csv`: kde, kde_det (re-run `compute_rank_preservation.py` with those scorers).
+Under ortho_linear alone: ridged maha max 1−ρ = 7.1e-05 / max discordant = 7358; maha_noridge max 1−ρ = 1.7e-07 / max discordant = 276 (median discordant = 0). The residual drops by orders of magnitude; the overall max above is driven by zca on ill-conditioned backbones (still ≪ 1e-3). Theorem 1 holds on its estimator; the ridged residual is the ridge.
+
+Degenerate constant-score rows (ptp=0 before and after, forced ρ=1): 0 (expect 0).
 
 Sensitivity over tau in [.001,.01] and S_high in [.005,.1] (20 cells), registered labels:
 
@@ -274,6 +353,16 @@ Across configurations, median λ_min(C) = 3.5e-05, median ‖I−AAᵀ‖₂ = 9
 | zca | 5.92e+04 | 207 | 1.00e+12 | 20 |
 
 ortho_linear with c ∈ [0.5, 2] has |1 − c²| ∈ [0, 3] (observed median ~0.25); ortho_scale is O(1). The median of 9 is exactly general_affine's construction (cond_target=10.0, every seed ‖I−AAᵀ‖₂ = 9); zca and spectral_temper contribute still larger values. No constant is leaking in.
+
+Joining maha's max-over-rungs 1−ρ to the Theorem 2 row of the same configuration: the measured equivariance violation of the refit predicts loss of rank preservation; the Theorem 2 bound carries the right variable but is too loose to rank configurations (same finding as the vacuity above, arriving a second way). The audit can flag its own rank failures from a column it already computes:
+
+| predictor | spearman_with_1_minus_rho | n |
+|---|---|---|
+| actual_refit_observed_max | 0.849 | 105 |
+| observed_max | 0.849 | 105 |
+| lambda_min_C | 0.496 | 105 |
+| predicted_max | -0.148 | 105 |
+| sigma_min | -0.187 | 105 |
 
 Lemma 2 (cosine, retained-quantity form) holds in 100.0% of 105 configurations at tightness 0.12–0.23 (within an order of magnitude of the observation) — useful, unlike Theorem 2. Median tightness by operator: general_affine 0.19, ortho_linear 1.7e-09, ortho_scale 0.15, spectral_temper 0.19, zca 0.21.
 

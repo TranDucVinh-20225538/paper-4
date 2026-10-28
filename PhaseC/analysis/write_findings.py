@@ -116,7 +116,10 @@ def panderm_reference():
 #: This is a stricter flatness test, not evidence of invariance — see Q1.
 CHECK1_AUROC_ARITH = max(64 * float(np.finfo(np.float32).eps), 1e-5)
 
-#: Spearman within this of 1.0 counts as rank preservation (matches reach.RANK_RHO_TOL).
+#: Spearman within this of 1.0 counts as rank preservation for the *ridged* scorer
+#: (matches reach.RANK_RHO_TOL). Anchored to a round number above the clean-affine
+#: Theorem-2-scale residual (~1e-4), not fitted to the γ<0 failures. Raw 1−ρ and
+#: discordant counts are always reported beside the label.
 RANK_RHO_TOL = 1e-3
 RANK_LABELS = ("moved", "invariant", "insensitive", "cancelling", "inconsistent", "flat_high_reach")
 
@@ -200,18 +203,17 @@ def main(argv=None):
               "δ = 0:", "", table(diag, p=3), "",
               "knn10's scores move under scale (median δ_med large) so many ID–OOD pairs sit "
               "inside 2δ and S ≈ 1, while ranks — hence AUROC — stay flat: registered invariant. "
-              "Mahalanobis is exactly rank-invariant under the affine group (Theorem 1). Its scores "
-              f"also move (median δ_med = {num(float(diag.loc['maha', 'median_delta_med']), 3)} on this "
-              "slice): the map is monotone in the score, so it reorders nothing, and separately the "
-              "ID–OOD margins are wide relative to that displacement, so S stays ≪ S_high. Both are "
-              "true; neither is \"the scorer did not need to move.\" The registered invariant label is "
-              "**structurally unreachable** for an exactly invariant scorer with wide margins, because "
-              "S(δ) is a worst-case bound over *arbitrary* perturbations of size δ and carries no "
-              "information about a perturbation known to be monotone. That is a miscalibration of the "
-              "label by construction, not a floating-point issue and not a failure of maha. "
-              "Q3's refit-versus-closed-form relative error of ~1e-5 (float32) and Q4's |dAUROC| "
-              "~3e-06 are the arithmetic residual, not an operator effect.", ""]
-    # Precision-aware alternate — stricter flatness, NOT invariance
+              "The *ridged* Mahalanobis the audit scores with (eps = 1e-5) is rank-invariant under "
+              "the affine group to within the Theorem 2 deviation — not the exact Theorem 1 "
+              "statement, which is about the unregularised refit. Its scores also move "
+              f"(median δ_med = {num(float(diag.loc['maha', 'median_delta_med']), 3)} on this "
+              "slice); the map is nearly monotone in the score, and separately the ID–OOD margins "
+              "are wide relative to that displacement, so S stays ≪ S_high. Both are true; neither "
+              "is \"the scorer did not need to move.\" The registered invariant label is "
+              "**structurally unreachable** for a scorer whose margins dwarf δ, because S(δ) is a "
+              "worst-case bound over *arbitrary* perturbations of size δ and carries no information "
+              "about a nearly monotone one. That is a miscalibration of the label by construction, "
+              "not a failure of maha.", ""]    # Precision-aware alternate — stricter flatness, NOT invariance
     alt_rows = []
     for grp, names in (("affine", AFFINE), ("outside", OUTSIDE)):
         for sc in SCORERS:
@@ -254,18 +256,15 @@ def main(argv=None):
           "a PAIR_SEED sample); **cancelling** if rho < 1, AUROC flat, F > F0; **insensitive** if rho < 1, "
           "AUROC flat, S < S_high; **flat_high_reach** if rho < 1, F ≤ F0, S ≥ S_high (the registered-"
           "invariant case without rank preservation). The registered predicate is not edited — that it is "
-          "unreachable for an exactly invariant scorer is a finding about Check 1, which ships as a library.", ""]
+          "unreachable for a wide-margin flat scorer is a finding about Check 1, which ships as a library. "
+          f"`n_discordant_pairs` counts sampled pairs that were untied before and whose sign(s_i−s_j) "
+          "changed after — including before-untied → after-tied, not only flips.", ""]
     if rp is not None and len(rp):
         rp = rp[rp.id_set == ar.id_set]
         key = ["backbone", "id_set", "ood_set", "operator", "dose", "scorer", "seed"]
         cols_rp = [c for c in ("rank_spearman", "rank_one_minus_rho", "n_discordant_pairs") if c in rp.columns]
         j = wt.drop(columns=[c for c in cols_rp if c in wt.columns], errors="ignore")
         j = j.merge(rp[key + cols_rp], on=key, how="left")
-        # Fall back to audit-embedded columns for configs the dedicated CSV has not yet covered.
-        if "rank_spearman" in wt.columns:
-            miss = j.rank_spearman.isna() & wt.rank_spearman.notna()
-            if miss.any():
-                j.loc[miss, "rank_spearman"] = wt.loc[miss, "rank_spearman"].values
         if "rank_one_minus_rho" not in j.columns:
             j["rank_one_minus_rho"] = 1.0 - j.rank_spearman
         else:
@@ -275,6 +274,18 @@ def main(argv=None):
         if have.sum() == 0:
             L += ["`rank_preservation.csv` is present but did not join onto the audit rows.", ""]
         else:
+            # Harness control: dose-0 identity maps
+            id0 = rp[((rp.operator == "spectral_temper") & (rp.dose == 0)) |
+                     ((rp.operator == "zca") & (rp.dose == 0)) |
+                     ((rp.operator == "adapter") & (rp.dose == 0))]
+            id0_4 = id0[id0.scorer.isin(["maha", "rmd", "cosine", "knn10"])]
+            if len(id0_4):
+                n_cfg = id0_4.groupby(["backbone", "operator", "seed", "scorer"]).ngroups
+                L += ["**Harness control (dose-0 identity maps).** spectral_temper γ=0, zca α=0, adapter α=0 "
+                      f"({n_cfg} backbone×operator×seed×scorer cells over the four scorers above; every OOD rung): "
+                      f"max 1−ρ = {num(float(id0_4.rank_one_minus_rho.max()), 2)}, "
+                      f"max discordant pairs = {int(id0_4.n_discordant_pairs.max())} out of 2,000,000. "
+                      "Every non-zero reading elsewhere is therefore attributable, not ambient.", ""]
             def _rank_label(r):
                 if not np.isfinite(r.rank_spearman):
                     return "undefined"
@@ -294,10 +305,10 @@ def main(argv=None):
                     rr.append({"group": grp, "scorer": sc, "n": len(s),
                                **{l: float(vc.get(l, 0.0)) for l in RANK_LABELS},
                                "flat_invariant_share": float((flat.rank_label == "invariant").mean()) if len(flat) else np.nan,
-                               "median_1_minus_rho": float(s.rank_one_minus_rho.median()) if "rank_one_minus_rho" in s else float((1 - s.rank_spearman).median()),
+                               "median_1_minus_rho": float(s.rank_one_minus_rho.median()),
                                "median_n_discordant": float(s.n_discordant_pairs.median()) if "n_discordant_pairs" in s else np.nan})
             L += [table(pd.DataFrame(rr), index=False, p=2), ""]
-            # Affine prediction test — split clean affine from spectral_temper γ<0 (ill-conditioned)
+
             aff_ops = ["ortho_linear", "ortho_scale", "general_affine", "zca", "spectral_temper"]
             ja = j[j.operator.isin(aff_ops) & (j.dose != 0) & j.scorer.isin(list(SCORERS))]
             if len(ja):
@@ -309,12 +320,17 @@ def main(argv=None):
                 if "n_discordant_pairs" in ja.columns:
                     agg_kw["median_n_discordant"] = ("n_discordant_pairs", "median")
                 pred = ja.groupby("scorer").agg(**agg_kw).reindex([s for s in SCORERS if s in set(ja.scorer)])
-                L += ["**Affine prediction test.** Under the affine operators (ortho_linear, ortho_scale, "
-                      "general_affine, zca, spectral_temper; dose ≠ 0), Theorem 1 says maha (and rmd) are "
-                      "rank-invariant, so rho should be 1 in essentially every configuration; cosine, knn10 "
-                      "and kde sit outside parts of that group and should fall below 1 where they do. "
-                      f"Tolerance: 1−rho ≤ {RANK_RHO_TOL:.0e} (float32 operating floor; raw 1−rho and "
-                      "discordant counts are reported beside the label).", "",
+                L += ["**Affine rank test (ridged estimator, eps = 1e-5).** The audit's Mahalanobis is "
+                      "`scatter/(N−K) + eps·I` with eps = 1e-5 — the Theorem 2 object, not the unregularised "
+                      "Theorem 1 object. The claim that can be made about what people deploy: the ridged "
+                      "estimator is rank-invariant under the affine group to within the Theorem 2 deviation; "
+                      f"at eps = 1e-5 that deviation stays below 1−ρ = {RANK_RHO_TOL:.0e} in 100% of clean-affine "
+                      "configurations and becomes visible only under tempering that drives σ_min(A) toward zero. "
+                      "ρ = 1 exactly was never the prediction for this estimator: under ortho_linear (a pure "
+                      "rotation) ridged maha already reaches 1−ρ = 7.06e-05 with a median of 46 and a maximum of "
+                      "7358 discordant pairs of 2M — an exactly rank-invariant scorer has zero. "
+                      f"Tolerance {RANK_RHO_TOL:.0e} is a round number above that clean-affine residual, not "
+                      "fitted to the γ<0 failures.", "",
                       table(pred, p=3), ""]
                 clean = ja[ja.operator.isin(["ortho_linear", "ortho_scale", "general_affine", "zca"])]
                 temper_neg = ja[(ja.operator == "spectral_temper") & (ja.dose < 0)]
@@ -326,32 +342,120 @@ def main(argv=None):
                         continue
                     sm = sub[sub.scorer == "maha"]
                     sr = sub[sub.scorer == "rmd"]
+                    bits = []
                     if len(sm):
-                        L += [f"{tag}: maha n={len(sm)}, min rho={num(float(sm.rank_spearman.min()), 3)}, "
-                              f"max 1−rho={num(float((1 - sm.rank_spearman).max()), 2)}, "
-                              f"frac ≥ 1−tol = {(sm.rank_spearman >= 1.0 - RANK_RHO_TOL).mean():.1%}"
-                              + (f"; rmd max 1−rho={num(float((1 - sr.rank_spearman).max()), 2)}, "
-                                 f"frac ≥ 1−tol = {(sr.rank_spearman >= 1.0 - RANK_RHO_TOL).mean():.1%}"
-                                 if len(sr) else "") + ".", ""]
-                maha_bad = ja[(ja.scorer == "maha") & (ja.rank_spearman < 1.0 - RANK_RHO_TOL)]
-                if len(maha_bad):
-                    show_cols = ["backbone", "ood_set", "operator", "dose", "seed", "rank_spearman"]
-                    if "rank_one_minus_rho" in maha_bad.columns:
-                        show_cols.append("rank_one_minus_rho")
-                    # All failures so far are spectral_temper γ<0 on a single backbone — name that.
-                    L += [f"**maha below 1−{RANK_RHO_TOL:.0e} under an affine map in {len(maha_bad)} readings** "
-                          f"(worst 1−rho = {num(float((1 - maha_bad.rank_spearman).max()), 2)}). "
-                          "Breakdown by operator: "
-                          + ", ".join(f"{k} {int(v)}" for k, v in maha_bad.groupby("operator").size().items())
-                          + ". This is a numerical issue under extreme tempering (negative γ amplifies "
-                          "small eigenvalues before the float32 refit), not a counterexample to Theorem 1 "
-                          "in exact arithmetic — clean affine (including zca and γ>0 temper) stays inside "
-                          "tolerance:", "",
-                          table(maha_bad.nsmallest(5, "rank_spearman")[show_cols], index=False, p=3), ""]
+                        bits.append(f"maha n={len(sm)}, max 1−ρ={num(float((1 - sm.rank_spearman).max()), 2)}, "
+                                    f"frac ≥ 1−tol = {(sm.rank_spearman >= 1.0 - RANK_RHO_TOL).mean():.1%}")
+                    if len(sr):
+                        bits.append(f"rmd n={len(sr)}, max 1−ρ={num(float((1 - sr.rank_spearman).max()), 2)}, "
+                                    f"frac ≥ 1−tol = {(sr.rank_spearman >= 1.0 - RANK_RHO_TOL).mean():.1%}")
+                    if bits:
+                        L += [f"{tag}: " + "; ".join(bits) + ".", ""]
+                # rmd exceeds maha on clean affine
+                if len(clean):
+                    cmp = (clean[clean.scorer.isin(["maha", "rmd"])]
+                           .groupby(["operator", "scorer"]).rank_one_minus_rho.max().unstack())
+                    if {"maha", "rmd"}.issubset(cmp.columns):
+                        L += ["On every clean operator rmd's max 1−ρ exceeds maha's by 3–4× "
+                              "(rmd inverts two ridged fits). Cosine and knn10 on the same rounded cloud "
+                              "under ortho_linear sit at 1−ρ ≈ 1e-12 with 0–1 discordant pairs — that bounds "
+                              "unamplified storage rounding at 1e-12; those scorers never invert a covariance, "
+                              "so the bound does not by itself refute a condition-amplified float32 story:", "",
+                              table(cmp, p=3), ""]
+                # Full failure count (maha + rmd)
+                bad = ja[ja.scorer.isin(["maha", "rmd"]) & (ja.rank_spearman < 1.0 - RANK_RHO_TOL)]
+                if len(bad):
+                    fail_tab = (bad.groupby(["backbone", "dose", "scorer"])
+                                .agg(n_below_tol=("rank_spearman", "size"),
+                                     worst_1_minus_rho=("rank_one_minus_rho", "max"))
+                                .reset_index().sort_values(["backbone", "dose", "scorer"]))
+                    show_cols = ["backbone", "ood_set", "operator", "dose", "seed", "scorer",
+                                 "rank_spearman", "rank_one_minus_rho"]
+                    show_cols = [c for c in show_cols if c in bad.columns]
+                    L += [f"**Below 1−{RANK_RHO_TOL:.0e} under an affine map: {len(bad)} readings "
+                          f"(maha {int((bad.scorer=='maha').sum())}, rmd {int((bad.scorer=='rmd').sum())}) "
+                          "across two backbones.** All are spectral_temper γ<0:", "",
+                          table(fail_tab, index=False, p=3), "",
+                          "Worst five by 1−ρ (of six OOD rungs at the worst cell; svhn on resnet18 γ=−0.5 "
+                          "maha is sixth at 1−ρ = 0.0102 and is omitted from this top-five only):", "",
+                          table(bad.nsmallest(5, "rank_spearman")[show_cols], index=False, p=3), ""]
+                    # γ profile on resnet18 maha
+                    gprof = (rp[(rp.backbone == "resnet18_cifar_openood") & (rp.scorer == "maha") &
+                                (rp.operator == "spectral_temper")]
+                             .groupby("dose").rank_one_minus_rho.max().sort_index())
+                    if len(gprof):
+                        L += ["γ-profile on resnet18 maha (max 1−ρ over OOD), monotone through zero — "
+                              "operator-driven, not ambient:", "",
+                              table(gprof.to_frame("max_1_minus_rho"), p=3), ""]
+                # Attribution experiments
+                attr_path = ar.out / "rank_failure_attribution.csv"
+                note_path = ar.out / "notes" / "rank_failure_attribution.json"
+                if attr_path.is_file():
+                    attr = pd.read_csv(attr_path)
+                    sw = (attr[attr.experiment == "eps_sweep"]
+                          .groupby(["backbone", "dose", "scorer", "eps"]).rank_one_minus_rho.max()
+                          .unstack("eps"))
+                    f32 = (attr[(attr.experiment == "eps_sweep") & (np.isclose(attr.eps, 1e-5))]
+                           .groupby(["backbone", "dose", "scorer"]).rank_one_minus_rho.max())
+                    f64 = (attr[attr.experiment == "float64_storage"]
+                           .groupby(["backbone", "dose", "scorer"]).rank_one_minus_rho.max())
+                    cmp64 = pd.DataFrame({"worst_1m_f32": f32, "worst_1m_f64": f64})
+                    cmp64["f64_over_f32"] = cmp64.worst_1m_f64 / cmp64.worst_1m_f32.replace(0, np.nan)
+                    sw2 = (attr[attr.experiment == "eps_sweep"]
+                           .groupby(["backbone", "dose", "scorer", "eps"]).rank_one_minus_rho.max()
+                           .reset_index())
+                    sp_eps = float(spearmanr(np.log10(sw2.eps), sw2.rank_one_minus_rho).statistic)
+                    med_ratio = float(cmp64.f64_over_f32.median())
+                    L += ["**Attribution of the γ<0 failures (ridge vs float32 storage).** Two mechanisms "
+                          "share a λ_min signature and scale with eps in opposite directions: (A) the ridge "
+                          "discrepancy — refit uses ACAᵀ+eps·I where equivariance needs ACAᵀ+eps·AAᵀ, relative "
+                          "size eps‖I−AAᵀ‖/λ_min(C+eps), grows with eps; (B) float32 rounding of the stored "
+                          "cloud, amplified by cond(C+eps·I), falls as eps rises. Both were run on the failing "
+                          "configurations only (resnet18, clip; γ ∈ {−0.5,−0.25}; maha, rmd).", "",
+                          "Worst 1−ρ under the eps sweep (float32 storage):", "", table(sw, p=3), "",
+                          "float64 storage at eps = 1e-5 vs production float32:", "", table(cmp64, p=3), "",
+                          f"Spearman(log10 eps, 1−ρ) = {num(sp_eps, 3)}; median (f64 1−ρ)/(f32 1−ρ) = "
+                          f"{num(med_ratio, 3)}. float64 storage leaves the residual unchanged; raising eps "
+                          "makes it worse. **Winner: (A) ridge discrepancy.** The earlier sentence blaming "
+                          "\"negative γ amplifies small eigenvalues before the float32 refit\" predicted "
+                          "dinov2 worst (smallest λ_min) and got the sign of corr(1−ρ, λ_min(C)) wrong "
+                          "(+0.48 over joined affine rows); it is withdrawn. Cosine/knn10's 1e-12 ortho_linear "
+                          "floor bounds unamplified rounding only — they never invert a covariance.", ""]
+                # maha_noridge (Theorem 1 estimator)
+                nr_path = ar.out / "maha_noridge_clean_affine.csv"
+                if nr_path.is_file():
+                    nr = pd.read_csv(nr_path)
+                    agg_nr = dict(n=("rank_one_minus_rho", "size"),
+                                  max_1_minus_rho=("rank_one_minus_rho", "max"),
+                                  median_1_minus_rho=("rank_one_minus_rho", "median"),
+                                  max_n_discordant=("n_discordant_pairs", "max"),
+                                  median_n_discordant=("n_discordant_pairs", "median"))
+                    if "degenerate_constant" in nr.columns:
+                        agg_nr["n_degenerate"] = ("degenerate_constant", "sum")
+                    nr_sum = nr.groupby("scorer").agg(**agg_nr)
+                    ol = nr[nr.operator == "ortho_linear"]
+                    L += ["**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12) over clean "
+                          "affine.** Prediction: under ortho_linear, 1−ρ and discordant counts at the level "
+                          "cosine/knn10 already show (max ~1 discordant of 2M), not thousands. "
+                          "Compared side-by-side with the ridged (eps = 1e-5) column on the same maps:", "",
+                          table(nr_sum, p=3), ""]
+                    if len(ol):
+                        L += ["Under ortho_linear alone: ridged maha max 1−ρ = "
+                              f"{num(float(ol[ol.scorer=='maha'].rank_one_minus_rho.max()), 2)} / "
+                              f"max discordant = {int(ol[ol.scorer=='maha'].n_discordant_pairs.max())}; "
+                              f"maha_noridge max 1−ρ = "
+                              f"{num(float(ol[ol.scorer=='maha_noridge'].rank_one_minus_rho.max()), 2)} / "
+                              f"max discordant = {int(ol[ol.scorer=='maha_noridge'].n_discordant_pairs.max())} "
+                              f"(median discordant = {int(ol[ol.scorer=='maha_noridge'].n_discordant_pairs.median())}). "
+                              "The residual drops by orders of magnitude; the overall max above is driven by "
+                              "zca on ill-conditioned backbones (still ≪ 1e-3). Theorem 1 holds on its "
+                              "estimator; the ridged residual is the ridge.", ""]
+                    if "degenerate_constant" in nr.columns:
+                        L += [f"Degenerate constant-score rows (ptp=0 before and after, forced ρ=1): "
+                              f"{int(nr.degenerate_constant.sum())} (expect 0).", ""]
                 else:
-                    L += [f"maha stays at rho ≥ 1−{RANK_RHO_TOL:.0e} in every affine configuration measured — "
-                          "consistent with Theorem 1. Residuals below that floor are float32 ranking noise "
-                          f"(median 1−rho on this slice: {num(float((1 - ja.loc[ja.scorer=='maha','rank_spearman']).median()), 2)}).", ""]
+                    L += ["`maha_noridge_clean_affine.csv` not yet written — Theorem 1 on the unregularised "
+                          "estimator is pending (`diagnose_rank_failures.py`).", ""]
             missing = [s for s in SCORERS if s not in scorers_present]
             if missing:
                 L += [f"Scorers not yet in `rank_preservation.csv`: {', '.join(missing)} "
@@ -613,6 +717,35 @@ def main(argv=None):
                   "ortho_scale is O(1). The median of 9 is exactly general_affine's construction "
                   f"(cond_target={10.0}, every seed ‖I−AAᵀ‖₂ = 9); zca and spectral_temper contribute "
                   "still larger values. No constant is leaking in.", ""]
+            # Predictor of rank failure from bounds columns already computed
+            if rp is not None and len(rp):
+                rp_m = rp[(rp.id_set == ar.id_set) & (rp.scorer == "maha")]
+                m1 = (rp_m.groupby(["backbone", "id_set", "operator", "dose", "seed"])
+                      .rank_one_minus_rho.max().reset_index()
+                      .rename(columns={"rank_one_minus_rho": "one_minus_rho"}))
+                t2j = t2.merge(m1, on=["backbone", "id_set", "operator", "dose", "seed"], how="inner")
+                if len(t2j):
+                    preds = []
+                    for col in ["actual_refit_observed_max", "observed_max", "lambda_min_C",
+                                "predicted_max", "sigma_min"]:
+                        if col not in t2j.columns:
+                            continue
+                        sub = t2j[["one_minus_rho", col]].dropna()
+                        if len(sub) < 5:
+                            continue
+                        preds.append({
+                            "predictor": col,
+                            "spearman_with_1_minus_rho": float(spearmanr(sub.one_minus_rho, sub[col]).statistic),
+                            "n": len(sub),
+                        })
+                    if preds:
+                        L += ["Joining maha's max-over-rungs 1−ρ to the Theorem 2 row of the same "
+                              "configuration: the measured equivariance violation of the refit predicts "
+                              "loss of rank preservation; the Theorem 2 bound carries the right variable "
+                              "but is too loose to rank configurations (same finding as the vacuity "
+                              "above, arriving a second way). The audit can flag its own rank failures "
+                              "from a column it already computes:", "",
+                              table(pd.DataFrame(preds), index=False, p=3), ""]
         if len(l2):
             L += [f"Lemma 2 (cosine, retained-quantity form) holds in {l2.bound_holds.mean():.1%} of {len(l2)} configurations "
                   f"at tightness 0.12–0.23 (within an order of magnitude of the observation) — useful, unlike Theorem 2. "
