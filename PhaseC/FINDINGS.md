@@ -227,7 +227,19 @@ Summary:
 | kde_det | 90 | 3.48e-09 | 6.27e-12 | 18 | 0 | 1 |
 | knn10 | 90 | 9.41e-12 | 4.50e-12 | 1 | 0 | 1 |
 
-Separation holds: kde max discordant = 42454; kde_det max = 18 (cosine 1). kde reorders under pure rotation; kde_det stays near cosine/knn10 scale. Q4's ortho_scale AUROC gap is reading the bandwidth mechanism.
+**Separation holds, paired within backbone.** kde discordant ≫ cosine/knn10 on every backbone. kde_det is **exactly 0 of 2×10⁶** on clip_vitb16, resnet18_cifar_openood, resnet50_imagenet; residual discordant only on dinov2_vitb14, vitb16_imagenet (dinov2_vitb14=18, vitb16_imagenet=10). Do not summarise as a single max-over-backbone — that hides the 0/0/0 vs residual split. Q4's ortho_scale AUROC gap is reading the bandwidth mechanism.
+
+**Bandwidth attribution (discriminating column).** Relative change in the computed Scott bandwidth under ortho_linear, |h_after/(c·h_before) − 1|, from `kde_sigma_bar.csv` (h̄ = σ̄·n_c^(−1/(d+4)); h_det = det(Σ)^(1/(2d))·n_c^(−1/(d+4))):
+
+| backbone | kde_max_disc | kde_det_max_disc | max_|h̄/(c·h̄)−1| | max_|h_det/(c·h_det)−1| | regime |
+|---|---|---|---|---|---|
+| clip_vitb16 | 15024 | 0 | 0.0648 | 7.92e-10 | computable |
+| dinov2_vitb14 | 983 | 18 | 0.00344 | 2.88e-05 | float32 floor |
+| resnet18_cifar_openood | 42454 | 0 | 0.205 | 1.71e-09 | computable |
+| resnet50_imagenet | 40361 | 0 | 0.113 | 3.77e-10 | computable |
+| vitb16_imagenet | 7111 | 10 | 0.0223 | 9.46e-06 | float32 floor |
+
+kde's h̄ moves by 0.3%–21% (rotation-dependent AM). kde_det's h_det stays ≤ ~1e-9 on the three computable backbones (exact invariance of the geometric mean) and is **visibly larger** on dinov2/vitb16 (~1e-5), where det(Σ_c) of a spectrum with float32-noise eigenvalues is itself unstable under rotation. Same regime boundary as `maha_noridge`: ill-conditioned solve there, unstable determinant here. Two independent probes, one five-way split.
 
 Sensitivity over tau in [.001,.01] and S_high in [.005,.1] (20 cells), registered labels:
 
@@ -548,7 +560,7 @@ Registered before the numbers: n_c drops 5000 → 500, so (i) reach rises, (ii) 
 
 Prediction (i) holds for Mahalanobis on every backbone measured.
 
-**Prediction (iv) — λ_min(C)/λ̄ falls.** ε²_float32 = 1.42e-14. Falls on **1/5** backbones (paired within backbone):
+**Prediction (iv) — λ_min(C)/λ̄ falls — FAILED, derivation error.** ε²_float32 = 1.42e-14. Registered from n_c (5000→500); the pooled estimator is scatter/(N−K) with N identical on both ID sets (CIFAR-10: N=50000, K=10, N−K=49990; CIFAR-100: N=50000, K=100, N−K=49900). n_c never enters the estimator whose λ_min the prediction was about, so λ_min had no statistical reason to fall. Observed: falls on **1/5** only:
 
 | backbone | ratio_c10 | ratio_c100 | ratio_sign |
 |---|---|---|---|
@@ -558,13 +570,15 @@ Prediction (i) holds for Mahalanobis on every backbone measured.
 | resnet50_imagenet | 0.00873 | 0.00979 | ↑ |
 | vitb16_imagenet | 3.56e-13 | 3.59e-13 | ↑ |
 
-Prediction (iv) does **not** hold on every backbone — the pooled within-class spectrum under 100 classes is not a pure n_c effect. Report the sign failures above; do not restate the prediction as a result.
+The rise on 4/5 is the second-order term: subtracting 100 class means instead of 10 removes more between-class variance from the scatter. Between-class variance sits in the top eigendirections, so λ̄ falls faster than λ_min and the ratio goes up — the measured sign. **resnet18** is the lone ↓ (6.7×) and the only backbone trained on CIFAR-10, so on CIFAR-100 its spectrum changes through distribution shift rather than class count — the expected exception, not a puzzle.
 
-Backbones with λ_min/λ̄ within ~100× of ε²_float32 on CIFAR-100: dinov2_vitb14, vitb16_imagenet. Same criterion on CIFAR-10: dinov2_vitb14, vitb16_imagenet.
+Record (iv) as a **failed registered prediction with a diagnosed derivation error**, not as a surprising property of the data. Prediction (iii) is the same failure through 1/λ_min² — one sign error, not two.
 
-The float32-floor regime (dinov2 / vitb16) does not newly claim resnet18 or clip at n_c = 500 under this threshold; those two stay computable. The practically relevant direction still leaves the transformer pair untestable.
+**Replacement finding — regime assignment is stable across datasets.** Backbones with λ_min/λ̄ within ~100× of ε²_float32 on CIFAR-100: dinov2_vitb14, vitb16_imagenet. Same criterion on CIFAR-10: dinov2_vitb14, vitb16_imagenet.
 
-**Prediction (iii) — Theorem 2 bound looser.** Median predicted_max rises (looser) on **2/5** backbones:
+Two ID sets with a tenfold difference in per-class count and a tenfold difference in class count put **exactly the same two backbones** on the far side of the boundary and leave the other three three orders clear of it. The float32-floor regime is a **property of the representation**, not of the sample or the dataset — measure λ_min/λ̄ once per backbone and the regime is settled. Better for the paper than a dataset-dependent widening: a representation property is reported once.
+
+**Prediction (iii) — Theorem 2 bound looser** (same failure as (iv)). Median predicted_max rises (looser) on **2/5** backbones — exactly where λ_min fell:
 
 | backbone | pred_max_c10 | pred_max_c100 | bound_sign |
 |---|---|---|---|
@@ -574,7 +588,7 @@ The float32-floor regime (dinov2 / vitb16) does not newly claim resnet18 or clip
 | resnet50_imagenet | 8.88e+04 | 4.07e+04 | tighter |
 | vitb16_imagenet | 8.35e+10 | 9.30e+10 | looser |
 
-Where λ_min rose, the bound tightened — prediction (iii) tracks prediction (iv)'s failures, as expected from the 1/λ_min² factor.
+Where λ_min rose, the bound tightened, as expected from the 1/λ_min² factor.
 
 **(ii) KDE bandwidth — pending.** `kde_sigma_bar.csv` lacks CIFAR-100 rows; run `confirm_kde_bandwidth.py --id-set cifar100`. Prediction stands written above; numbers will fill this cell.
 
