@@ -31,7 +31,6 @@ from run_audit import (  # noqa: E402
 )
 from train_adapters import EMB_ROOT  # noqa: E402
 
-ID_SET = "cifar10"
 GATE_TAU = 0.002  # same flat threshold as Check 1
 BACKBONES = (
     "resnet18_cifar_openood", "resnet50_imagenet", "vitb16_imagenet",
@@ -48,8 +47,8 @@ def _auroc_by_ood(scores, n_id, slices):
     return out
 
 
-def run_backbone(backbone, emb_root=EMB_ROOT):
-    Ztr, ytr, Zte, oods = load_embeddings(backbone, ID_SET, emb_root)
+def run_backbone(backbone, id_set, emb_root=EMB_ROOT):
+    Ztr, ytr, Zte, oods = load_embeddings(backbone, id_set, emb_root)
     n_id = len(Zte)
     E = np.concatenate([Zte] + list(oods.values()))
     slices, o = {}, n_id
@@ -88,7 +87,7 @@ def run_backbone(backbone, emb_root=EMB_ROOT):
             dev_det = abs(np.log(ratio_det / c)) if np.isfinite(ratio_det) and ratio_det > 0 else float("nan")
             rel_dev_sig.append(dev_sig)
             sigma_rows.append({
-                "backbone": backbone, "id_set": ID_SET, "operator": "ortho_linear",
+                "backbone": backbone, "id_set": id_set, "operator": "ortho_linear",
                 "seed": seed, "scale_c": c, "class": int(c_id), "n_c": int(n_c[i]),
                 "sigma_bar_before": float(sig0[i]), "sigma_bar_after": float(sig1[i]),
                 "sigma_bar_ratio": float(ratio_sig), "sigma_bar_ratio_over_c": float(ratio_sig / c),
@@ -117,7 +116,7 @@ def run_backbone(backbone, emb_root=EMB_ROOT):
                 ("kde_det", d_det, base_auc_det[ood], auc_det[ood]),
             ):
                 gate_rows.append({
-                    "backbone": backbone, "id_set": ID_SET, "ood_set": ood,
+                    "backbone": backbone, "id_set": id_set, "ood_set": ood,
                     "operator": "ortho_linear", "seed": seed, "scale_c": c,
                     "scorer": scorer, "auroc_before": a0, "auroc_after": a1,
                     "delta_auroc": d_auc, "abs_delta_auroc": abs(d_auc),
@@ -207,24 +206,43 @@ def write_note(sigma_df, gate_df, path: Path):
             "kde_max_by_backbone": kde_max.to_dict(), "kde_det_max_by_backbone": det_max.to_dict()}
 
 
-def main():
-    out = OUT
+def main(argv=None):
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--id-set", default="cifar10")
+    ap.add_argument("--out", type=Path, default=OUT)
+    ar = ap.parse_args(argv)
+    out = ar.out
     out.mkdir(parents=True, exist_ok=True)
     sigma_rows, gate_rows = [], []
     for bb in BACKBONES:
-        print(f"[kde-bw] === {bb} ===", flush=True)
-        s, g = run_backbone(bb)
+        print(f"[kde-bw] === {bb} / {ar.id_set} ===", flush=True)
+        s, g = run_backbone(bb, ar.id_set)
         sigma_rows.extend(s)
         gate_rows.extend(g)
-    sigma_df = pd.DataFrame(sigma_rows)
-    gate_df = pd.DataFrame(gate_rows)
+    sigma_new = pd.DataFrame(sigma_rows)
+    gate_new = pd.DataFrame(gate_rows)
     sigma_path = out / "kde_sigma_bar.csv"
     gate_path = out / "kde_det_gate.csv"
+    # Merge by id_set: keep other ID sets already on disk.
+    if sigma_path.is_file():
+        old = pd.read_csv(sigma_path)
+        sigma_df = pd.concat([old[old.id_set != ar.id_set], sigma_new], ignore_index=True)
+    else:
+        sigma_df = sigma_new
+    if gate_path.is_file():
+        old = pd.read_csv(gate_path)
+        gate_df = pd.concat([old[old.id_set != ar.id_set], gate_new], ignore_index=True)
+    else:
+        gate_df = gate_new
     sigma_df.to_csv(sigma_path, index=False, float_format="%.10g")
     gate_df.to_csv(gate_path, index=False, float_format="%.10g")
-    summary = write_note(sigma_df, gate_df, out / "notes" / "kde_bandwidth_mechanism.md")
-    (out / "notes" / "kde_bandwidth_mechanism.json").write_text(json.dumps(summary, indent=1) + "\n")
-    print(f"[kde-bw] wrote {sigma_path}")
+    note_name = ("kde_bandwidth_mechanism.md" if ar.id_set == "cifar10"
+                 else f"kde_bandwidth_mechanism_{ar.id_set}.md")
+    summary = write_note(sigma_new, gate_new, out / "notes" / note_name)
+    (out / "notes" / note_name.replace(".md", ".json")).write_text(
+        json.dumps(summary, indent=1) + "\n")
+    print(f"[kde-bw] wrote {sigma_path} ({ar.id_set} rows={len(sigma_new)})")
     print(f"[kde-bw] wrote {gate_path}")
     print(f"[kde-bw] spearman ρ={summary['spearman_rho']:.4f} p={summary['spearman_p']:.3g}")
     print(f"[kde-bw] max|dAUROC| kde={max(summary['kde_max_by_backbone'].values()):.4g} "

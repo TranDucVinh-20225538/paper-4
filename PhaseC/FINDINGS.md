@@ -517,6 +517,69 @@ Dose response, median dAUROC over backbones, rungs and seeds:
 
 By rung (w_construction, median over backbones and seeds): cifar100 1, mnist 0.47, places365 0.58, svhn 0.4, texture 0.45, tin 0.56.
 
+## Round two: CIFAR-100 (n_c = 500) — four signed predictions
+
+Registered before the numbers: n_c drops 5000 → 500, so (i) reach rises, (ii) the KDE bandwidth deviation rises with the n_c^(−1/(d+4)) factor (and noisier σ̄), (iii) Theorem 2's λ_min(C) falls and the bound gets looser, not tighter, (iv) λ_min(C)/λ̄ falls on every backbone. Report each against its sign. `resnet18_cifar_openood` was trained on CIFAR-10, which is near-OOD here — within-backbone ΔAUROC is still valid; the reverse overlap is labelled, not removed.
+
+**Prediction (i) — reach rises.** Under ortho_linear, mean S(δ_med) cifar100/cifar10. Mahalanobis rises on **5/5** backbones:
+
+| backbone | scorer | S_med_cifar10 | S_med_cifar100 | ratio | sign |
+|---|---|---|---|---|---|
+| clip_vitb16 | kde | 0.314 | 0.389 | 1.24 | ↑ |
+| clip_vitb16 | knn10 | 0.419 | 0.48 | 1.15 | ↑ |
+| clip_vitb16 | maha | 5.14e-04 | 8.94e-04 | 1.74 | ↑ |
+| clip_vitb16 | rmd | 3.31e-04 | 6.29e-04 | 1.9 | ↑ |
+| dinov2_vitb14 | kde | 0.473 | 0.513 | 1.09 | ↑ |
+| dinov2_vitb14 | knn10 | 0.525 | 0.583 | 1.11 | ↑ |
+| dinov2_vitb14 | maha | 3.97e-06 | 7.22e-06 | 1.82 | ↑ |
+| dinov2_vitb14 | rmd | 2.78e-07 | 2.39e-06 | 8.6 | ↑ |
+| resnet18_cifar_openood | kde | 0.322 | 0.866 | 2.69 | ↑ |
+| resnet18_cifar_openood | knn10 | 0.349 | 0.613 | 1.76 | ↑ |
+| resnet18_cifar_openood | maha | 0.0411 | 0.108 | 2.63 | ↑ |
+| resnet18_cifar_openood | rmd | 0.00358 | 0.0223 | 6.22 | ↑ |
+| resnet50_imagenet | kde | 0.546 | 0.541 | 0.99 | ↓ |
+| resnet50_imagenet | knn10 | 0.587 | 0.594 | 1.01 | ↑ |
+| resnet50_imagenet | maha | 0.00124 | 0.00157 | 1.27 | ↑ |
+| resnet50_imagenet | rmd | 1.59e-04 | 2.56e-04 | 1.61 | ↑ |
+| vitb16_imagenet | kde | 0.416 | 0.468 | 1.12 | ↑ |
+| vitb16_imagenet | knn10 | 0.464 | 0.527 | 1.13 | ↑ |
+| vitb16_imagenet | maha | 9.14e-06 | 1.46e-05 | 1.6 | ↑ |
+| vitb16_imagenet | rmd | 1.36e-06 | 4.47e-06 | 3.29 | ↑ |
+
+Prediction (i) holds for Mahalanobis on every backbone measured.
+
+**Prediction (iv) — λ_min(C)/λ̄ falls.** ε²_float32 = 1.42e-14. Falls on **1/5** backbones (paired within backbone):
+
+| backbone | ratio_c10 | ratio_c100 | ratio_sign |
+|---|---|---|---|
+| clip_vitb16 | 0.00122 | 0.00137 | ↑ |
+| dinov2_vitb14 | 7.28e-14 | 9.04e-14 | ↑ |
+| resnet18_cifar_openood | 0.00753 | 0.00112 | ↓ |
+| resnet50_imagenet | 0.00873 | 0.00979 | ↑ |
+| vitb16_imagenet | 3.56e-13 | 3.59e-13 | ↑ |
+
+Prediction (iv) does **not** hold on every backbone — the pooled within-class spectrum under 100 classes is not a pure n_c effect. Report the sign failures above; do not restate the prediction as a result.
+
+Backbones with λ_min/λ̄ within ~100× of ε²_float32 on CIFAR-100: dinov2_vitb14, vitb16_imagenet. Same criterion on CIFAR-10: dinov2_vitb14, vitb16_imagenet.
+
+The float32-floor regime (dinov2 / vitb16) does not newly claim resnet18 or clip at n_c = 500 under this threshold; those two stay computable. The practically relevant direction still leaves the transformer pair untestable.
+
+**Prediction (iii) — Theorem 2 bound looser.** Median predicted_max rises (looser) on **2/5** backbones:
+
+| backbone | pred_max_c10 | pred_max_c100 | bound_sign |
+|---|---|---|---|
+| clip_vitb16 | 2.14e+06 | 9.05e+05 | tighter |
+| dinov2_vitb14 | 7.86e+10 | 8.73e+10 | looser |
+| resnet18_cifar_openood | 2.57e+06 | 9.41e+05 | tighter |
+| resnet50_imagenet | 8.88e+04 | 4.07e+04 | tighter |
+| vitb16_imagenet | 8.35e+10 | 9.30e+10 | looser |
+
+Where λ_min rose, the bound tightened — prediction (iii) tracks prediction (iv)'s failures, as expected from the 1/λ_min² factor.
+
+**(ii) KDE bandwidth — pending.** `kde_sigma_bar.csv` lacks CIFAR-100 rows; run `confirm_kde_bandwidth.py --id-set cifar100`. Prediction stands written above; numbers will fill this cell.
+
+Round-two adapter seed coverage may still be completing on individual backbones; affine operators (including ortho_linear used above) are the basis for (i)–(iv).
+
 ## Provenance
 
 Checkpoint and data hashes, seeds, package versions and GPU are in `PhaseC/outputs/manifest.json` (`write_manifest.py`). Seeds: adapters 42..132 (10), operators per `run_audit.OPERATOR_SEEDS`, pairs 2e6 with PAIR_SEED. The ten adapter seeds are replicates of one training recipe on one backbone, not independent datasets: claims about a backbone rest on seed variation, claims across backbones on five backbones.

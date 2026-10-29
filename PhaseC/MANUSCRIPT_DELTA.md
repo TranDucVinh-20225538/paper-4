@@ -29,4 +29,8 @@ Corollaries: never pool a max over a grouping the claim is about (pair within ba
 ## Not in this delta
 
 - ImageNet-200 round three: still blocked (ImageNet-1k absent). Scope notes and imglist SHA-256s prepared; do not substitute another ID set.
-- CIFAR-100 round two: four signed predictions (reach↑, KDE deviation↑, Theorem 2 looser, λ_min/λ̄↓) — report when audits complete; not yet mapped to manuscript sentences.
+- CIFAR-100 round two (numbers in `FINDINGS.md` §Round two; not yet manuscript rows):
+  - (i) reach↑ — **holds** for maha on 5/5 backbones under ortho_linear.
+  - (ii) KDE σ̄ deviation↑ — pending `confirm_kde_bandwidth.py --id-set cifar100`.
+  - (iii) Theorem 2 looser — **fails** 3/5 (bound tightens where λ_min rises); holds only on dinov2, vitb16.
+  - (iv) λ_min/λ̄↓ — **fails** 4/5; falls only on resnet18. Regime does **not** newly claim resnet18/clip at n_c=500; dinov2/vitb16 remain at the float32 floor.

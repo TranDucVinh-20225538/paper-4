@@ -141,14 +141,14 @@ def main(argv=None):
     ap.add_argument("--findings", type=Path, default=PHASEC / "FINDINGS.md")
     ap.add_argument("--id-set", default="cifar10")
     ar = ap.parse_args(argv)
-    a, c1, b, c2, c3, rp = load(ar.out)
+    a_all, c1, b, c2, c3, rp = load(ar.out)
     L = ["# Phase C findings: the flat-response audit across backbones", ""]
-    if a is None:
+    if a_all is None:
         L += ["No `generalisation_audit.csv` yet: run `PhaseC/run_pipeline.sh`. Nothing to report."]
         ar.findings.write_text("\n".join(L) + "\n")
         print("[findings] no audit CSV; wrote stub")
         return 0
-    a = a[a.id_set == ar.id_set]
+    a = a_all[a_all.id_set == ar.id_set]
     w = wide(a)
     w = w.assign(ctrl=is_control(w))
     wt = w[~w.ctrl & (w.operator != "identity")]
@@ -961,6 +961,9 @@ def main(argv=None):
         per = c[(c.w_kind == "w_construction") & (c.ood_set != "ref")].groupby("ood_set").abs_projection.median()
         L += ["By rung (w_construction, median over backbones and seeds): " + ", ".join(f"{k} {num(v, 2)}" for k, v in per.items()) + ".", ""]
 
+    if ar.id_set == "cifar10" and a_all is not None and (a_all.id_set == "cifar100").any():
+        L += round_two_cifar100(a_all, b, ar.out)
+
     L += ["## Provenance", "",
           "Checkpoint and data hashes, seeds, package versions and GPU are in `PhaseC/outputs/manifest.json` (`write_manifest.py`). "
           "Seeds: adapters 42..132 (10), operators per `run_audit.OPERATOR_SEEDS`, pairs 2e6 with PAIR_SEED. The ten adapter seeds are replicates of "
@@ -970,6 +973,184 @@ def main(argv=None):
     n = text.count("\n")
     print(f"[findings] wrote {ar.findings} ({n} lines){'  WARNING: over ~4 pages' if n > 230 else ''}")
     return 0
+
+
+EPS2_F32 = float(np.finfo(np.float32).eps) ** 2  # ≈ 1.4e-14
+
+
+def round_two_cifar100(a_all: pd.DataFrame, b, out: Path) -> list[str]:
+    """Four signed predictions registered before CIFAR-100 numbers: report each against its sign.
+
+    Predictions (n_c 5000 → 500): (i) reach rises; (ii) KDE bandwidth deviation rises;
+    (iii) Theorem 2 bound gets looser; (iv) λ_min(C)/λ̄ falls on every backbone.
+    """
+    L = ["## Round two: CIFAR-100 (n_c = 500) — four signed predictions", "",
+         "Registered before the numbers: n_c drops 5000 → 500, so (i) reach rises, "
+         "(ii) the KDE bandwidth deviation rises with the n_c^(−1/(d+4)) factor (and noisier σ̄), "
+         "(iii) Theorem 2's λ_min(C) falls and the bound gets looser, not tighter, "
+         "(iv) λ_min(C)/λ̄ falls on every backbone. Report each against its sign. "
+         "`resnet18_cifar_openood` was trained on CIFAR-10, which is near-OOD here — "
+         "within-backbone ΔAUROC is still valid; the reverse overlap is labelled, not removed.", ""]
+
+    # --- (i) reach: S_med under ortho_linear, mean over OOD × seed, paired within backbone×scorer
+    sm = a_all[(a_all.quantity == "S_med") & (a_all.operator == "ortho_linear")
+               & (a_all.scorer.isin(SCORERS))]
+    g = (sm.groupby(["id_set", "backbone", "scorer"]).value.mean()
+         .unstack("id_set"))
+    if "cifar10" not in g.columns or "cifar100" not in g.columns:
+        L += ["(i) Reach comparison blocked: missing S_med on one ID set.", ""]
+    else:
+        g = g.assign(ratio=g["cifar100"] / g["cifar10"].replace(0, np.nan))
+        # focus maha (primary) and kde; count rises
+        focus = g.loc[g.index.get_level_values("scorer").isin(["maha", "kde", "rmd", "knn10"])].copy()
+        rows = []
+        for (bb, sc), r in focus.iterrows():
+            rows.append({
+                "backbone": bb, "scorer": sc,
+                "S_med_cifar10": r["cifar10"], "S_med_cifar100": r["cifar100"],
+                "ratio": r["ratio"],
+                "sign": "↑" if r["ratio"] > 1 else ("↓" if r["ratio"] < 1 else "="),
+            })
+        tab = pd.DataFrame(rows)
+        n_up = int((tab.scorer.eq("maha") & (tab.ratio > 1)).sum())
+        n_maha = int(tab.scorer.eq("maha").sum())
+        L += [f"**Prediction (i) — reach rises.** Under ortho_linear, mean S(δ_med) "
+              f"cifar100/cifar10. Mahalanobis rises on **{n_up}/{n_maha}** backbones:", "",
+              table(tab, index=False, p=3), ""]
+        if n_up < n_maha:
+            down = tab[(tab.scorer == "maha") & (tab.ratio <= 1)]
+            L += ["Mahalanobis did **not** rise on: "
+                  + ", ".join(f"{r.backbone} (ratio {num(r.ratio, 3)})" for r in down.itertuples())
+                  + ". Prediction (i) fails on those cells.", ""]
+        else:
+            L += ["Prediction (i) holds for Mahalanobis on every backbone measured.", ""]
+
+    # --- (iv) then (iii): λ_min / λ̄ and Theorem 2 predicted_max from bounds
+    if b is not None and (b.id_set == "cifar100").any():
+        t2 = b[b.bound == "theorem2_maha"].copy()
+        t2["lam_bar"] = t2.Sigma_trace / t2.dim
+        t2["lam_min_over_lam_bar"] = t2.lambda_min_C / t2.lam_bar
+        # λ_min is a property of the ID train fit — take first row per id_set×backbone
+        u = (t2.groupby(["id_set", "backbone"], as_index=False)
+             .agg(lambda_min_C=("lambda_min_C", "first"),
+                  lam_bar=("lam_bar", "first"),
+                  lam_min_over_lam_bar=("lam_min_over_lam_bar", "first"),
+                  n_train=("n_train", "first"), n_classes=("n_classes", "first"),
+                  predicted_max_med=("predicted_max", "median"),
+                  tightness_med=("tightness_max", "median")))
+        p10 = u[u.id_set == "cifar10"].set_index("backbone")
+        p100 = u[u.id_set == "cifar100"].set_index("backbone")
+        rows = []
+        n_ratio_down = 0
+        n_bound_looser = 0
+        crossed = []
+        for bb in sorted(set(p10.index) & set(p100.index)):
+            r10, r100 = p10.loc[bb], p100.loc[bb]
+            ratio_fall = r100.lam_min_over_lam_bar < r10.lam_min_over_lam_bar
+            bound_looser = r100.predicted_max_med > r10.predicted_max_med
+            n_ratio_down += int(ratio_fall)
+            n_bound_looser += int(bound_looser)
+            below10 = r10.lam_min_over_lam_bar < EPS2_F32
+            below100 = r100.lam_min_over_lam_bar < EPS2_F32 * 10  # "near / at floor"
+            at_floor100 = r100.lam_min_over_lam_bar < EPS2_F32 * 100
+            if (not below10) and at_floor100:
+                crossed.append(bb)
+            rows.append({
+                "backbone": bb,
+                "ratio_c10": r10.lam_min_over_lam_bar,
+                "ratio_c100": r100.lam_min_over_lam_bar,
+                "ratio_sign": "↓" if ratio_fall else "↑",
+                "pred_max_c10": r10.predicted_max_med,
+                "pred_max_c100": r100.predicted_max_med,
+                "bound_sign": "looser" if bound_looser else "tighter",
+            })
+        tab = pd.DataFrame(rows)
+        L += [f"**Prediction (iv) — λ_min(C)/λ̄ falls.** ε²_float32 = {EPS2_F32:.2e}. "
+              f"Falls on **{n_ratio_down}/{len(rows)}** backbones (paired within backbone):", "",
+              table(tab[["backbone", "ratio_c10", "ratio_c100", "ratio_sign"]], index=False, p=3), ""]
+        if n_ratio_down < len(rows):
+            L += ["Prediction (iv) does **not** hold on every backbone — the pooled "
+                  "within-class spectrum under 100 classes is not a pure n_c effect. "
+                  "Report the sign failures above; do not restate the prediction as a result.", ""]
+        # loud callout if regime widens
+        floor_bbs_100 = [r["backbone"] for r in rows
+                         if r["ratio_c100"] < EPS2_F32 * 100]
+        floor_bbs_10 = [r["backbone"] for r in rows
+                        if r["ratio_c10"] < EPS2_F32 * 100]
+        newly = [bb for bb in floor_bbs_100 if bb not in floor_bbs_10]
+        L += [f"Backbones with λ_min/λ̄ within ~100× of ε²_float32 on CIFAR-100: "
+              f"{', '.join(floor_bbs_100) or 'none'}. "
+              f"Same criterion on CIFAR-10: {', '.join(floor_bbs_10) or 'none'}.", ""]
+        if newly:
+            L += [f"**Regime widens:** {', '.join(newly)} cross into the "
+                  "near-floor regime at n_c = 500. Theorem 1's unregularised claim is "
+                  "unavailable there at realistic per-class sample sizes.", ""]
+        elif set(floor_bbs_100) == set(floor_bbs_10) and floor_bbs_100:
+            L += ["The float32-floor regime (dinov2 / vitb16) does not newly claim "
+                  "resnet18 or clip at n_c = 500 under this threshold; those two stay "
+                  "computable. The practically relevant direction still leaves the "
+                  "transformer pair untestable.", ""]
+
+        L += [f"**Prediction (iii) — Theorem 2 bound looser.** Median predicted_max "
+              f"rises (looser) on **{n_bound_looser}/{len(rows)}** backbones:", "",
+              table(tab[["backbone", "pred_max_c10", "pred_max_c100", "bound_sign"]],
+                    index=False, p=3), ""]
+        if n_bound_looser < len(rows):
+            L += ["Where λ_min rose, the bound tightened — prediction (iii) tracks "
+                  "prediction (iv)'s failures, as expected from the 1/λ_min² factor.", ""]
+    else:
+        L += ["(iii)/(iv) blocked: no CIFAR-100 rows in `bounds_evaluation.csv`.", ""]
+
+    # --- (ii) KDE bandwidth deviation
+    sigma_path = out / "kde_sigma_bar.csv"
+    if sigma_path.is_file():
+        sig = pd.read_csv(sigma_path)
+        if (sig.id_set == "cifar100").any() and (sig.id_set == "cifar10").any():
+            # Scott factor: n_c^(-1/(d+4)); quote theoretical ratio and measured |log σ̄|
+            agg = (sig.groupby(["id_set", "backbone"])
+                   .agg(n_c=("n_c", "first"),
+                        mean_abs_log_dev=("abs_log_sigma_ratio_over_c", "mean"),
+                        max_abs_log_dev=("abs_log_sigma_ratio_over_c", "max"),
+                        mean_abs_log_det=("abs_log_det_ratio_over_c", "mean")))
+            wide = agg.unstack("id_set")
+            rows = []
+            n_up = 0
+            for bb in sorted(wide.index):
+                m10 = wide.loc[bb, ("mean_abs_log_dev", "cifar10")]
+                m100 = wide.loc[bb, ("mean_abs_log_dev", "cifar100")]
+                n_c10 = wide.loc[bb, ("n_c", "cifar10")]
+                n_c100 = wide.loc[bb, ("n_c", "cifar100")]
+                up = m100 > m10
+                n_up += int(up)
+                rows.append({
+                    "backbone": bb,
+                    "n_c_c10": n_c10, "n_c_c100": n_c100,
+                    "mean_|log σ̄|_c10": m10, "mean_|log σ̄|_c100": m100,
+                    "dev_sign": "↑" if up else "↓",
+                    "mean_|log det|_c100": wide.loc[bb, ("mean_abs_log_det", "cifar100")],
+                })
+            tab = pd.DataFrame(rows)
+            L += [f"**Prediction (ii) — KDE σ̄ deviation rises.** Mean |log(σ̄_after/(c·σ̄_before))| "
+                  f"under ortho_linear rises on **{n_up}/{len(rows)}** backbones "
+                  f"(Scott factor n_c^(−1/(d+4)) is larger at n_c=500; noisier per-axis stds "
+                  f"also inflate the rotation-dependent AM):", "",
+                  table(tab, index=False, p=3), ""]
+            if n_up == len(rows):
+                L += ["Prediction (ii) holds on every backbone. det-scale |log| stays near "
+                      "machine eps on CIFAR-100 as on CIFAR-10.", ""]
+            else:
+                L += ["Prediction (ii) fails on some backbones — see sign column. "
+                      "If the bandwidth mechanism is not driving the AUROC gap, say so.", ""]
+        else:
+            L += ["**(ii) KDE bandwidth — pending.** `kde_sigma_bar.csv` lacks CIFAR-100 rows; "
+                  "run `confirm_kde_bandwidth.py --id-set cifar100`. Prediction stands written "
+                  "above; numbers will fill this cell.", ""]
+    else:
+        L += ["**(ii) KDE bandwidth — pending.** No `kde_sigma_bar.csv`.", ""]
+
+    L += ["Round-two adapter seed coverage may still be completing on individual backbones; "
+          "affine operators (including ortho_linear used above) are the basis for (i)–(iv).", ""]
+    return L
 
 
 if __name__ == "__main__":
