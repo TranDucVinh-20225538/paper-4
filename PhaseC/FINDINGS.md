@@ -70,14 +70,14 @@ Flat cases then separate on their own evidence (`reach.check1_rank_reading`, rho
 | affine | maha | 540 | 0.02 | 0.98 | 0 | 0.0037 | 0 | 0 | 1 | 1.9e-06 | 9.6e+02 |
 | affine | cosine | 540 | 0.74 | 0 | 0.033 | 0.21 | 0 | 0.015 | 0 | 0.049 | 1.9e+05 |
 | affine | knn10 | 540 | 0.55 | 0.18 | 0.0019 | 0.26 | 0 | 0.015 | 0.39 | 0.0088 | 7.6e+04 |
-| affine | kde | 462 | 0.62 | 0.12 | 0.015 | 0.24 | 0 | 0.0022 | 0.32 | 0.01 | 8.4e+04 |
-| affine | kde_det | 396 | 0.72 | 0.061 | 0.0076 | 0.19 | 0 | 0.013 | 0.22 | 0.021 | 1.2e+05 |
+| affine | kde | 540 | 0.63 | 0.11 | 0.013 | 0.25 | 0 | 0.0019 | 0.29 | 0.011 | 8.8e+04 |
+| affine | kde_det | 474 | 0.73 | 0.051 | 0.0063 | 0.2 | 0 | 0.011 | 0.19 | 0.022 | 1.2e+05 |
 | affine | rmd | 540 | 0.0056 | 0.96 | 0 | 0.03 | 0 | 0 | 0.97 | 4.6e-06 | 1.6e+03 |
 | outside | maha | 1830 | 0.38 | 0.58 | 0.0038 | 0.034 | 0 | 0 | 0.94 | 4.0e-04 | 1.6e+04 |
 | outside | cosine | 1830 | 0.66 | 0.28 | 0.014 | 0.051 | 0 | 0 | 0.81 | 0.32 | 5.1e+05 |
 | outside | knn10 | 1830 | 0.67 | 0.27 | 0.0016 | 0.052 | 0 | 0.0011 | 0.83 | 0.11 | 2.9e+05 |
-| outside | kde | 306 | 0.078 | 0.9 | 0.0033 | 0.02 | 0 | 0 | 0.98 | 3.9e-05 | 5e+03 |
-| outside | kde_det | 306 | 0.13 | 0.85 | 0.0033 | 0.02 | 0 | 0 | 0.97 | 5.9e-05 | 6.3e+03 |
+| outside | kde | 1830 | 0.68 | 0.27 | 0.0066 | 0.05 | 0 | 0 | 0.83 | 0.21 | 4.0e+05 |
+| outside | kde_det | 1830 | 0.67 | 0.25 | 0.006 | 0.076 | 0 | 0 | 0.75 | 0.12 | 3.2e+05 |
 | outside | rmd | 1830 | 0.56 | 0.13 | 0 | 0.31 | 0 | 0 | 0.29 | 0.027 | 1.4e+05 |
 
 **Affine rank test (ridged estimator, eps = 1e-5).** The audit's Mahalanobis is `scatter/(N−K) + eps·I` with eps = 1e-5 — the Theorem 2 object, not the unregularised Theorem 1 object. The claim that can be made about what people deploy — and the only well-posed claim on all five backbones, including those where λ_min(C) sits at the float32 noise floor — is that the ridged estimator is rank-invariant under the affine group to within the Theorem 2 deviation; at eps = 1e-5 that deviation stays below 1−ρ = 1e-03 in 100% of clean-affine configurations and becomes visible only under tempering that drives σ_min(A) toward zero. ρ = 1 exactly was never the prediction for this estimator: under ortho_linear (a pure rotation) ridged maha already reaches 1−ρ = 7.06e-05 with thousands of discordant pairs of 2M on resnet18 — an exactly rank-invariant scorer has zero. Tolerance 1e-03 is a round number above that clean-affine residual, not fitted to the γ<0 failures. Exact Theorem 1 confirmation is available only on the three backbones where the unregularised covariance is computable in float32 (maha_noridge section).
@@ -87,8 +87,8 @@ Flat cases then separate on their own evidence (`reach.check1_rank_reading`, rho
 | maha | 630 | 0.98 | 1 | 0.0204 | 0.981 | 476 |
 | cosine | 630 | 0.702 | 0.962 | 0.298 | 0.143 | 1.66e+05 |
 | knn10 | 630 | 0.765 | 0.994 | 0.235 | 0.295 | 6.49e+04 |
-| kde | 552 | 0.84 | 0.993 | 0.16 | 0.228 | 6.83e+04 |
-| kde_det | 396 | 0.736 | 0.979 | 0.264 | 0.0606 | 1.18e+05 |
+| kde | 630 | 0.605 | 0.992 | 0.395 | 0.2 | 7.66e+04 |
+| kde_det | 474 | 0.57 | 0.978 | 0.43 | 0.0506 | 1.24e+05 |
 | rmd | 630 | 0.979 | 1 | 0.0206 | 0.971 | 1.45e+03 |
 
 clean affine (ortho_linear, ortho_scale, general_affine, zca): maha n=450, max 1−ρ=2.8e-04, frac ≥ 1−tol = 100.0%; rmd n=450, max 1−ρ=9.4e-04, frac ≥ 1−tol = 100.0%.
@@ -171,19 +171,63 @@ Spearman(log10 eps, 1−ρ) = 0.759; median (f64 1−ρ)/(f32 1−ρ) = 1. float
 
 Degenerate constant-score rows (ptp=0 before and after, forced ρ=1): 0 (expect 0).
 
-**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12), paired within backbone under ortho_linear.** Pooling max-over-backbone reverses the sign: the ridged max discordant (7358) is resnet18; the noridge max (276) is vitb16. Same maps, same backbone:
+**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12), paired within backbone under ortho_linear.** Pooling max-over-backbone reverses the sign: the ridged max discordant (7358) is resnet18; the noridge max (276) is vitb16. Same maps, same backbone. ε²_float32 = 1.4e-14 is quoted beside the normalised ratio λ_min(C)/λ̄ (not λ_min/ε², which is not scale-invariant). λ̄ = tr(Σ)/d is a conservative lower bound on the representability floor (sharper form ε²·E‖z‖²/d); using λ̄ makes dinov2/vitb16 look *less* marginal than they are:
 
-| backbone | ridged_discordant | noridge_discordant | lam_bar | lambda_min_C | lam_min_over_lam_bar | lam_min_over_eps2_f32 |
+| backbone | ridged_discordant | noridge_discordant | lam_bar | lambda_min_C | lam_min_over_lam_bar |
+|---|---|---|---|---|---|
+| resnet50_imagenet | 147 | 0 | 0.113 | 3.50e-04 | 0.00311 |
+| resnet18_cifar_openood | 7358 | 0 | 0.0047 | 1.26e-05 | 0.00268 |
+| clip_vitb16 | 1292 | 0 | 0.0336 | 1.45e-05 | 4.33e-04 |
+| vitb16_imagenet | 6 | 276 | 1.13 | 1.42e-13 | 1.26e-13 |
+| dinov2_vitb14 | 7 | 194 | 2.16 | 6.65e-14 | 3.07e-14 |
+
+On the three backbones where λ_min(C)/λ̄ ≫ ε²_float32 (resnet18, clip, resnet50), over all clean-affine readings: **268/270 at exactly 0 discordant pairs; max 1−ρ = 4.1e-11 over all 270.** ortho_linear 54/54, ortho_scale 54/54, zca 72/72 are clean; general_affine 88/90 has the 2 exceptions — both resnet18 / general_affine cond_target=10 / texture / seeds 1 and 3, one discordant pair each (1−ρ = 4.1e-11 and 2.2e-11). Theorem 1 confirmed to one pair in 2×10⁶ across 270 readings.
+
+On dinov2 and vitb16, λ_min(C)/λ̄ sits at 3.1e-14–1.3e-13 (against ε²_float32 = 1.4e-14); the variance in that direction is float32 rounding noise, the unregularised covariance is not a computable object, and eps = 1e-12 implements a differently-ridged solve conditioned ~10⁷ worse — noridge is 27–28× *worse* than ridged under ortho_linear, and the same reversal holds on ortho_scale, general_affine, and zca. That is those two backbones under every operator, not zca alone. Do not re-extract in float64: the backbones compute in float32, so float64 storage would only record float32-precision values and λ_min would not move.
+
+So the claim is not "Theorem 1 holds on its estimator." **Theorem 1 is confirmed to one pair in 2×10⁶ (268/270 exactly 0) on every clean affine operator on the three backbones where its hypothesis is computable in float32, and is not testable on the two where λ_min(C) falls to the float32 noise floor.** The dividing line is λ_min(C)/λ̄ against ε²_float32, and it separates the five backbones by ten orders of magnitude with nothing in between. The exact-invariance result that motivates the scorer choice cannot be realised on DINOv2 or ViT-B/16 embeddings at the precision those embeddings carry. The ridged statement is therefore not a concession: it is the only well-posed claim available on two of five backbones.
+
+### Prediction: kde vs kde_det under ortho_linear
+
+Written before the kde/kde_det rank columns are read. kde uses Scott's rule with σ̄_c, the arithmetic mean of per-dimension standard deviations — rotation-dependent (AM of square roots is concave). kde_det uses det(Σ_c)^{1/(2d)}, a geometric mean — rotation-invariant. Under ortho_linear (pure rotation about the origin):
+
+- **kde** should give ρ < 1 with a discordant count well above cosine/knn10's 0–1.
+- **kde_det** should give ρ = 1 to float tolerance where kde does not.
+
+If that separation does not appear, the bandwidth mechanism is not what Q4's kde_det ortho_scale 1.0e-08 vs kde 3.0e-04 was reading, and that needs saying.
+
+**Result against that prediction** (from `rank_preservation.csv`, paired within backbone under ortho_linear; CIFAR-10 audit CSV lacks kde_det×ortho_linear):
+
+Per-backbone max discordant pairs:
+
+| backbone | cosine | kde | kde_det | knn10 |
+|---|---|---|---|---|
+| clip_vitb16 | 1 | 1.502e+04 | 0 | 0 |
+| dinov2_vitb14 | 0 | 983 | 18 | 0 |
+| resnet18_cifar_openood | 0 | 4.245e+04 | 0 | 1 |
+| resnet50_imagenet | 0 | 4.036e+04 | 0 | 0 |
+| vitb16_imagenet | 0 | 7111 | 10 | 0 |
+
+Per-backbone max 1−ρ:
+
+| backbone | cosine | kde | kde_det | knn10 |
+|---|---|---|---|---|
+| clip_vitb16 | 6.00e-12 | 3.42e-04 | 6.27e-12 | 6.27e-12 |
+| dinov2_vitb14 | 6.00e-12 | 2.46e-06 | 3.48e-09 | 3.14e-12 |
+| resnet18_cifar_openood | 1.50e-12 | 0.00356 | 6.00e-12 | 9.41e-12 |
+| resnet50_imagenet | 3.62e-12 | 0.0024 | 3.00e-12 | 4.50e-12 |
+| vitb16_imagenet | 1.50e-12 | 1.00e-04 | 1.19e-09 | 1.50e-12 |
+
+Summary:
+
+| scorer | n | max_1_minus_rho | median_of_bb_max_1m | max_n_discordant | median_of_bb_max_disc | mean_frac_rho_eq_1 |
 |---|---|---|---|---|---|---|
-| resnet50_imagenet | 147 | 0 | 0.113 | 3.50e-04 | 0.00311 | 2.46e+10 |
-| clip_vitb16 | 1292 | 0 | 0.0336 | 1.45e-05 | 4.33e-04 | 1.02e+09 |
-| resnet18_cifar_openood | 7358 | 0 | 0.0047 | 1.26e-05 | 0.00268 | 8.86e+08 |
-| vitb16_imagenet | 6 | 276 | 1.13 | 1.42e-13 | 1.26e-13 | 10 |
-| dinov2_vitb14 | 7 | 194 | 2.16 | 6.65e-14 | 3.07e-14 | 4.68 |
+| cosine | 90 | 6.00e-12 | 3.62e-12 | 1 | 0 | 1 |
+| kde | 90 | 0.00356 | 3.42e-04 | 42454 | 1.50e+04 | 0.7 |
+| kde_det | 90 | 3.48e-09 | 6.27e-12 | 18 | 0 | 1 |
+| knn10 | 90 | 9.41e-12 | 4.50e-12 | 1 | 0 | 1 |
 
-ε²_float32 = 1.4e-14. On the three backbones where λ_min(C)/λ̄ ≫ ε²_float32 (resnet18, clip, resnet50; λ_min/ε² from 8.9e+08 to 2.5e+10), dropping the ridge takes every clean-affine operator to **0 discordant pairs of 2,000,000** — Theorem 1 confirmed exactly. On dinov2 and vitb16, λ_min(C) sits within a factor of ~2–10 of ε²_float32 (λ_min/ε² = 4.7–10); the variance in that direction is float32 rounding noise, the unregularised covariance is not a computable object, and eps = 1e-12 implements a differently-ridged solve conditioned ~10⁷ worse — noridge is 27–28× *worse* than ridged under ortho_linear, and the same reversal holds on ortho_scale, general_affine, and zca. That is those two backbones under every operator, not zca alone. Do not re-extract in float64: the backbones compute in float32, so float64 storage would only record float32-precision values and λ_min would not move. Limitation, with the table as evidence.
-
-So the claim is not "Theorem 1 holds on its estimator." **Theorem 1 is confirmed exactly — 0 discordant pairs of 2,000,000, on every clean affine operator — on the three backbones where its hypothesis is computable in float32, and is not testable on the two where λ_min(C) falls to the float32 noise floor.** The dividing line is λ_min(C)/λ̄ against ε²_float32, and it separates the five backbones by ten orders of magnitude with nothing in between. The exact-invariance result that motivates the scorer choice cannot be realised on DINOv2 or ViT-B/16 embeddings at the precision those embeddings carry. The ridged statement is therefore not a concession: it is the only well-posed claim available on two of five backbones.
+Separation holds: kde max discordant = 42454; kde_det max = 18 (cosine 1). kde reorders under pure rotation; kde_det stays near cosine/knn10 scale. Q4's ortho_scale AUROC gap is reading the bandwidth mechanism.
 
 Sensitivity over tau in [.001,.01] and S_high in [.005,.1] (20 cells), registered labels:
 
@@ -347,7 +391,7 @@ Theorem 2 holds in 100.0% of 105 affine configurations — the first numerical e
 
 Across configurations, median λ_min(C) = 3.5e-05, median ‖I−AAᵀ‖₂ = 9, median factor eps·‖I−AAᵀ‖₂/denom = 5.9e+04, median implied ‖y‖² = 3.3e+03. The dominant pessimism is λ_min(C): in high-d embeddings the ridge-stabilised smallest eigenvalue is 1e-13–1e-3, so the denominator collapses and the bound inflates by 1/λ_min². On dinov2/vitb16 that single factor accounts for the ~1e11 pred/obs ratio; on resnet50 λ_min is larger (~1e-3) and the overstatement drops to ~1e3. "The bound is loose because λ_min(C) is pessimistic by that much," not merely "the bound is loose."
 
-**Two regimes for exact affine rank-invariance (Q1 maha_noridge).** The same λ_min that makes Theorem 2 vacuous on dinov2/vitb16 also makes Theorem 1's unregularised estimator uncomputable there: λ_min(C) sits within a factor of ~2–10 of ε²_float32, so the variance in that direction is feature rounding noise. Theorem 1 is confirmed exactly (0 discordant pairs of 2M on every clean affine operator) on resnet18, clip, and resnet50, where λ_min/ε²_float32 is 10⁸–10¹⁰; it is not testable on the two transformer backbones. The ridged (eps = 1e-5) claim is therefore the only well-posed one on all five. Do not re-extract embeddings in float64 — the backbones compute in float32 and λ_min would not move.
+**Two regimes for exact affine rank-invariance (Q1 maha_noridge).** The same λ_min that makes Theorem 2 vacuous on dinov2/vitb16 also makes Theorem 1's unregularised estimator uncomputable there: λ_min(C)/λ̄ sits at the float32 noise floor (ε²_float32 = 1.4e-14), so the variance in that direction is feature rounding noise. On resnet18, clip, and resnet50, Theorem 1 is confirmed to one pair in 2×10⁶ (268/270 clean-affine readings at exactly 0 discordant; the two exceptions are one pair each). It is not testable on the two transformer backbones. The ridged (eps = 1e-5) claim is therefore the only well-posed one on all five. Do not re-extract embeddings in float64 — the backbones compute in float32 and λ_min would not move.
 
 ‖I−AAᵀ‖₂ medianed to 9 on every backbone in the table above: that common value is set by the operator family, not the data. Per operator (Theorem 2 rows):
 

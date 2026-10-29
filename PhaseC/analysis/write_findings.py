@@ -435,21 +435,20 @@ def main(argv=None):
                     if "degenerate_constant" in nr.columns:
                         L += [f"Degenerate constant-score rows (ptp=0 before and after, forced ρ=1): "
                               f"{int(nr.degenerate_constant.sum())} (expect 0).", ""]
-                    # λ_min(C)/λ̄ from Theorem 2 rows (median over configs); λ̄ = tr(Σ)/d
+                    # λ_min(C)/λ̄ from Theorem 2 rows; λ̄ = tr(Σ)/d. Do NOT report λ_min/ε²
+                    # (mixes variance with a dimensionless relative tolerance; not scale-invariant).
                     eps2 = float(np.finfo(np.float32).eps) ** 2
                     lam_tab = None
                     if b is not None and len(b):
                         t2lam = b[(b.id_set == ar.id_set) & (b.bound == "theorem2_maha")].copy()
                         if len(t2lam) and "Sigma_trace" in t2lam.columns and "dim" in t2lam.columns:
-                            # Prefer raw smallest eigenvalue when present (pre-ridge).
                             lam_col = "lambda_min_C_raw" if "lambda_min_C_raw" in t2lam.columns else "lambda_min_C"
                             lam_tab = (t2lam.groupby("backbone")
                                        .agg(lambda_min_C=(lam_col, "median"),
                                             Sigma_trace=("Sigma_trace", "median"),
                                             dim=("dim", "first")))
                             lam_tab["lam_bar"] = lam_tab.Sigma_trace / lam_tab.dim
-                            lam_tab["lam_min_over_bar"] = lam_tab.lambda_min_C / lam_tab.lam_bar
-                            lam_tab["lam_min_over_eps2_f32"] = lam_tab.lambda_min_C / eps2
+                            lam_tab["lam_min_over_lam_bar"] = lam_tab.lambda_min_C / lam_tab.lam_bar
                     ol = nr[nr.operator == "ortho_linear"]
                     if len(ol):
                         disc = (ol.groupby(["backbone", "scorer"]).n_discordant_pairs.max()
@@ -457,56 +456,138 @@ def main(argv=None):
                                                            "maha_noridge": "noridge_discordant"}))
                         paired = disc.copy()
                         if lam_tab is not None:
-                            paired = paired.join(lam_tab[["lam_bar", "lambda_min_C", "lam_min_over_bar",
-                                                          "lam_min_over_eps2_f32"]], how="left")
-                            paired = paired.rename(columns={
-                                "lam_bar": "lam_bar",
-                                "lambda_min_C": "lambda_min_C",
-                                "lam_min_over_bar": "lam_min_over_lam_bar",
-                                "lam_min_over_eps2_f32": "lam_min_over_eps2_f32",
-                            })
-                            # Sort: exact regime first (high lam_min/eps2), then noise-floor.
-                            paired = paired.sort_values("lam_min_over_eps2_f32", ascending=False)
+                            paired = paired.join(
+                                lam_tab[["lam_bar", "lambda_min_C", "lam_min_over_lam_bar"]], how="left")
+                            paired = paired.sort_values("lam_min_over_lam_bar", ascending=False)
                         L += ["**Theorem 1 on Theorem 1's estimator (`maha_noridge`, eps = 1e-12), "
                               "paired within backbone under ortho_linear.** Pooling max-over-backbone "
                               "reverses the sign: the ridged max discordant (7358) is resnet18; the "
-                              "noridge max (276) is vitb16. Same maps, same backbone:", "",
+                              "noridge max (276) is vitb16. Same maps, same backbone. "
+                              f"ε²_float32 = {num(eps2, 2)} is quoted beside the normalised ratio "
+                              "λ_min(C)/λ̄ (not λ_min/ε², which is not scale-invariant). λ̄ = tr(Σ)/d "
+                              "is a conservative lower bound on the representability floor "
+                              "(sharper form ε²·E‖z‖²/d); using λ̄ makes dinov2/vitb16 look *less* "
+                              "marginal than they are:", "",
                               table(paired, p=3), ""]
-                        # Regime split
-                        if lam_tab is not None and "lam_min_over_eps2_f32" in paired.columns:
-                            exact = paired[paired.noridge_discordant == 0]
-                            noise = paired[paired.noridge_discordant > 0]
-                            L += [f"ε²_float32 = {num(eps2, 2)}. On the three backbones where "
-                                  f"λ_min(C)/λ̄ ≫ ε²_float32 (resnet18, clip, resnet50; "
-                                  f"λ_min/ε² from {num(float(exact.lam_min_over_eps2_f32.min()), 2)} to "
-                                  f"{num(float(exact.lam_min_over_eps2_f32.max()), 2)}), dropping the ridge "
-                                  "takes every clean-affine operator to **0 discordant pairs of 2,000,000** — "
-                                  "Theorem 1 confirmed exactly. On dinov2 and vitb16, λ_min(C) sits within a "
-                                  f"factor of ~2–10 of ε²_float32 (λ_min/ε² = "
-                                  f"{num(float(noise.lam_min_over_eps2_f32.min()), 2)}–"
-                                  f"{num(float(noise.lam_min_over_eps2_f32.max()), 2)}); the variance in that "
-                                  "direction is float32 rounding noise, the unregularised covariance is not a "
-                                  "computable object, and eps = 1e-12 implements a differently-ridged solve "
-                                  "conditioned ~10⁷ worse — noridge is 27–28× *worse* than ridged under "
-                                  "ortho_linear, and the same reversal holds on ortho_scale, general_affine, "
-                                  "and zca. That is those two backbones under every operator, not zca alone. "
-                                  "Do not re-extract in float64: the backbones compute in float32, so float64 "
-                                  "storage would only record float32-precision values and λ_min would not move. "
-                                  "Limitation, with the table as evidence.", "",
+                        # Exact-regime counts over all clean affine on the three computable backbones
+                        computable = ["resnet18_cifar_openood", "clip_vitb16", "resnet50_imagenet"]
+                        noise_bbs = ["dinov2_vitb14", "vitb16_imagenet"]
+                        clean_ops = ["ortho_linear", "ortho_scale", "general_affine", "zca"]
+                        nr_c = nr[(nr.backbone.isin(computable)) & (nr.scorer == "maha_noridge") &
+                                  (nr.operator.isin(clean_ops))]
+                        n_tot = len(nr_c)
+                        n_zero = int((nr_c.n_discordant_pairs == 0).sum())
+                        exc = nr_c[nr_c.n_discordant_pairs > 0]
+                        max_1m = float(nr_c.rank_one_minus_rho.max()) if n_tot else float("nan")
+                        by_op = {op: int((nr_c[nr_c.operator == op].n_discordant_pairs == 0).sum())
+                                 for op in clean_ops}
+                        n_op = {op: int((nr_c.operator == op).sum()) for op in clean_ops}
+                        exc_note = ""
+                        if len(exc):
+                            rhos = sorted(exc.rank_one_minus_rho.tolist(), reverse=True)
+                            exc_note = (f"general_affine {by_op['general_affine']}/{n_op['general_affine']} "
+                                        f"has the {len(exc)} exceptions — both resnet18 / general_affine "
+                                        f"cond_target=10 / texture / seeds 1 and 3, one discordant pair each "
+                                        f"(1−ρ = {num(rhos[0], 2)}"
+                                        + (f" and {num(rhos[1], 2)}" if len(rhos) > 1 else "")
+                                        + "). ")
+                        L += [f"On the three backbones where λ_min(C)/λ̄ ≫ ε²_float32 (resnet18, clip, "
+                              f"resnet50), over all clean-affine readings: **{n_zero}/{n_tot} at exactly 0 "
+                              f"discordant pairs; max 1−ρ = {num(max_1m, 2)} over all {n_tot}.** "
+                              f"ortho_linear {by_op['ortho_linear']}/{n_op['ortho_linear']}, "
+                              f"ortho_scale {by_op['ortho_scale']}/{n_op['ortho_scale']}, "
+                              f"zca {by_op['zca']}/{n_op['zca']} are clean; "
+                              + exc_note +
+                              f"Theorem 1 confirmed to one pair in 2×10⁶ across {n_tot} readings.", ""]
+                        if lam_tab is not None and len(noise_bbs):
+                            noise_ratios = lam_tab.reindex(
+                                [bb for bb in noise_bbs if bb in lam_tab.index])["lam_min_over_lam_bar"]
+                            L += ["On dinov2 and vitb16, λ_min(C)/λ̄ sits at "
+                                  f"{num(float(noise_ratios.min()), 2)}–{num(float(noise_ratios.max()), 2)} "
+                                  f"(against ε²_float32 = {num(eps2, 2)}); the variance in that direction is "
+                                  "float32 rounding noise, the unregularised covariance is not a computable "
+                                  "object, and eps = 1e-12 implements a differently-ridged solve conditioned "
+                                  "~10⁷ worse — noridge is 27–28× *worse* than ridged under ortho_linear, and "
+                                  "the same reversal holds on ortho_scale, general_affine, and zca. That is "
+                                  "those two backbones under every operator, not zca alone. Do not re-extract "
+                                  "in float64: the backbones compute in float32, so float64 storage would only "
+                                  "record float32-precision values and λ_min would not move.", "",
                                   "So the claim is not \"Theorem 1 holds on its estimator.\" **Theorem 1 is "
-                                  "confirmed exactly — 0 discordant pairs of 2,000,000, on every clean affine "
-                                  "operator — on the three backbones where its hypothesis is computable in "
-                                  "float32, and is not testable on the two where λ_min(C) falls to the float32 "
-                                  "noise floor.** The dividing line is λ_min(C)/λ̄ against ε²_float32, and it "
-                                  "separates the five backbones by ten orders of magnitude with nothing in "
-                                  "between. The exact-invariance result that motivates the scorer choice cannot "
-                                  "be realised on DINOv2 or ViT-B/16 embeddings at the precision those "
+                                  f"confirmed to one pair in 2×10⁶ ({n_zero}/{n_tot} exactly 0) on every clean "
+                                  "affine operator on the three backbones where its hypothesis is computable "
+                                  "in float32, and is not testable on the two where λ_min(C) falls to the "
+                                  "float32 noise floor.** The dividing line is λ_min(C)/λ̄ against ε²_float32, "
+                                  "and it separates the five backbones by ten orders of magnitude with nothing "
+                                  "in between. The exact-invariance result that motivates the scorer choice "
+                                  "cannot be realised on DINOv2 or ViT-B/16 embeddings at the precision those "
                                   "embeddings carry. The ridged statement is therefore not a concession: it is "
                                   "the only well-posed claim available on two of five backbones.", ""]
                 else:
                     L += ["`maha_noridge_clean_affine.csv` not yet written — Theorem 1 on the unregularised "
                           "estimator is pending (`diagnose_rank_failures.py`).", ""]
-            missing = [s for s in SCORERS if s not in scorers_present]
+            # --- kde / kde_det rank prediction (stated before the result block reads the CSV) ---
+            L += ["### Prediction: kde vs kde_det under ortho_linear", "",
+                  "Written before the kde/kde_det rank columns are read. kde uses Scott's rule with "
+                  "σ̄_c, the arithmetic mean of per-dimension standard deviations — rotation-dependent "
+                  "(AM of square roots is concave). kde_det uses det(Σ_c)^{1/(2d)}, a geometric mean — "
+                  "rotation-invariant. Under ortho_linear (pure rotation about the origin):", "",
+                  "- **kde** should give ρ < 1 with a discordant count well above cosine/knn10's 0–1.",
+                  "- **kde_det** should give ρ = 1 to float tolerance where kde does not.", "",
+                  "If that separation does not appear, the bandwidth mechanism is not what Q4's "
+                  "kde_det ortho_scale 1.0e-08 vs kde 3.0e-04 was reading, and that needs saying.", ""]
+            # Read kde/kde_det from rank_preservation directly: CIFAR-10's audit CSV never
+            # recorded kde_det under ortho_linear (added later; present for CIFAR-100).
+            ol_rp = rp[(rp.operator == "ortho_linear") &
+                       rp.scorer.isin(["kde", "kde_det", "cosine", "knn10"])]
+            if len(ol_rp):
+                rows_k = []
+                for sc in ["kde", "kde_det", "cosine", "knn10"]:
+                    s = ol_rp[ol_rp.scorer == sc]
+                    if not len(s):
+                        continue
+                    for bb, g in s.groupby("backbone"):
+                        rows_k.append({
+                            "backbone": bb, "scorer": sc, "n": len(g),
+                            "max_1_minus_rho": float(g.rank_one_minus_rho.max()),
+                            "median_1_minus_rho": float(g.rank_one_minus_rho.median()),
+                            "max_n_discordant": int(g.n_discordant_pairs.max()),
+                            "median_n_discordant": float(g.n_discordant_pairs.median()),
+                            "frac_rho_eq_1": float((g.rank_spearman >= 1.0 - RANK_RHO_TOL).mean()),
+                        })
+                kt = pd.DataFrame(rows_k)
+                summ = (kt.groupby("scorer")
+                        .agg(n=("n", "sum"),
+                             max_1_minus_rho=("max_1_minus_rho", "max"),
+                             median_of_bb_max_1m=("max_1_minus_rho", "median"),
+                             max_n_discordant=("max_n_discordant", "max"),
+                             median_of_bb_max_disc=("max_n_discordant", "median"),
+                             mean_frac_rho_eq_1=("frac_rho_eq_1", "mean")))
+                L += ["**Result against that prediction** (from `rank_preservation.csv`, paired within "
+                      "backbone under ortho_linear; CIFAR-10 audit CSV lacks kde_det×ortho_linear):", "",
+                      "Per-backbone max discordant pairs:", "",
+                      table(kt.pivot_table(index="backbone", columns="scorer",
+                                           values="max_n_discordant"), p=4), "",
+                      "Per-backbone max 1−ρ:", "",
+                      table(kt.pivot_table(index="backbone", columns="scorer",
+                                           values="max_1_minus_rho"), p=3), "",
+                      "Summary:", "", table(summ, p=3), ""]
+                if {"kde", "kde_det"}.issubset(summ.index):
+                    kde_disc = int(summ.loc["kde", "max_n_discordant"])
+                    det_disc = int(summ.loc["kde_det", "max_n_discordant"])
+                    cos_disc = int(summ.loc["cosine", "max_n_discordant"]) if "cosine" in summ.index else 0
+                    # Separation: kde well above cosine/knn10; kde_det at float scale (≤ tens of pairs, 1−ρ ≪ 1e-3)
+                    sep = (kde_disc > max(cos_disc, 10)) and (float(summ.loc["kde_det", "max_1_minus_rho"]) < 1e-6
+                                                              and det_disc <= 50)
+                    if sep:
+                        L += [f"Separation holds: kde max discordant = {kde_disc}; kde_det max = {det_disc} "
+                              f"(cosine {cos_disc}). kde reorders under pure rotation; kde_det stays near "
+                              "cosine/knn10 scale. Q4's ortho_scale AUROC gap is reading the bandwidth "
+                              "mechanism.", ""]
+                    else:
+                        L += ["**Separation does not hold as predicted.** The bandwidth mechanism is "
+                              "not what Q4's kde_det ortho_scale 1.0e-08 vs kde 3.0e-04 was reading — "
+                              "unattributed until a discriminating test is run.", ""]
+            missing = [s for s in SCORERS if s not in set(rp.scorer.unique())]
             if missing:
                 L += [f"Scorers not yet in `rank_preservation.csv`: {', '.join(missing)} "
                       "(re-run `compute_rank_preservation.py` with those scorers).", ""]
@@ -761,12 +842,13 @@ def main(argv=None):
                   "\"The bound is loose because λ_min(C) is pessimistic by that much,\" not merely \"the bound is loose.\"", "",
                   "**Two regimes for exact affine rank-invariance (Q1 maha_noridge).** The same λ_min that "
                   "makes Theorem 2 vacuous on dinov2/vitb16 also makes Theorem 1's unregularised estimator "
-                  "uncomputable there: λ_min(C) sits within a factor of ~2–10 of ε²_float32, so the variance "
-                  "in that direction is feature rounding noise. Theorem 1 is confirmed exactly (0 discordant "
-                  "pairs of 2M on every clean affine operator) on resnet18, clip, and resnet50, where "
-                  "λ_min/ε²_float32 is 10⁸–10¹⁰; it is not testable on the two transformer backbones. The "
-                  "ridged (eps = 1e-5) claim is therefore the only well-posed one on all five. Do not "
-                  "re-extract embeddings in float64 — the backbones compute in float32 and λ_min would not move.", ""]
+                  "uncomputable there: λ_min(C)/λ̄ sits at the float32 noise floor (ε²_float32 = 1.4e-14), "
+                  "so the variance in that direction is feature rounding noise. On resnet18, clip, and "
+                  "resnet50, Theorem 1 is confirmed to one pair in 2×10⁶ (268/270 clean-affine readings at "
+                  "exactly 0 discordant; the two exceptions are one pair each). It is not testable on the "
+                  "two transformer backbones. The ridged (eps = 1e-5) claim is therefore the only well-posed "
+                  "one on all five. Do not re-extract embeddings in float64 — the backbones compute in "
+                  "float32 and λ_min would not move.", ""]
             # ‖I−AAᵀ‖₂ = 9 is operator-set, not data: confirm per-operator breakdown
             i2 = t2.groupby("operator").I_minus_AAT_2.agg(["median", "min", "max", "count"])
             L += ["‖I−AAᵀ‖₂ medianed to 9 on every backbone in the table above: that common value is set by "
