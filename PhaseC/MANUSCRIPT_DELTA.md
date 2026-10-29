@@ -1,36 +1,176 @@
-# Manuscript delta — Phase C audit → paper claims
+# Manuscript delta v2 — Phase C → the submitted paper
 
-One row per confirmed result. Current claim → replacement → evidence pointer.
-Numbers as of `81fbf8b` / Follow-up 09–10 corrections; correct any that drift.
+**Supersedes `PhaseC/MANUSCRIPT_DELTA.md` entirely.** That file was built from the Phase C
+audit's own framing and from `paper/sections/*.tex`, which is a different (IEEEtran/JBHI)
+draft. It is wrong in sign on four rows. This file is built by reading the submitted
+manuscript, *"Reading an Unchanged AUROC: Invariance, Insensitivity and Infeasibility in
+Distance-Based Out-of-Distribution Detection"* (Springer style, Theorem 1–2, Lemma 1–2,
+Proposition 1–3, Corollary 1–3; SI Sections S1–S6). Quotes are verbatim with the
+manuscript's own line numbers.
 
-Items 1, 4 and 5 are errors in the paper's own theory-to-practice chain, found by an
-extension commissioned as a robustness check. Item 5 is a finding about a published
-instrument (Check 1) that currently has **no home** in the manuscript's framing —
-flagged here rather than decided.
+**What the paper is.** A methods paper proposing a three-Check auditing workflow, packaged
+as `flatresaudit` v1.0.0 (Zenodo 10.5281/zenodo.23150930), validated on planted ground
+truth and applied to one frozen dermatology backbone.
 
-| # | Current manuscript claim | What the audit says | Evidence |
-|---|---|---|---|
-| 1 | Mahalanobis is exactly rank-invariant under the affine group (Theorem 1), stated of the audited scorer | The audited scorer carries `eps = 1e-5` and is the Theorem 2 object. The exact Theorem 1 claim is available only where `λ_min(C)/λ̄ ≫ ε²_float32` — three of five backbones (resnet18, clip, resnet50): **268/270** clean-affine readings at exactly 0 discordant pairs of 2×10⁶, max 1−ρ = 4.1e-11; the two exceptions are one pair each (resnet18 / general_affine / texture / seeds 1, 3). On dinov2 and vitb16 the unregularised estimator is not a computable object. **Stability claim:** the same two-vs-three split holds on CIFAR-100 (n_c=500, K=100, N unchanged) — dinov2/vitb16 at the floor, the other three three orders clear. The float32-floor regime is a **property of the representation**, not of the sample or the dataset; measure λ_min/λ̄ once per backbone. **Corroboration:** under ortho_linear, `kde_det` is exactly 0 of 2×10⁶ discordant on the three computable backbones and leaves a residual only on dinov2 (18) and vitb16 (10); the discriminating column is max \|h_det/(c·h_det)−1\| (~1e-9 computable vs ~1e-5 floor). Same boundary, different scorer, different mechanism (unstable det vs ill-conditioned solve). Do not report `λ_min/ε²`; keep `λ_min/λ̄` with ε² beside it. | `FINDINGS.md` §Q1 regime table + kde/kde_det bandwidth attribution; §Round two; `maha_noridge_clean_affine.csv`; `kde_sigma_bar.csv` |
-| 2 | The reach ordering across scorers reproduces (PanDerm: maha ≪ knn < kde < cosine) | Mahalanobis least susceptible replicates on **all five** backbones; the full ordering does not — Kendall τ vs PanDerm 0.91, 0.91, 0.33, 0.33, 0.18 (**2 of 5**). RMD is second. Mid-ranks are backbone-dependent. | `FINDINGS.md` §Q2 |
-| 3 | Theorem 2 bounds the ridge-induced deviation | Holds **105/105** and is **vacuous**: pred/obs 1.2e+03 to 7.1e+11, dominated by `λ_min(C)` inflating the bound by ~1/λ_min². It carries the right variable and cannot rank configurations (Spearman of predicted_max with 1−ρ = **−0.148**; measured `actual_refit_observed_max` ranks at **0.849**, n=105 matched Theorem 2 rows). | `FINDINGS.md` §Q3; `bounds_evaluation.csv` |
-| 4 | Lemma 1 (κ-only) applies to the audit's operators | Lemma 1 assumes the map acts about the origin; the audit's maps act about the fit mean. Lemma 1 fails **28.6%**; Lemma 2 holds **105/105** at tightness 0.12–0.23. First numerical demonstration that the centred/linear distinction has teeth. | `FINDINGS.md` §Q3 |
-| 5 | Check 1's `invariant` label identifies invariance | The registered label requires `S ≥ S_high` and is **structurally unreachable** for an exactly (or ridge-near) rank-invariant scorer with wide margins: `S(δ)` bounds arbitrary perturbations of size δ and says nothing about a monotone one. Rank preservation (`ρ = spearman(s, s̃∘T)`) is the correct test. **`invariant_fp` is not a fix** — it drops the reach requirement and is stricter flatness, not invariance. This is a defect in a published instrument that ships as a library. **No manuscript home yet** — framing decision needed (methods erratum vs contribution vs appendix). | `FINDINGS.md` §Q1 (registered / `_fp` / rank-preserving columns); `reach.check1_reading` vs `reach.check1_rank_reading` |
-| 6 | PanDerm's reported reach figures (maha 6.5e-05, cosine 0.0478) | Reproduce exactly against the **5-seed mean** of median-quantile S in `PhaseB/outputs/rq1/rq1_4_susceptibility_observed.csv` (6.47e-05 → 6.5e-5; 0.04782 → 0.0478). Not the median, not the 10-seed table. Estimator was unstated; now named. | `FINDINGS.md` §Q2; `write_findings.panderm_reference` |
-| 7 | KDE is a comparable density scorer | Scott's rule with `σ̄_c` is rotation-dependent; deviation 1.002–1.205 where the det-based form stays near machine eps on computable backbones; deviation predicts violation at ρ ≈ 0.882 (n=15); anisotropy predicts deviation at ρ ≈ 0.95 (n=50). **kde_det** is the fix and is an **addition**, not a replacement. Under ortho_linear (paired within backbone): kde discordant ≫ cosine on every backbone; kde_det is **0, 0, 0** of 2×10⁶ on clip/resnet18/resnet50 and residual **18 / 10** on dinov2 / vitb16 — do not lead with the pooled max of 18. Bandwidth column closes the residual: max \|h_det/(c·h_det)−1\| ~1e-9 vs ~1e-5. Q4's ortho_scale AUROC gap is reading the bandwidth mechanism. | `FINDINGS.md` §Q1 (prediction + result + bandwidth attribution), §Q4; `rank_preservation.csv`; `kde_sigma_bar.csv` |
-| 8 | — (no claim) | **Negative result:** anisotropy does not predict KDE score displacement after correctly attributing each ID point to its argmax class — ρ ≈ −0.09, p ≈ 0.52. Report, do not bury. | `FINDINGS.md` §Q4; `kde_anisotropy_class_join.csv` |
-| 9 | Difficulty correlates with reach | Holds for maha (Spearman −0.892) and rmd (−0.899). kde's −0.23 is sensitive to **2** named below-chance cells (20 of 300 seed-level rows); pooled was −0.087. Report with that caveat. Below-chance cells named and excluded from the correlation. | `FINDINGS.md` §Q2 (difficulty axis) |
+**What the advisor asked for.** Not a robustness check and not error-hunting. Discussion
+l.752–756 names the paper's principal limitation, and that is what "more backbones, more
+datasets" is aimed at. Every row below is scored against that target.
 
-## Standing attribution rule (Phase C)
+---
 
-Every causal claim ships with the test that discriminates it from the nearest rival mechanism, or it ships labelled **unattributed**. If two mechanisms predict the same observable, name both and say which experiment separates them (model: eps sweep vs float64 storage for γ<0 rank failures). "Numerical issue", "arithmetic residual", and "ill-conditioned" are not attributions unless a column shows the alternative was excluded.
+## A. Answers a question the paper explicitly declines to answer
 
-Corollaries: never pool a max over a grouping the claim is about (pair within backbone / operator / seed); a claim of exactness takes a count, never a round word.
+**A1 — Is the reach ordering a property of distance-based detection, or of the
+representation?**
 
-## Not in this delta
+> l.752–756: "The evaluation covers one backbone, one layer, one diagnostic task and four
+> evaluation domain pairs. **Generalization beyond a single encoder is the principal
+> limitation**: every statement is, strictly, about PanDerm ViT-L/16 and these domains, and
+> **whether the ordering of scorers by reach is a property of distance-based detection or
+> of this representation is not claimed either way**."
 
-- ImageNet-200 round three: still blocked (ImageNet-1k absent). Scope notes and imglist SHA-256s prepared; do not substitute another ID set.
-- CIFAR-100 round two (numbers in `FINDINGS.md` §Round two; stability claim promoted into item 1 above):
-  - (i) reach↑ — **holds** for maha on 5/5 under ortho_linear.
-  - (ii) KDE σ̄ deviation↑ — pending `confirm_kde_bandwidth.py --id-set cifar100`.
-  - (iii)/(iv) — **one** failed registered prediction: derivation error (predicted from n_c; pooled estimator depends on N−K with N identical). Rise on 4/5 = between-class variance removed; resnet18 lone ↓ = CIFAR-10-trained distribution shift. Replacement finding is cross-dataset regime stability (item 1).
-- CIFAR-10 n_c=500 subsample (confirmatory; after r50 CIFAR-100 clears): hold K=10, cut N→5000; predict λ_min/λ̄ falls by ~(1−√(d/N))² but regime assignment unchanged. Not a 95-config grid.
+Phase C answers it, and the answer **splits**:
+
+| | result | reading |
+|---|---|---|
+| "Mahalanobis nearly unable to reorder" (l.482, Table 5) | replicates on **5/5** backbones | a property of distance-based detection |
+| the full four-scorer ordering | Kendall τ vs PanDerm 0.91, 0.91, 0.33, 0.33, 0.18 — **2/5** | a property of the representation |
+
+This is the single most valuable result of the extension. It converts "not claimed either
+way" into a measured answer with a boundary. Compare on the paper's four scorers only;
+rmd and kde_det are additions and belong in C/B.
+
+**Text:** rewrite l.752–756 and add the transfer table to Section 6.
+
+## B. Fills a cell the paper marks undetermined
+
+**B1 — KDE.** Table 1 (RQ1 structural classification under T_γ) classifies KDE as
+**"Undetermined / Qualitative group only (Sec. 3.4) / Kernel and bandwidth model"**, and
+l.249 says "KDE remains quantitatively undetermined."
+
+Phase C determines the bandwidth half. SI S3.3 defines
+`h_c = max{σ̄_c · n_c^(−1/(d+4)), 10^−6}` with σ̄_c the **mean per-dimension standard
+deviation** — an arithmetic mean, hence rotation-dependent (AM of square roots is concave).
+Measured: σ̄ deviates by 1.002–1.205 under rotation where the determinant form
+`det(Σ_c)^{1/(2d)}` stays at ~2.9e-05; deviation predicts violation at ρ = 0.882 (n=15);
+anisotropy predicts deviation at ρ = 0.95 (n=50). Under `ortho_linear` (pure rotation),
+per-backbone max discordant pairs of 2×10⁶: kde 1.50e4 / 4.25e4 / 4.04e4 / 983 / 7111,
+kde_det **0 / 0 / 0 / 18 / 10**, with bandwidth relative error ~1e-9–1e-10 on the three
+computable backbones against 2.9e-5 and 9.5e-6 on the two at the float32 floor.
+
+So KDE's group dependence is **not** intrinsic to the kernel — it is Scott's rule's
+estimator. `kde_det` is an addition, not a replacement.
+
+**Text:** Table 1's KDE row gains a determinate statement for the bandwidth; Section 3.4
+gains the AM/GM argument; `kde_det` enters Section 3.6 as a variant.
+
+## C. Adds a precondition to a stated result
+
+**C1 — When is the ε = 0 branch available?** Table 1 gives Mahalanobis admissibility as
+"Exact (ε = 0) / bounded (ε > 0)" under Theorem 1 / Theorem 2, and SI S1.5 states
+Theorem 1 with "**no fixed ridge is added**". The paper is already careful here; what it
+does not state is when ε = 0 is *computable*.
+
+Phase C: with λ_min(C)/λ̄ measured against ε²_float32 = 1.4e-14 —
+
+| backbone | λ_min/λ̄ | ε=0 refit |
+|---|---|---|
+| resnet50, resnet18, clip | 3.0e-03, 2.6e-03, 4.1e-04 | 268/270 clean-affine readings at exactly **0** discordant of 2×10⁶ (two exceptions, one pair each); max 1−ρ = 4.1e-11 |
+| dinov2, vitb16 | 3.0e-14, 1.2e-13 | **not a computable object** — the variance in that direction is float32 rounding noise; ε = 1e-12 is 27–28× *worse* than ε = 1e-5 |
+
+Two independent probes place the same boundary: the unregularised Mahalanobis solve, and
+kde_det's determinant (B1). The regime is **stable across datasets** — CIFAR-10 and
+CIFAR-100 put the same two backbones at the floor despite a tenfold change in both n_c and
+class count — so it is a property of the representation, measured once per backbone.
+
+**Text:** a precondition column or footnote on Table 1's Mahalanobis row.
+
+**C2 — Theorem 2 is sound and uninformative.** Table 1's "Bound requires: per-point y
+(Thm 2)". Phase C: holds 105/105; pred/obs 1.2e+03 to 7.1e+11; the pessimism is λ_min(C),
+which inflates by ~1/λ_min². It cannot rank configurations (Spearman with 1−ρ = −0.148)
+where the measured violation ranks them at 0.849.
+
+**Text:** one sentence in Section 3.4 or Table 1's note.
+
+## D. Confirms stated limitations on real backbones
+
+**D1 — The in-group / low-reach case.** The paper states this four times and quantifies it:
+
+> Algorithm 1, l.7: "INSENSITIVE (LOW OBSERVED REACH); **if δ_max ≈ 0, consult the
+> analytical transformation group (Section 3)**"
+> §4 l.348–350: "When scores barely change, **only a structural argument can distinguish
+> mathematical invariance from insensitivity**."
+> §4.1 l.384–386: "*structurally invariant* is reserved for a conclusion that follows from
+> the results of Section 3."
+> E1 l.426–428: "One case is out of reach of any score-based quantity: in-group flat
+> responses whose scores the group transformation leaves unchanged have negligible reach
+> and look like insensitivity."
+> SI S4.2: "242 of 480 in-group flat responses had negligible reach and were read
+> insensitive… **The protocol's stated limitation appeared as stated**."
+
+Phase C reproduces it on five real backbones: Mahalanobis δ_med = 2.54 with S = 7.45e-05
+and frac_invariant 0, against knn10 δ_med = 7.29 with S = 0.999. Confirmation, not a defect.
+
+**D2 — Threshold transfer.** l.757–761: thresholds "are conventions fixed before execution
+rather than derived", softened by stability "across an order of magnitude in τ and S_high,
+with F0 the one threshold that must stay small." Conclusion l.804–805 asks for "validation
+of the audit thresholds in each new setting." Phase C's 20-cell τ×S_high grid on five
+backbones is exactly that evidence.
+
+**D3 — Checks 2 and 3 transfer.** Check 2: k=10 floor 2.8e-07 against Holm's first
+threshold 2.8e-04 over 180 tests, reachable, smallest k = 7. Check 3: w_construction
+0.41–0.91, w_learned 0.057–0.25.
+
+## E. Removes the scope limitation
+
+> Abstract l.20: "**Findings concern one backbone**; pretraining overlap remains unverified,
+> and no unique geometric mechanism or clinical safety claim is established."
+> Conclusion l.804–805: "The empirical findings concern **one frozen backbone**…"
+
+Five backbones (ResNet-18, ResNet-50, ViT-B/16, DINOv2 ViT-B/14, CLIP ViT-B/16), two ID
+sets (CIFAR-10, CIFAR-100), six OOD rungs, 95 configurations per backbone. ImageNet-200 is
+blocked and is not claimed.
+
+**Text:** abstract l.20, discussion l.752–756, conclusion l.804–805. Keep the pretraining-
+overlap and clinical-safety clauses — Phase C does not touch either.
+
+## F. Corrections to Phase C, not to the paper
+
+**F1 — Phase C invented an `invariant` label.** Algorithm 1 has no such branch: its labels
+are RESPONSIVE / INSENSITIVE (LOW OBSERVED REACH) / EMPIRICALLY PROTECTED AT TESTED DOSE /
+SUSCEPTIBLE, with structural invariance routed to Section 3. `reach.check1_reading`'s
+`invariant` label, and the `invariant_fp` and rank-preserving columns built to repair it,
+are audit-side artefacts. Keep `check1_rank_reading` as a **tool** — rank preservation is
+the right direct test when you want one — but it does not correct the paper, and nothing
+in F goes into the manuscript.
+
+**F2 — The audit's "Lemma 1 / Lemma 2" is the audit's own naming.** SI p.3: "Two results
+are stated only here: **Lemma 1 (the bound for a purely linear map, which does not apply to
+the implemented cosine scorer)** and Proposition 2." The paper already excludes it. Phase
+C's 28.6% failure rate of the κ-only form is a *numerical confirmation* of a stated
+exclusion — reportable, but as support, not as a correction.
+
+## G. Negatives and caveats to report
+
+**G1** Anisotropy does **not** predict KDE score displacement after attributing each ID
+point to its argmax class: ρ = −0.09, p = 0.52.
+**G2** kde's difficulty–reach correlation is −0.23, sensitive to 2 below-chance cells
+(20 of 300 seed rows); pooled it is −0.087. Maha −0.892 and rmd −0.899 are stable.
+**G3** Round-two prediction (iv) — λ_min/λ̄ falls at n_c = 500 — **failed**, by a derivation
+error: `scatter/(N−K)` is pooled and N = 50 000 on both datasets, so n_c never enters the
+estimator. (iii) failed as a consequence of (iv). Record as one failed registered
+prediction with a diagnosed cause.
+**G4** PanDerm's published figures reproduce exactly against the **5-seed mean**
+(6.47e-05 → 6.5e-5; 0.04782 → 0.0478). The estimator was unstated; name it.
+
+---
+
+## What this changes in the plan
+
+The deliverable is **one transfer section plus three text edits** (abstract l.20,
+discussion l.752–756, conclusion l.804–805), not nine rows of claim surgery. No claim of
+the paper's is broken. Rows A1, B1 and C1 are new contributions; D is confirmation; E is
+the advisor's actual request; F never reaches the manuscript.
+
+Nothing above depends on the two jobs still running. (ii) and the r50 tail land in B1 and
+E respectively.
