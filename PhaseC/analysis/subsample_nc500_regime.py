@@ -46,8 +46,13 @@ BACKBONES = (
     "resnet18_cifar_openood", "resnet50_imagenet", "vitb16_imagenet",
     "clip_vitb16", "dinov2_vitb14",
 )
-# one seed per clean operator (tight confirmatory scope)
-SEEDS_ONE = {op: (OPERATOR_SEEDS[op][0],) for op in CLEAN}
+# one seed per clean operator (tight confirmatory scope).
+# zca is deterministic — seed list lives under OPERATOR_SEEDS["deterministic"].
+SEEDS_ONE = {
+    op: ((OPERATOR_SEEDS[op][0],) if op in OPERATOR_SEEDS
+         else (OPERATOR_SEEDS["deterministic"][0],))
+    for op in CLEAN
+}
 
 
 def subsample_train(Ztr, ytr, n_c, rng):
