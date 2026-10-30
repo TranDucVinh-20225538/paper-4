@@ -1215,8 +1215,8 @@ def round_two_cifar100(a_all: pd.DataFrame, b, out: Path) -> list[str]:
     else:
         L += ["**(ii) KDE bandwidth — pending.** No `kde_sigma_bar.csv`.", ""]
 
-    L += ["Round-two adapter seed coverage may still be completing on individual backbones; "
-          "affine operators (including ortho_linear used above) are the basis for (i)–(iv).", ""]
+    L += ["Affine operators (including ortho_linear used above) are the basis for (i)–(iv); "
+          "all five backbones are at 95/95 configurations on CIFAR-100.", ""]
     return L
 
 

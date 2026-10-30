@@ -590,9 +590,19 @@ Two ID sets with a tenfold difference in per-class count and a tenfold differenc
 
 Where λ_min rose, the bound tightened, as expected from the 1/λ_min² factor.
 
-**(ii) KDE bandwidth — pending.** `kde_sigma_bar.csv` lacks CIFAR-100 rows; run `confirm_kde_bandwidth.py --id-set cifar100`. Prediction stands written above; numbers will fill this cell.
+**Prediction (ii) — KDE σ̄ deviation rises.** Mean |log(σ̄_after/(c·σ̄_before))| under ortho_linear rises on **3/5** backbones (Scott factor n_c^(−1/(d+4)) is larger at n_c=500; noisier per-axis stds also inflate the rotation-dependent AM):
 
-Round-two adapter seed coverage may still be completing on individual backbones; affine operators (including ortho_linear used above) are the basis for (i)–(iv).
+| backbone | n_c_c10 | n_c_c100 | mean_|log σ̄|_c10 | mean_|log σ̄|_c100 | dev_sign | mean_|log det|_c100 |
+|---|---|---|---|---|---|---|
+| clip_vitb16 | 5000 | 500 | 0.0488 | 0.0483 | ↓ | 0.00263 |
+| dinov2_vitb14 | 5000 | 500 | 0.00248 | 0.00317 | ↑ | 0.00436 |
+| resnet18_cifar_openood | 5000 | 500 | 0.152 | 0.0466 | ↓ | 0.00332 |
+| resnet50_imagenet | 5000 | 500 | 0.0975 | 0.108 | ↑ | 0.159 |
+| vitb16_imagenet | 5000 | 500 | 0.0144 | 0.022 | ↑ | 0.0163 |
+
+Prediction (ii) fails on some backbones — see sign column. If the bandwidth mechanism is not driving the AUROC gap, say so.
+
+Affine operators (including ortho_linear used above) are the basis for (i)–(iv); all five backbones are at 95/95 configurations on CIFAR-100.
 
 ## Provenance
 
