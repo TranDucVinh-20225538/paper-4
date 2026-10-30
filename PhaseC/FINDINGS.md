@@ -604,6 +604,22 @@ Prediction (ii) fails on some backbones — see sign column. If the bandwidth me
 
 Affine operators (including ortho_linear used above) are the basis for (i)–(iv); all five backbones are at 95/95 configurations on CIFAR-100.
 
+## Confirmatory: CIFAR-10 n_c = 500 subsample (genuine N cut)
+
+Registered before the run (Follow-up 11), contradicting the mis-derived CIFAR-100 (iv): hold K = 10, subsample train to n_c = 500 so N = 5000 — a real tenfold cut to the pooled estimator's sample size. Predictions: (1) λ_min/λ̄ falls on all five by a bounded factor of order 1/(1−√(d/N))² (~2× / 2.7× / 7.7× for d = 512 / 768 / 2048); (2) regime assignment does not change. Marchenko–Pastur is order-of-magnitude only.
+
+| backbone | ratio_full | ratio_n_c500 | fall_obs | MP_fall ≈1/(1−√(d/N))² | regime |
+|---|---:|---:|---:|---:|---|
+| clip_vitb16 | 4.13e-04 | 3.53e-04 | 1.17× | 2.16× | computable → computable |
+| dinov2_vitb14 | 3.09e-14 | 2.23e-14 | 1.39× | 2.70× | floor → floor |
+| resnet18_cifar_openood | 2.56e-03 | 2.32e-03 | 1.10× | 2.16× | computable → computable |
+| resnet50_imagenet | 2.96e-03 | 1.73e-03 | 1.71× | 7.72× | computable → computable |
+| vitb16_imagenet | 1.19e-13 | 1.03e-13 | 1.16× | 2.70× | floor → floor |
+
+**(1) holds** — falls on 5/5. Observed fall (1.10–1.71×) is milder than the MP order-of-magnitude (2–8×); features do not show heavier spectral tails than the law assumes. **(2) holds** — regime assignment unchanged; a factor &lt;2× cannot cross the ten-order gap. maha_noridge under clean affine (one seed): clip / resnet18 / resnet50 stay at 0 discordant; dinov2 / vitb16 retain residuals (max 1348 / 1168 on zca) — same boundary.
+
+Evidence: `nc500_lam_min_ratio.csv`, `nc500_maha_noridge_rank.csv`, `notes/nc500_regime.md`.
+
 ## Provenance
 
 Checkpoint and data hashes, seeds, package versions and GPU are in `PhaseC/outputs/manifest.json` (`write_manifest.py`). Seeds: adapters 42..132 (10), operators per `run_audit.OPERATOR_SEEDS`, pairs 2e6 with PAIR_SEED. The ten adapter seeds are replicates of one training recipe on one backbone, not independent datasets: claims about a backbone rest on seed variation, claims across backbones on five backbones.

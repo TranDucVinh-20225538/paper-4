@@ -158,25 +158,30 @@ def write_note(lam_df, disc_df, path: Path):
     sub = lam_df[lam_df.setting.str.startswith("n_c")].set_index("backbone")
     full = lam_df[lam_df.setting == "full"].set_index("backbone")
     lines += [
-        "| backbone | ratio_full | ratio_n_c500 | fall_obs | MP_pred (1−√(d/N))² | regime_full | regime_500 |",
+        "| backbone | ratio_full | ratio_n_c500 | fall_obs | MP_fall ≈1/(1−√(d/N))² | regime_full | regime_500 |",
         "|---|---:|---:|---:|---:|---|---|",
     ]
     for bb in sorted(full.index):
         rf = float(full.loc[bb, "lam_min_over_lam_bar"])
         rs = float(sub.loc[bb, "lam_min_over_lam_bar"])
         fall = rf / rs
-        mp = float(sub.loc[bb, "mp_factor_pred"]) if "mp_factor_pred" in sub.columns else float("nan")
-        # mp_factor may only be on sub rows from construction
-        mp = mp_factor(int(sub.loc[bb, "dim"]), int(sub.loc[bb, "n_train"]))
+        # (1−√(d/N))² is the MP edge multiplier on λ_min; expected fall factor is its reciprocal.
+        mp_mult = mp_factor(int(sub.loc[bb, "dim"]), int(sub.loc[bb, "n_train"]))
+        mp_fall = (1.0 / mp_mult) if mp_mult and mp_mult > 0 else float("nan")
         reg_f = "floor" if rf < EPS2_F32 * 100 else "computable"
         reg_s = "floor" if rs < EPS2_F32 * 100 else "computable"
         lines.append(
-            f"| {bb} | {rf:.3e} | {rs:.3e} | {fall:.2f}× | {mp:.2f}× | {reg_f} | {reg_s} |"
+            f"| {bb} | {rf:.3e} | {rs:.3e} | {fall:.2f}× | {mp_fall:.2f}× | {reg_f} | {reg_s} |"
         )
     lines += ["", "## maha_noridge discordant (clean affine, one seed)", ""]
     g = (disc_df.groupby(["backbone", "operator"])
          .n_discordant_pairs.max().unstack(fill_value=-1))
-    lines.append(g.to_markdown())
+    # Avoid pandas.to_markdown (needs optional tabulate).
+    cols = ["backbone"] + list(g.columns)
+    lines += ["| " + " | ".join(str(c) for c in cols) + " |",
+              "|" + "|".join("---" for _ in cols) + "|"]
+    for bb, row in g.iterrows():
+        lines.append("| " + " | ".join([str(bb)] + [str(int(row[c])) for c in g.columns]) + " |")
     lines += ["", f"ε²_float32 = {EPS2_F32:.2e}.", ""]
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text("\n".join(lines) + "\n")
